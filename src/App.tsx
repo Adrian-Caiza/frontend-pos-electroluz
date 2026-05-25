@@ -8,6 +8,7 @@ import InventarioPage from './app/inventario/page';
 import UsuariosPage from './app/usuarios/page';
 import UnauthorizedPage from './app/unauthorized/page';
 import { AuthGuard } from './shared/components/layout/AuthGuard';
+import { GuestGuard } from './shared/components/layout/GuestGuard';
 import { RoleGuard } from './shared/components/layout/RoleGuard';
 import { MainLayout } from './shared/components/layout/MainLayout';
 
@@ -17,7 +18,14 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
-          <Route path="/auth/login" element={<LoginPage />} />
+          <Route
+            path="/auth/login"
+            element={
+              <GuestGuard>
+                <LoginPage />
+              </GuestGuard>
+            }
+          />
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Protected Routes */}

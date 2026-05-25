@@ -23,11 +23,24 @@ import {
 import { cn } from '../../lib/utils';
 
 export const MainLayout = () => {
-  const { user, company, logout } = useAuthStore();
+  const { user, company, refreshToken, logout } = useAuthStore();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    // 1. Instanciar dependencias (Idealmente esto vendría de un contenedor DI o un hook)
+    const { AuthRepository } = await import('../../../modules/auth/infrastructure/repositories/AuthRepository');
+    const { LogoutUseCase } = await import('../../../modules/auth/application/use-cases/LogoutUseCase');
+    
+    const repository = new AuthRepository();
+    const useCase = new LogoutUseCase(repository);
+
+    // 2. Ejecutar caso de uso (API call)
+    if (refreshToken) {
+      await useCase.execute(refreshToken);
+    }
+
+    // 3. Limpiar estado local y redirigir
     logout();
     navigate('/auth/login');
   };

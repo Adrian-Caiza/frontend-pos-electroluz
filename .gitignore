@@ -14,6 +14,7 @@ dist-ssr
 
 #ignorar carpetas de endpoints locales
 .endpoints
+.env.local
 
 # Editor directories and files
 .vscode/*

@@ -10,8 +10,7 @@ export class AuthRepository implements IAuthRepository {
     return authApi.login(credentials);
   }
 
-  async logout(): Promise<void> {
-    // Call logout endpoint if exists, else just clear client state
-    // await apiClient.post('/auth/logout');
+  async logout(refreshToken: string): Promise<void> {
+    await authApi.logout(refreshToken);
   }
 }
