@@ -1,7 +1,10 @@
 import type { IAuthRepository } from '../../domain/repositories/IAuthRepository';
 
 export class LogoutUseCase {
-  constructor(private authRepository: IAuthRepository) {}
+  private authRepository: IAuthRepository;
+  constructor(authRepository: IAuthRepository) {
+    this.authRepository = authRepository;
+  }
 
   async execute(refreshToken: string): Promise<void> {
     if (!refreshToken) return;

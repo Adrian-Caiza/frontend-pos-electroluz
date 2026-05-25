@@ -2,7 +2,10 @@ import type { ICheckoutRepository } from '../../domain/repositories/ICheckoutRep
 import type { Checkout, UpdateCheckoutStatusDto } from '../../domain/entities/Checkout';
 
 export class UpdateCheckoutStatusUseCase {
-  constructor(private checkoutRepository: ICheckoutRepository) {}
+  private checkoutRepository: ICheckoutRepository;
+  constructor(checkoutRepository: ICheckoutRepository) {
+    this.checkoutRepository = checkoutRepository;
+  }
 
   execute(id: string, data: UpdateCheckoutStatusDto): Promise<Checkout> {
     return this.checkoutRepository.updateCheckoutStatus(id, data);

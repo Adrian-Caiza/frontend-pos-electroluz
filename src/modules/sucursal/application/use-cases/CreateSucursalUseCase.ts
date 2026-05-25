@@ -2,7 +2,10 @@ import type { ISucursalRepository } from '../../domain/repositories/ISucursalRep
 import type { Sucursal, CreateSucursalDto } from '../../domain/entities/Sucursal';
 
 export class CreateSucursalUseCase {
-  constructor(private sucursalRepository: ISucursalRepository) {}
+  private sucursalRepository: ISucursalRepository;
+  constructor(sucursalRepository: ISucursalRepository) {
+    this.sucursalRepository = sucursalRepository;
+  }
 
   execute(data: CreateSucursalDto): Promise<Sucursal> {
     return this.sucursalRepository.createSucursal(data);

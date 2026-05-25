@@ -2,7 +2,10 @@ import type { ICheckoutRepository } from '../../domain/repositories/ICheckoutRep
 import type { PaginatedCheckouts } from '../../domain/entities/Checkout';
 
 export class GetCheckoutsUseCase {
-  constructor(private checkoutRepository: ICheckoutRepository) {}
+  private checkoutRepository: ICheckoutRepository;
+  constructor(checkoutRepository: ICheckoutRepository) {
+    this.checkoutRepository = checkoutRepository;
+  }
 
   execute(page: number, pageSize: number): Promise<PaginatedCheckouts> {
     return this.checkoutRepository.getCheckouts(page, pageSize);

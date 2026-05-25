@@ -2,7 +2,10 @@ import type { ISucursalRepository } from '../../domain/repositories/ISucursalRep
 import type { PaginatedSucursales } from '../../domain/entities/Sucursal';
 
 export class GetSucursalesUseCase {
-  constructor(private sucursalRepository: ISucursalRepository) {}
+  private sucursalRepository: ISucursalRepository;
+  constructor(sucursalRepository: ISucursalRepository) {
+    this.sucursalRepository = sucursalRepository;
+  }
 
   execute(page: number, pageSize: number): Promise<PaginatedSucursales> {
     return this.sucursalRepository.getSucursales(page, pageSize);
