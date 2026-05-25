@@ -1,16 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'sonner';
+import { AuthLayout } from './shared/components/layout/AuthLayout';
+import { MainLayout } from './shared/components/layout/MainLayout';
+import { AuthGuard } from './shared/components/layout/AuthGuard';
+import { GuestGuard } from './shared/components/layout/GuestGuard';
+import { RoleGuard } from './shared/components/layout/RoleGuard';
 import LoginPage from './app/auth/login/page';
 import DashboardPage from './app/dashboard/page';
 import CajaPage from './app/caja/page';
+import SucursalesPage from './app/sucursales/page';
 import ProductosPage from './app/productos/page';
 import InventarioPage from './app/inventario/page';
 import UsuariosPage from './app/usuarios/page';
 import UnauthorizedPage from './app/unauthorized/page';
-import { AuthGuard } from './shared/components/layout/AuthGuard';
-import { GuestGuard } from './shared/components/layout/GuestGuard';
-import { RoleGuard } from './shared/components/layout/RoleGuard';
-import { MainLayout } from './shared/components/layout/MainLayout';
 
 function App() {
   return (
@@ -18,26 +20,15 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
-          <Route
-            path="/auth/login"
-            element={
-              <GuestGuard>
-                <LoginPage />
-              </GuestGuard>
-            }
-          />
+          <Route element={<GuestGuard><AuthLayout /></GuestGuard>}>
+            <Route path="/auth/login" element={<LoginPage />} />
+          </Route>
+          
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Protected Routes */}
-          <Route
-            path="/"
-            element={
-              <AuthGuard>
-                <MainLayout />
-              </AuthGuard>
-            }
-          >
-            <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route element={<AuthGuard><MainLayout /></AuthGuard>}>
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
             
             {/* Dashboard for 'jefe' */}
             <Route
@@ -45,6 +36,16 @@ function App() {
               element={
                 <RoleGuard allowedRoles={['jefe']}>
                   <DashboardPage />
+                </RoleGuard>
+              }
+            />
+
+            {/* Sucursales for 'jefe' */}
+            <Route
+              path="sucursales"
+              element={
+                <RoleGuard allowedRoles={['jefe']}>
+                  <SucursalesPage />
                 </RoleGuard>
               }
             />

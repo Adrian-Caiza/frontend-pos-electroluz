@@ -18,7 +18,8 @@ import {
   Users,
   Settings,
   PackageSearch,
-  ShoppingCart
+  ShoppingCart,
+  Building2
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -47,6 +48,7 @@ export const MainLayout = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
+    { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
     { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
     { name: 'Productos', path: '/productos', icon: PackageSearch, roles: ['jefe'] },
     { name: 'Inventario', path: '/inventario', icon: Store, roles: ['jefe'] },
