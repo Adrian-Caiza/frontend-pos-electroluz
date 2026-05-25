@@ -30,9 +30,15 @@ export const useLoginForm = () => {
   const mutation = useMutation({
     mutationFn: (data: LoginFormData) => loginUseCase.execute(data),
     onSuccess: (data) => {
-      setAuth(data.user, data.tokens);
+      setAuth(data.user, data.company, data.accessToken, data.refreshToken);
       toast.success('Inicio de sesión exitoso');
-      navigate('/dashboard'); // Ajustar ruta según corresponda
+      
+      // Role-based redirection
+      if (data.user.usrol === 'cajero') {
+        navigate('/caja');
+      } else {
+        navigate('/dashboard');
+      }
     },
     onError: (error: any) => {
       // Manejar error 401, 422, 500, etc.
