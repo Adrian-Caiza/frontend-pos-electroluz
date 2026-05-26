@@ -16,11 +16,10 @@ export const AuthLayout = () => {
 
         <div className="relative z-10 max-w-lg mb-12">
           <h1 className="text-5xl font-extrabold text-white leading-tight mb-6">
-            Your Trusted<br />Partner in Business.
+            FERRECONST<br />ELECTRO K&B
           </h1>
           <p className="text-lg text-white/90 leading-relaxed font-medium">
-            At Electroluz, we ensure fast and reliable management services,
-            tailored to meet your needs with efficiency and care.
+            Somos distribuidores de insumos ferreteros, electrico y construccion.
           </p>
         </div>
         
