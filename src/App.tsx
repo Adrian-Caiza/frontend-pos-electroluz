@@ -10,7 +10,6 @@ import DashboardPage from './app/dashboard/page';
 import CajaPage from './app/caja/page';
 import SucursalesPage from './app/sucursales/page';
 import ProductosPage from './app/productos/page';
-import InventarioPage from './app/inventario/page';
 import UsuariosPage from './app/usuarios/page';
 import UnauthorizedPage from './app/unauthorized/page';
 
@@ -70,15 +69,7 @@ function App() {
               }
             />
 
-            {/* Inventario for 'jefe' */}
-            <Route
-              path="inventario"
-              element={
-                <RoleGuard allowedRoles={['jefe']}>
-                  <InventarioPage />
-                </RoleGuard>
-              }
-            />
+
 
             {/* Usuarios for 'jefe' */}
             <Route

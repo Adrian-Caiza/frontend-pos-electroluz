@@ -46,12 +46,40 @@ export const MainLayout = () => {
     navigate('/auth/login');
   };
 
+  const getImageUrl = (rawPath: string | null | undefined) => {
+    if (!rawPath || rawPath === 'null' || rawPath === 'undefined' || rawPath.trim() === '') return null;
+    
+    const imagePath = rawPath.replace(/\\/g, '/');
+    if (imagePath.startsWith('blob:')) return imagePath;
+
+    if (imagePath.startsWith('http')) {
+      try {
+        const url = new URL(imagePath);
+        const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+        const isApiHost = import.meta.env.VITE_API_URL && url.hostname === new URL(import.meta.env.VITE_API_URL).hostname;
+        const isKnownIP = url.hostname === '163.245.192.54';
+        
+        if (isLocalhost || isApiHost || isKnownIP) {
+          return `/api-proxy${url.pathname}`;
+        }
+        return imagePath;
+      } catch (e) {
+        return imagePath;
+      }
+    }
+    
+    const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `/api-proxy${path}`;
+  };
+
+  const userImage = getImageUrl(user?.usimagen as string | undefined);
+
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
     { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
     { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
     { name: 'Productos', path: '/productos', icon: PackageSearch, roles: ['jefe'] },
-    { name: 'Inventario', path: '/inventario', icon: Store, roles: ['jefe'] },
+
     { name: 'Usuarios', path: '/usuarios', icon: Users, roles: ['jefe'] },
   ];
 
@@ -111,8 +139,12 @@ export const MainLayout = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-8 flex items-center space-x-2 pl-2">
-                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                    <UserIcon className="w-4 h-4 text-indigo-600" />
+                  <div className="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center overflow-hidden border border-indigo-200">
+                    {userImage ? (
+                      <img src={userImage} alt={user?.usnombre || 'User'} className="w-full h-full object-cover" />
+                    ) : (
+                      <UserIcon className="w-4 h-4 text-indigo-600" />
+                    )}
                   </div>
                   <span className="text-sm font-medium hidden sm:block">
                     {user?.usapodo || 'Usuario'}
