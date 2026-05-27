@@ -112,7 +112,9 @@ export const ProductoTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.items.map((producto) => (
+            {data.items
+              .filter((producto) => producto.prdtoestado !== 'eliminado')
+              .map((producto) => (
               <TableRow key={producto.prdtoid}>
                 <TableCell>
                   <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 relative">
