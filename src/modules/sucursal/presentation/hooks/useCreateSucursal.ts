@@ -11,7 +11,18 @@ export const useCreateSucursal = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: CreateSucursalDto) => createSucursalUseCase.execute(data),
+    mutationFn: async (data: CreateSucursalDto) => {
+      const created = await createSucursalUseCase.execute(data);
+      // Workaround: Backend ignores sudireccion and sucorreo on POST /branches.
+      // We manually trigger a PATCH immediately after creation to save them.
+      if (data.sudireccion || data.sucorreo) {
+        await sucursalRepository.updateSucursal(created.suid, {
+          sudireccion: data.sudireccion,
+          sucorreo: data.sucorreo
+        });
+      }
+      return created;
+    },
     onSuccess: () => {
       toast.success('Sucursal creada exitosamente');
       queryClient.invalidateQueries({ queryKey: ['sucursales'] });

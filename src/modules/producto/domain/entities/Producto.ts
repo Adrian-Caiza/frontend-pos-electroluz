@@ -22,6 +22,7 @@ export interface Producto {
 }
 
 export interface CreateProductoDto {
+  prdtoemid: string;
   prdtoctgriaid: string;
   prdtomrcid: string;
   prdtoprovid: string;

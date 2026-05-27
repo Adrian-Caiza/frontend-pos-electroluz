@@ -58,9 +58,9 @@ interface EditProductoModalProps {
 export const EditProductoModal = ({ producto, open, onOpenChange }: EditProductoModalProps) => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  
+
   const updateMutation = useUpdateProducto();
-  
+
   const { data: categoriasData, isLoading: loadingCat } = useCategorias(1, 100);
   const { data: marcasData, isLoading: loadingMarcas } = useMarcas(1, 100);
   const { data: proveedoresData, isLoading: loadingProv } = useProveedores(1, 100);
@@ -101,6 +101,32 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
     }
   };
 
+  const getImageUrl = (rawPath: string | null) => {
+    if (!rawPath || rawPath === 'null' || rawPath === 'undefined' || rawPath.trim() === '') return null;
+    
+    const imagePath = rawPath.replace(/\\/g, '/');
+    if (imagePath.startsWith('blob:')) return imagePath;
+
+    if (imagePath.startsWith('http')) {
+      try {
+        const url = new URL(imagePath);
+        const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+        const isApiHost = import.meta.env.VITE_API_URL && url.hostname === new URL(import.meta.env.VITE_API_URL).hostname;
+        const isKnownIP = url.hostname === '163.245.192.54';
+        
+        if (isLocalhost || isApiHost || isKnownIP) {
+          return `/api-proxy${url.pathname}`;
+        }
+        return imagePath;
+      } catch (e) {
+        return imagePath;
+      }
+    }
+    
+    const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `/api-proxy${path}`;
+  };
+
   const onSubmit = (values: FormValues) => {
     if (!producto) return;
     updateMutation.mutate({
@@ -124,7 +150,7 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Relaciones */}
               <FormField
@@ -235,7 +261,7 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="prdtonombre"
@@ -331,13 +357,13 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
                   </FormItem>
                 )}
               />
-              
+
               <div>
                 <FormLabel className="block mb-2">Imagen (Opcional)</FormLabel>
                 <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors">
+                  <div className="relative w-16 h-16 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors shrink-0">
                     {imagePreview ? (
-                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <img src={getImageUrl(imagePreview)!} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
                       <Upload className="w-6 h-6 text-slate-400" />
                     )}
@@ -348,8 +374,25 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
                   </div>
-                  <div className="text-xs text-slate-500">
-                    <p>Click para cambiar foto</p>
+                  <div className="text-xs text-slate-500 flex flex-col justify-center items-start">
+                    {imagePreview ? (
+                      <Button 
+                        type="button" 
+                        variant="destructive" 
+                        size="sm" 
+                        className="h-6 px-2 text-[10px]" 
+                        onClick={() => {
+                          setImageFile(null);
+                          setImagePreview(null);
+                          const fileInputs = document.querySelectorAll('input[type="file"]');
+                          fileInputs.forEach(input => { (input as HTMLInputElement).value = ''; });
+                        }}
+                      >
+                        Quitar imagen
+                      </Button>
+                    ) : (
+                      <p>Click para cambiar foto</p>
+                    )}
                   </div>
                 </div>
               </div>

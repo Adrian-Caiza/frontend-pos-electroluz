@@ -25,7 +25,7 @@ import { EditProductoModal } from './EditProductoModal';
 export const ProductoTable = () => {
   const [page, setPage] = useState(1);
   const pageSize = 10;
-  
+
   const { data, isLoading } = useProductos(page, pageSize);
   const updateMutation = useUpdateProducto();
   const { user } = useAuthStore();
@@ -52,6 +52,32 @@ export const ProductoTable = () => {
       id: producto.prdtoid,
       data: { prdtoestado: newStatus }
     });
+  };
+
+  const getImageUrl = (rawPath: string | null) => {
+    if (!rawPath || rawPath === 'null' || rawPath === 'undefined' || rawPath.trim() === '') return null;
+    
+    const imagePath = rawPath.replace(/\\/g, '/');
+    if (imagePath.startsWith('blob:')) return imagePath;
+
+    if (imagePath.startsWith('http')) {
+      try {
+        const url = new URL(imagePath);
+        const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
+        const isApiHost = import.meta.env.VITE_API_URL && url.hostname === new URL(import.meta.env.VITE_API_URL).hostname;
+        const isKnownIP = url.hostname === '163.245.192.54';
+        
+        if (isLocalhost || isApiHost || isKnownIP) {
+          return `/api-proxy${url.pathname}`;
+        }
+        return imagePath;
+      } catch (e) {
+        return imagePath;
+      }
+    }
+    
+    const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
+    return `/api-proxy${path}`;
   };
 
   if (isLoading) {
@@ -89,12 +115,26 @@ export const ProductoTable = () => {
             {data.items.map((producto) => (
               <TableRow key={producto.prdtoid}>
                 <TableCell>
-                  <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 relative">
                     {producto.prdtoimagen ? (
-                      <img src={producto.prdtoimagen} alt={producto.prdtonombre} className="w-full h-full object-cover" />
-                    ) : (
+                      <img
+                        src={getImageUrl(producto.prdtoimagen)!}
+                        alt={producto.prdtonombre}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          if (e.currentTarget.nextElementSibling) {
+                            (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
+                          }
+                        }}
+                      />
+                    ) : null}
+                    <div
+                      className="absolute inset-0 flex items-center justify-center bg-slate-100"
+                      style={{ display: producto.prdtoimagen ? 'none' : 'flex' }}
+                    >
                       <ImageOff className="w-5 h-5 text-slate-400" />
-                    )}
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -177,10 +217,10 @@ export const ProductoTable = () => {
         </div>
       )}
 
-      <EditProductoModal 
-        producto={selectedProducto} 
-        open={isEditOpen} 
-        onOpenChange={setIsEditOpen} 
+      <EditProductoModal
+        producto={selectedProducto}
+        open={isEditOpen}
+        onOpenChange={setIsEditOpen}
       />
     </>
   );

@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '../../../../shared/components/ui/select';
 import { Plus, Loader2, Upload } from 'lucide-react';
+import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useCreateProducto } from '../hooks/useCreateProducto';
 import { useCategorias } from '../../../categoria/presentation/hooks/useCategorias';
 import { useMarcas } from '../../../marca/presentation/hooks/useMarcas';
@@ -53,6 +54,7 @@ export const CreateProductoModal = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   
+  const { company } = useAuthStore();
   const createMutation = useCreateProducto();
   
   // Queries for relationships
@@ -86,8 +88,11 @@ export const CreateProductoModal = () => {
   };
 
   const onSubmit = (values: FormValues) => {
+    if (!company) return;
+
     createMutation.mutate({
       ...values,
+      prdtoemid: company.emid,
       imagen: imageFile || undefined,
     }, {
       onSuccess: () => {
@@ -313,10 +318,28 @@ export const CreateProductoModal = () => {
                     className="absolute inset-0 opacity-0 cursor-pointer"
                   />
                 </div>
-                <div className="text-sm text-slate-500">
+                <div className="text-sm text-slate-500 flex flex-col justify-center items-start">
                   <p>Formatos: JPG, PNG</p>
                   <p>Max: 5MB</p>
-                  <p className="mt-1 font-medium text-slate-700">Click en el recuadro para subir</p>
+                  {imagePreview ? (
+                    <Button 
+                      type="button" 
+                      variant="destructive" 
+                      size="sm" 
+                      className="mt-2 h-7 px-3 text-xs" 
+                      onClick={() => {
+                        setImageFile(null);
+                        setImagePreview(null);
+                        // Also clear the input value so the same file can be selected again
+                        const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                        if (fileInput) fileInput.value = '';
+                      }}
+                    >
+                      Quitar imagen
+                    </Button>
+                  ) : (
+                    <p className="mt-1 font-medium text-slate-700">Click en el recuadro para subir</p>
+                  )}
                 </div>
               </div>
             </div>
