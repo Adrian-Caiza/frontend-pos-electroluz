@@ -20,7 +20,9 @@ import {
   PackageSearch,
   ShoppingCart,
   Building2,
-  WalletCards
+  WalletCards,
+  Monitor,
+  Receipt
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -77,6 +79,8 @@ export const MainLayout = () => {
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
+    { name: 'Terminal POS', path: '/terminal', icon: Monitor, roles: ['jefe', 'empleado', 'cajero'] },
+    { name: 'Historial Ventas', path: '/proformas', icon: Receipt, roles: ['jefe', 'empleado', 'cajero'] },
     { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
     { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
     { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
