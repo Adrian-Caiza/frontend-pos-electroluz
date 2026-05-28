@@ -48,8 +48,9 @@ export const CartPanel = ({ config, onSuccess }: CartPanelProps) => {
       cart.clearCart();
       onSuccess();
     } catch (error: any) {
-      alert('Ocurrió un error al procesar la venta. Verifique los datos.');
-      console.error(error);
+      const backendError = error.response?.data?.message || error.response?.data || error.message;
+      alert(`Ocurrió un error al procesar la venta.\nDetalle: ${JSON.stringify(backendError, null, 2)}`);
+      console.error('Error detallado:', error.response?.data || error);
     }
   };
 
