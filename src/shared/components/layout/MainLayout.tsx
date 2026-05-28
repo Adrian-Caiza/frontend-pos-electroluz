@@ -1,4 +1,4 @@
-import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { Button } from '../ui/button';
 import {
@@ -10,26 +10,15 @@ import {
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
 import {
-  LayoutDashboard,
   LogOut,
   User as UserIcon,
-  ShoppingBag,
-  Store,
-  Users,
   Settings,
-  PackageSearch,
-  ShoppingCart,
-  Building2,
-  WalletCards,
-  Monitor,
-  Receipt
 } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { Sidebar } from './Sidebar';
 
 export const MainLayout = () => {
   const { user, company, refreshToken, logout } = useAuthStore();
   const navigate = useNavigate();
-  const location = useLocation();
 
   const handleLogout = async () => {
     // 1. Instanciar dependencias (Idealmente esto vendría de un contenedor DI o un hook)
@@ -77,60 +66,9 @@ export const MainLayout = () => {
 
   const userImage = getImageUrl(user?.usimagen as string | undefined);
 
-  const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
-    { name: 'Terminal POS', path: '/terminal', icon: Monitor, roles: ['jefe', 'empleado', 'cajero'] },
-    { name: 'Historial Ventas', path: '/proformas', icon: Receipt, roles: ['jefe', 'empleado', 'cajero'] },
-    { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
-    { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
-    { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
-    { name: 'Productos', path: '/productos', icon: PackageSearch, roles: ['jefe'] },
-    { name: 'Clientes', path: '/clientes', icon: Users, roles: ['jefe', 'empleado'] },
-    { name: 'Métodos de Pago', path: '/metodos-pago', icon: WalletCards, roles: ['jefe', 'empleado'] },
-    { name: 'Usuarios', path: '/usuarios', icon: Users, roles: ['jefe'] },
-  ];
-
-  const authorizedNavItems = navItems.filter((item) =>
-    item.roles.includes(user?.usrol || '')
-  );
-
   return (
-    <div className="min-h-screen bg-slate-50 flex">
-      {/* Sidebar */}
-      <aside className="w-64 bg-white border-r border-slate-200 hidden md:flex flex-col">
-        <div className="h-16 flex items-center px-6 border-b border-slate-200">
-          <ShoppingBag className="w-6 h-6 text-indigo-600 mr-2" />
-          <span className="font-bold text-lg text-slate-800 truncate">
-            {company?.emrznsocial || 'POS App'}
-          </span>
-        </div>
-        <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
-          {authorizedNavItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path);
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  'flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors',
-                  isActive
-                    ? 'bg-indigo-50 text-indigo-700'
-                    : 'text-slate-700 hover:bg-slate-100'
-                )}
-              >
-                <item.icon
-                  className={cn(
-                    'mr-3 flex-shrink-0 h-5 w-5',
-                    isActive ? 'text-indigo-700' : 'text-slate-400'
-                  )}
-                  aria-hidden="true"
-                />
-                {item.name}
-              </Link>
-            );
-          })}
-        </nav>
-      </aside>
+    <div className="h-screen w-full bg-slate-50 flex overflow-hidden">
+      <Sidebar onLogout={handleLogout} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
@@ -185,9 +123,8 @@ export const MainLayout = () => {
           </div>
         </header>
 
-        {/* Main Area */}
         <main className="flex-1 overflow-auto bg-slate-50 p-6">
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full max-w-[1600px] mx-auto h-full">
             <Outlet />
           </div>
         </main>
