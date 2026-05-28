@@ -78,8 +78,9 @@ export const MainLayout = () => {
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
     { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
     { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
+    { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
     { name: 'Productos', path: '/productos', icon: PackageSearch, roles: ['jefe'] },
-
+    { name: 'Clientes', path: '/clientes', icon: Users, roles: ['jefe', 'empleado'] },
     { name: 'Usuarios', path: '/usuarios', icon: Users, roles: ['jefe'] },
   ];
 

@@ -7,10 +7,12 @@ import { GuestGuard } from './shared/components/layout/GuestGuard';
 import { RoleGuard } from './shared/components/layout/RoleGuard';
 import LoginPage from './app/auth/login/page';
 import DashboardPage from './app/dashboard/page';
-import CajaPage from './app/caja/page';
-import SucursalesPage from './app/sucursales/page';
 import ProductosPage from './app/productos/page';
+import SucursalesPage from './app/sucursales/page';
+import CajaPage from './app/caja/page';
 import UsuariosPage from './app/usuarios/page';
+import { ClientesPage } from './app/clientes/page';
+import { StockPage } from './app/stock/page';
 import UnauthorizedPage from './app/unauthorized/page';
 
 function App() {
@@ -73,10 +75,26 @@ function App() {
 
             {/* Usuarios for 'jefe' */}
             <Route
-              path="usuarios"
+              path="/usuarios"
               element={
                 <RoleGuard allowedRoles={['jefe']}>
                   <UsuariosPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/clientes"
+              element={
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
+                  <ClientesPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/stock"
+              element={
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
+                  <StockPage />
                 </RoleGuard>
               }
             />
