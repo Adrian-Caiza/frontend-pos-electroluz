@@ -19,7 +19,8 @@ import {
   Settings,
   PackageSearch,
   ShoppingCart,
-  Building2
+  Building2,
+  WalletCards
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -81,6 +82,7 @@ export const MainLayout = () => {
     { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
     { name: 'Productos', path: '/productos', icon: PackageSearch, roles: ['jefe'] },
     { name: 'Clientes', path: '/clientes', icon: Users, roles: ['jefe', 'empleado'] },
+    { name: 'Métodos de Pago', path: '/metodos-pago', icon: WalletCards, roles: ['jefe', 'empleado'] },
     { name: 'Usuarios', path: '/usuarios', icon: Users, roles: ['jefe'] },
   ];
 

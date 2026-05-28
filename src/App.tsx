@@ -13,6 +13,9 @@ import CajaPage from './app/caja/page';
 import UsuariosPage from './app/usuarios/page';
 import { ClientesPage } from './app/clientes/page';
 import { StockPage } from './app/stock/page';
+import MetodosPagoPage from './app/metodos-pago/page';
+import ProformasPage from './app/proformas/page';
+import TerminalPage from './app/terminal/page';
 import UnauthorizedPage from './app/unauthorized/page';
 
 function App() {
@@ -95,6 +98,30 @@ function App() {
               element={
                 <RoleGuard allowedRoles={['jefe', 'empleado']}>
                   <StockPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/metodos-pago"
+              element={
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
+                  <MetodosPagoPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/proformas"
+              element={
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
+                  <ProformasPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/terminal"
+              element={
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
+                  <TerminalPage />
                 </RoleGuard>
               }
             />
