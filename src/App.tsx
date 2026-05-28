@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Toaster } from 'sonner';
+import { useAuthStore } from './shared/stores/useAuthStore';
 import { AuthLayout } from './shared/components/layout/AuthLayout';
 import { MainLayout } from './shared/components/layout/MainLayout';
 import { AuthGuard } from './shared/components/layout/AuthGuard';
@@ -19,6 +21,46 @@ import TerminalPage from './app/terminal/page';
 import UnauthorizedPage from './app/unauthorized/page';
 
 function App() {
+  const { company } = useAuthStore();
+
+  useEffect(() => {
+    if (company?.emlogo) {
+      // Remove all existing favicons
+      const links = document.querySelectorAll("link[rel~='icon']");
+      links.forEach(l => l.remove());
+
+      // Create a fresh one by fetching it as a Blob to bypass CORP same-origin policy
+      fetch(`${company.emlogo}?v=${new Date().getTime()}`)
+        .then(res => res.blob())
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('link');
+          link.type = blob.type || 'image/png';
+          link.rel = 'icon';
+          link.href = url;
+          document.head.appendChild(link);
+        })
+        .catch(err => console.error('Error loading favicon:', err));
+    } else {
+      // Revert to POS SVG if logged out
+      const links = document.querySelectorAll("link[rel~='icon']");
+      links.forEach(l => l.remove());
+      const link = document.createElement('link');
+      link.type = 'image/svg+xml';
+      link.rel = 'icon';
+      link.href = '/favicon.svg';
+      document.head.appendChild(link);
+    }
+  }, [company?.emlogo]);
+
+  useEffect(() => {
+    if (company?.emrznsocial) {
+      document.title = company.emrznsocial;
+    } else {
+      document.title = 'Electroluz';
+    }
+  }, [company]);
+
   return (
     <>
       <BrowserRouter>
@@ -27,13 +69,13 @@ function App() {
           <Route element={<GuestGuard><AuthLayout /></GuestGuard>}>
             <Route path="/auth/login" element={<LoginPage />} />
           </Route>
-          
+
           <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
           {/* Protected Routes */}
           <Route element={<AuthGuard><MainLayout /></AuthGuard>}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            
+
             {/* Dashboard for 'jefe' */}
             <Route
               path="dashboard"
