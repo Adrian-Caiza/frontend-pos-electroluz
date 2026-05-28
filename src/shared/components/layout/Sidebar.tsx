@@ -8,7 +8,9 @@ import {
   Building2,
   WalletCards,
   Users,
+  UserCog,
   Monitor,
+  Package,
   Receipt
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
@@ -29,10 +31,10 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
     { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
     { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
     { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
-    { name: 'Productos', path: '/productos', icon: PackageSearch, roles: ['jefe'] },
+    { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe'] },
     { name: 'Clientes', path: '/clientes', icon: Users, roles: ['jefe', 'empleado'] },
     { name: 'Métodos de Pago', path: '/metodos-pago', icon: WalletCards, roles: ['jefe', 'empleado'] },
-    { name: 'Usuarios', path: '/usuarios', icon: Users, roles: ['jefe'] },
+    { name: 'Personal', path: '/usuarios', icon: UserCog, roles: ['jefe'] },
   ];
 
   const authorizedNavItems = navItems.filter((item) =>
