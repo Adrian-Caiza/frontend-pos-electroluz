@@ -68,7 +68,7 @@ export const MainLayout = () => {
 
   return (
     <div className="h-screen w-full bg-slate-50 flex overflow-hidden">
-      <Sidebar onLogout={handleLogout} />
+      <Sidebar onLogout={handleLogout} userImage={userImage} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">

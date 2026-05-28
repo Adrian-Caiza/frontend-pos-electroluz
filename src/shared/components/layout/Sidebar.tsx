@@ -15,9 +15,10 @@ import { cn } from '../../lib/utils';
 
 export interface SidebarProps {
   onLogout: () => void;
+  userImage?: string | null;
 }
 
-export const Sidebar = ({ onLogout }: SidebarProps) => {
+export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
   const location = useLocation();
   const { user } = useAuthStore();
 
@@ -96,8 +97,35 @@ export const Sidebar = ({ onLogout }: SidebarProps) => {
         })}
       </nav>
 
-      {/* Bottom section (Log Out) */}
+      {/* User Section */}
       <div className="p-3 border-t border-[#1a2f4c] shrink-0">
+        <div className="flex items-center px-2 py-3 rounded-xl overflow-hidden whitespace-nowrap mb-2">
+          {/* Avatar */}
+          <div className="flex items-center justify-center min-w-[32px] w-[32px] h-[32px] rounded-full ring-2 ring-[#00e676] overflow-hidden bg-[#1a2f4c] shrink-0">
+            {userImage ? (
+              <img src={userImage} alt={user?.usnombre || 'User'} className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-[#00e676] font-bold text-sm uppercase">
+                {user?.usnombre?.charAt(0) || 'U'}
+              </span>
+            )}
+          </div>
+          
+          {/* User Details */}
+          <div className="ml-3 flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75 overflow-hidden">
+            <span className="text-[14px] text-white font-semibold truncate leading-tight">
+              {user?.usnombre || 'Usuario'}
+            </span>
+            <span className="text-[12px] text-slate-400 truncate leading-tight mt-0.5">
+              {user?.uscorreo || 'correo@empresa.com'}
+            </span>
+            <span className="text-[10px] text-[#00e676] font-medium tracking-wider uppercase mt-1 bg-[#00e676]/10 w-max px-1.5 py-0.5 rounded-sm">
+              {user?.usrol || 'Rol'}
+            </span>
+          </div>
+        </div>
+
+        {/* Log Out */}
         <button
           onClick={onLogout}
           title="Cerrar Sesión"
