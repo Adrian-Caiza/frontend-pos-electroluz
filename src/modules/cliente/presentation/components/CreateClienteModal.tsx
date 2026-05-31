@@ -25,11 +25,30 @@ const formSchema = z.object({
   clntetipoidentificacion: z.enum(['cedula', 'ruc'], {
     message: 'El tipo de identificación es requerido',
   }),
-  clnteidentificacion: z.string().min(1, 'La identificación es requerida'),
-  clntenombre: z.string().min(1, 'El nombre es requerido'),
+  clnteidentificacion: z.string()
+    .min(1, 'La identificación es requerida')
+    .regex(/^[0-9]+$/, 'Solo se permiten números'),
+  clntenombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   clntecorreo: z.string().email('Debe ser un correo válido').min(1, 'El correo es requerido'),
-  clntedireccion: z.string().min(1, 'La dirección es requerida'),
-  clntetelefono: z.string().min(10, 'El teléfono debe tener al menos 10 dígitos').max(10, 'El teléfono no puede tener más de 10 dígitos'),
+  clntedireccion: z.string().min(5, 'La dirección es muy corta'),
+  clntetelefono: z.string()
+    .min(10, 'El teléfono debe tener al menos 10 dígitos')
+    .max(10, 'El teléfono no puede tener más de 10 dígitos')
+    .regex(/^[0-9]+$/, 'Solo se permiten números'),
+}).superRefine((data, ctx) => {
+  if (data.clntetipoidentificacion === 'cedula' && data.clnteidentificacion.length !== 10) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'La cédula debe tener exactamente 10 dígitos',
+      path: ['clnteidentificacion'],
+    });
+  } else if (data.clntetipoidentificacion === 'ruc' && data.clnteidentificacion.length !== 13) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'El RUC debe tener exactamente 13 dígitos',
+      path: ['clnteidentificacion'],
+    });
+  }
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -45,6 +64,7 @@ export const CreateClienteModal = ({ open, onOpenChange }: CreateClienteModalPro
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       clntetipoidentificacion: 'cedula',
       clnteidentificacion: '',
