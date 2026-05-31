@@ -7,12 +7,14 @@ import { useCreateCheckout } from '../hooks/useCreateCheckout';
 import { useSucursales } from '../../../sucursal/presentation/hooks/useSucursales';
 import { Button } from '../../../../shared/components/ui/button';
 import {
+  BaseModal,
+  ModalFooter,
+  ModalSection,
+  ModalField,
+  ModalEntityCard
+} from '../../../../shared/components/ui/modal';
+import {
   Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
 } from '../../../../shared/components/ui/dialog';
 import {
   Form,
@@ -23,14 +25,14 @@ import {
   FormMessage,
 } from '../../../../shared/components/ui/form';
 import { Input } from '../../../../shared/components/ui/input';
-import {
+import { 
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from '../../../../shared/components/ui/select';
-import { Plus } from 'lucide-react';
+import { Plus, MonitorSmartphone, Building2, Fingerprint } from 'lucide-react';
 
 const formSchema = z.object({
   cjidentificador: z.string().length(3, 'El identificador debe tener exactamente 3 dígitos').regex(/^\d+$/, 'Solo se permiten números'),
@@ -47,6 +49,7 @@ export const CreateCheckoutModal = () => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       cjidentificador: '',
       cjsuid: '',
@@ -75,75 +78,81 @@ export const CreateCheckoutModal = () => {
     if (!newOpen) form.reset();
   };
 
+  const footer = (
+    <ModalFooter 
+      onCancel={() => handleOpenChange(false)} 
+      onConfirm={form.handleSubmit(onSubmit)} 
+      isLoading={isPending}
+      confirmLabel="Guardar Caja"
+    />
+  );
+
   return (
     <>
-      <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700">
+      <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 shadow-md text-white">
         <Plus className="w-4 h-4 mr-2" /> Nueva Caja
       </Button>
 
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Registrar Nueva Caja</DialogTitle>
-            <DialogDescription>
-              Crea una caja asignándole un identificador de 3 dígitos y vinculándola a una sucursal.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              
-              <FormField
-                control={form.control}
-                name="cjsuid"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Sucursal</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+      <BaseModal 
+        isOpen={open} 
+        onClose={() => handleOpenChange(false)}
+        title="Registrar Nueva Caja"
+        subtitle="Crea una caja asignándole un identificador de 3 dígitos y vinculándola a una sucursal."
+        size="md"
+        footer={footer}
+      >
+        <ModalEntityCard 
+          icon={MonitorSmartphone}
+          title="Nueva Caja/Terminal"
+          subtitle="Configure los datos de la nueva caja"
+        />
+
+        <Form {...form}>
+          <form id="create-checkout-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <ModalSection title="Asignación y Detalles">
+              <div className="grid grid-cols-1 gap-5">
+                <FormField
+                  control={form.control}
+                  name="cjsuid"
+                  render={({ field, fieldState }) => (
+                    <ModalField label="Sucursal" required error={fieldState.error?.message}>
                       <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={loadingSucursales ? "Cargando sucursales..." : "Seleccione una sucursal"} />
-                        </SelectTrigger>
+                        <div className="relative">
+                          <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 z-10" />
+                          <Select onValueChange={field.onChange} defaultValue={field.value}>
+                            <SelectTrigger className="h-11 rounded-xl pl-10 border-slate-300">
+                              <SelectValue placeholder={loadingSucursales ? "Cargando sucursales..." : "Seleccione una sucursal"} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {sucursalesData?.items.map((sucursal) => (
+                                <SelectItem key={sucursal.suid} value={sucursal.suid}>
+                                  {sucursal.sunombre} (ID: {sucursal.suidentificador})
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
                       </FormControl>
-                      <SelectContent>
-                        {sucursalesData?.items.map((sucursal) => (
-                          <SelectItem key={sucursal.suid} value={sucursal.suid}>
-                            {sucursal.sunombre} (ID: {sucursal.suidentificador})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    </ModalField>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="cjidentificador"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Identificador (Ej: 001)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="001" maxLength={3} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter className="pt-4">
-                <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700">
-                  {isPending ? 'Guardando...' : 'Guardar Caja'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                <FormField
+                  control={form.control}
+                  name="cjidentificador"
+                  render={({ field, fieldState }) => (
+                    <ModalField label="Identificador (Ej: 001)" required error={fieldState.error?.message}>
+                      <FormControl>
+                        <Input icon={Fingerprint} className="h-11 rounded-xl" placeholder="001" maxLength={3} {...field} />
+                      </FormControl>
+                    </ModalField>
+                  )}
+                />
+              </div>
+            </ModalSection>
+          </form>
+        </Form>
+      </BaseModal>
     </>
   );
 };

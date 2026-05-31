@@ -152,15 +152,15 @@ export const CreateUsuarioModal = ({ open, onOpenChange }: CreateUsuarioModalPro
                 <label className="text-xs font-semibold text-slate-600">
                   Foto de Perfil (Opcional)
                 </label>
-                <div className="flex items-center gap-4">
-                  <div className="relative">
-                    <label className="cursor-pointer block">
+                <div className="flex items-center gap-6">
+                  <div className="relative w-16 h-16 shrink-0">
+                    <label className="cursor-pointer block w-full h-full">
                       {imagePreview ? (
-                        <div className="w-16 h-16 rounded-full overflow-hidden border border-slate-200 hover:opacity-80 transition-opacity">
+                        <div className="w-full h-full rounded-full overflow-hidden border border-slate-200 hover:opacity-80 transition-opacity">
                           <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                         </div>
                       ) : (
-                        <div className="w-16 h-16 rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 text-slate-500 hover:bg-slate-100 hover:border-indigo-400 transition-colors">
+                        <div className="w-full h-full rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 text-slate-500 hover:bg-slate-100 hover:border-indigo-400 transition-colors">
                           <Camera className="w-6 h-6" />
                         </div>
                       )}

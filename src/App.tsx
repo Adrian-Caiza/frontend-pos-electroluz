@@ -20,6 +20,14 @@ import ProformasPage from './app/proformas/page';
 import TerminalPage from './app/terminal/page';
 import UnauthorizedPage from './app/unauthorized/page';
 
+const HomeRedirect = () => {
+  const { user } = useAuthStore();
+  if (user?.usrol === 'jefe') return <Navigate to="/dashboard" replace />;
+  if (user?.usrol === 'cajero') return <Navigate to="/caja" replace />;
+  if (user?.usrol === 'empleado') return <Navigate to="/terminal" replace />;
+  return <Navigate to="/unauthorized" replace />;
+};
+
 function App() {
   const { company } = useAuthStore();
 
@@ -74,7 +82,7 @@ function App() {
 
           {/* Protected Routes */}
           <Route element={<AuthGuard><MainLayout /></AuthGuard>}>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<HomeRedirect />} />
 
             {/* Dashboard for 'jefe' */}
             <Route

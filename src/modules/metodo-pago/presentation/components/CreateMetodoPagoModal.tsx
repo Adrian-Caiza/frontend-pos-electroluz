@@ -6,14 +6,19 @@ import { Wallet, Plus } from 'lucide-react';
 import { useCreateMetodoPago } from '../hooks/useCreateMetodoPago';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '../../../../shared/components/ui/dialog';
+  BaseModal,
+  ModalFooter,
+  ModalSection,
+  ModalField,
+  ModalEntityCard
+} from '../../../../shared/components/ui/modal';
 import { Button } from '../../../../shared/components/ui/button';
 import { Input } from '../../../../shared/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+} from '../../../../shared/components/ui/form';
 
 const createMetodoPagoSchema = z.object({
   mpnombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(50, 'El nombre es muy largo'),
@@ -26,14 +31,9 @@ export const CreateMetodoPagoModal = () => {
   const { user } = useAuthStore();
   const { mutateAsync: createMetodoPago, isPending } = useCreateMetodoPago();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setError,
-    formState: { errors },
-  } = useForm<CreateMetodoPagoFormData>({
+  const form = useForm<CreateMetodoPagoFormData>({
     resolver: zodResolver(createMetodoPagoSchema),
+    mode: 'onChange',
   });
 
   const onSubmit = async (data: CreateMetodoPagoFormData) => {
@@ -44,75 +44,84 @@ export const CreateMetodoPagoModal = () => {
         mpemid: user.usemid,
         mpnombre: data.mpnombre,
       });
-      reset();
+      form.reset();
       setOpen(false);
     } catch (error: any) {
       if (error.response?.data?.message === 'Playment method already exists with that name') {
-        setError('mpnombre', { message: 'Ya existe un método de pago con ese nombre' });
+        form.setError('mpnombre', { message: 'Ya existe un método de pago con ese nombre' });
       } else {
-        setError('root', { message: 'Ocurrió un error al crear el método de pago' });
+        form.setError('root', { message: 'Ocurrió un error al crear el método de pago' });
       }
     }
   };
 
+  const footer = (
+    <ModalFooter 
+      onCancel={() => {
+        setOpen(false);
+        form.reset();
+      }} 
+      onConfirm={form.handleSubmit(onSubmit)} 
+      isLoading={isPending}
+      confirmLabel="Guardar Método"
+    />
+  );
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button className="bg-indigo-600 hover:bg-indigo-700">
-          <Plus className="w-4 h-4 mr-2" />
-          Nuevo Método de Pago
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle className="flex items-center">
-            <Wallet className="w-5 h-5 mr-2 text-indigo-600" />
-            Registrar Método de Pago
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+        <Plus className="w-4 h-4 mr-2" />
+        Nuevo Método de Pago
+      </Button>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-          <div>
-            <label className="text-sm font-medium text-slate-700 block mb-1">
-              Nombre del Método de Pago *
-            </label>
-            <Input
-              {...register('mpnombre')}
-              placeholder="Ej: Efectivo, Tarjeta de Crédito, Transferencia"
-              className={errors.mpnombre ? 'border-red-500' : ''}
-            />
-            {errors.mpnombre && (
-              <p className="text-red-500 text-xs mt-1">{errors.mpnombre.message}</p>
-            )}
-          </div>
+      <BaseModal 
+        isOpen={open} 
+        onClose={() => {
+          setOpen(false);
+          form.reset();
+        }}
+        title="Registrar Método de Pago"
+        subtitle="Añade un nuevo método de pago para ser usado en las transacciones."
+        size="sm"
+        footer={footer}
+      >
+        <ModalEntityCard 
+          icon={Wallet}
+          title="Nuevo Método"
+          subtitle="Información del método de pago"
+        />
 
-          {errors.root && (
-            <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-md">
-              {errors.root.message}
-            </p>
-          )}
+        <Form {...form}>
+          <form id="create-metodo-pago-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <ModalSection title="Detalles">
+              <div className="grid grid-cols-1 gap-5">
+                <FormField
+                  control={form.control}
+                  name="mpnombre"
+                  render={({ field, fieldState }) => (
+                    <ModalField label="Nombre del Método de Pago" required error={fieldState.error?.message}>
+                      <FormControl>
+                        <Input 
+                          icon={Wallet} 
+                          className="h-11 rounded-xl" 
+                          placeholder="Ej: Efectivo, Tarjeta de Crédito" 
+                          {...field} 
+                        />
+                      </FormControl>
+                    </ModalField>
+                  )}
+                />
 
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => {
-                setOpen(false);
-                reset();
-              }}
-            >
-              Cancelar
-            </Button>
-            <Button
-              type="submit"
-              disabled={isPending}
-              className="bg-indigo-600 hover:bg-indigo-700"
-            >
-              {isPending ? 'Guardando...' : 'Guardar Método'}
-            </Button>
-          </div>
-        </form>
-      </DialogContent>
-    </Dialog>
+                {form.formState.errors.root && (
+                  <p className="text-red-500 text-sm text-center bg-red-50 p-2 rounded-md border border-red-100">
+                    {form.formState.errors.root.message}
+                  </p>
+                )}
+              </div>
+            </ModalSection>
+          </form>
+        </Form>
+      </BaseModal>
+    </>
   );
 };
