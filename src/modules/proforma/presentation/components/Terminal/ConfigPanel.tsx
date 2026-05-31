@@ -1,8 +1,10 @@
-import { Store, ShoppingCart, Users, WalletCards } from 'lucide-react';
+import { Store, ShoppingCart, Users, WalletCards, UserPlus } from 'lucide-react';
+import { useState } from 'react';
 import { useSucursales } from '../../../../sucursal/presentation/hooks/useSucursales';
 import { useCheckouts } from '../../../../caja/presentation/hooks/useCheckouts';
 import { useClientes } from '../../../../cliente/presentation/hooks/useClientes';
 import { useMetodosPago } from '../../../../metodo-pago/presentation/hooks/useMetodosPago';
+import { CreateClienteModal } from '../../../../cliente/presentation/components/CreateClienteModal';
 
 export interface TerminalConfig {
   sucursalId: string | null;
@@ -17,6 +19,7 @@ interface ConfigPanelProps {
 }
 
 export const ConfigPanel = ({ config, onChange }: ConfigPanelProps) => {
+  const [isClienteModalOpen, setClienteModalOpen] = useState(false);
   // Fetch lists for selectors
   const { data: sucursalesData, isLoading: loadingSucursales } = useSucursales(1, 50);
   const { data: clientesData, isLoading: loadingClientes } = useClientes(1, 100);
@@ -79,9 +82,19 @@ export const ConfigPanel = ({ config, onChange }: ConfigPanelProps) => {
 
         {/* Cliente */}
         <div>
-          <label className="text-sm font-medium text-slate-700 flex items-center mb-1.5">
-            <Users className="w-4 h-4 mr-1.5 text-indigo-500" />
-            Cliente
+          <label className="text-sm font-medium text-slate-700 flex items-center justify-between mb-1.5">
+            <span className="flex items-center">
+              <Users className="w-4 h-4 mr-1.5 text-indigo-500" />
+              Cliente
+            </span>
+            <button
+              type="button"
+              onClick={() => setClienteModalOpen(true)}
+              className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold transition-colors"
+            >
+              <UserPlus className="w-3 h-3" />
+              Nuevo
+            </button>
           </label>
           <select
             className="flex h-10 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition-colors"
@@ -113,6 +126,11 @@ export const ConfigPanel = ({ config, onChange }: ConfigPanelProps) => {
           </select>
         </div>
       </div>
+
+      <CreateClienteModal 
+        open={isClienteModalOpen} 
+        onOpenChange={setClienteModalOpen} 
+      />
     </div>
   );
 };
