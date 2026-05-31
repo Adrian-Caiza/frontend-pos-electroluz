@@ -2,29 +2,22 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { UserPlus, User, Mail, Phone, MapPin, Hash } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../../../../shared/components/ui/dialog';
+  BaseModal,
+  ModalFooter,
+  ModalSection,
+  ModalField,
+  ModalChipGroup,
+  ModalEntityCard
+} from '../../../../shared/components/ui/modal';
 import {
   Form,
   FormControl,
   FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from '../../../../shared/components/ui/form';
 import { Input } from '../../../../shared/components/ui/input';
-import { Button } from '../../../../shared/components/ui/button';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../../../shared/components/ui/select';
+
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useCreateCliente } from '../hooks/useCreateCliente';
 
@@ -82,124 +75,125 @@ export const CreateClienteModal = ({ open, onOpenChange }: CreateClienteModalPro
     );
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] bg-white">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold text-slate-900">Registrar Cliente</DialogTitle>
-        </DialogHeader>
+  const footer = (
+    <ModalFooter 
+      onCancel={() => onOpenChange(false)} 
+      onConfirm={form.handleSubmit(onSubmit)} 
+      isLoading={isPending}
+      confirmLabel="Guardar Cliente"
+    />
+  );
 
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-2 gap-4">
+  return (
+    <BaseModal 
+      isOpen={open} 
+      onClose={() => onOpenChange(false)}
+      title="Registrar Nuevo Cliente"
+      subtitle="Complete los datos personales y de contacto del cliente."
+      size="lg"
+      footer={footer}
+    >
+      <ModalEntityCard 
+        icon={UserPlus}
+        title="Información del Cliente"
+        subtitle="Los campos con asterisco (*) son obligatorios"
+        iconClassName="text-indigo-600 bg-indigo-50"
+      />
+
+      <Form {...form}>
+        <form id="create-cliente-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <ModalSection title="Identificación">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
                 control={form.control}
                 name="clntetipoidentificacion"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tipo de Identificación</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione el tipo" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="cedula">Cédula</SelectItem>
-                        <SelectItem value="ruc">RUC</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Tipo de Identificación" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <ModalChipGroup
+                        options={[
+                          { label: 'Cédula', value: 'cedula' },
+                          { label: 'RUC', value: 'ruc' }
+                        ]}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="clnteidentificacion"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Identificación</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Número de Identificación" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input placeholder="Ej. 1712345678" {...field} />
+                      <Input icon={Hash} className="h-11 rounded-xl" placeholder="Ej. 1712345678" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
+            </div>
+          </ModalSection>
 
+          <ModalSection title="Datos de Contacto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
                 control={form.control}
                 name="clntenombre"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Nombre o Razón Social</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej. Juan Perez" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <div className="md:col-span-2">
+                    <ModalField label="Nombre o Razón Social" required error={fieldState.error?.message}>
+                      <FormControl>
+                        <Input icon={User} className="h-11 rounded-xl" placeholder="Ej. Juan Perez" {...field} />
+                      </FormControl>
+                    </ModalField>
+                  </div>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="clntecorreo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Correo Electrónico</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Correo Electrónico" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input type="email" placeholder="cliente@correo.com" {...field} />
+                      <Input icon={Mail} className="h-11 rounded-xl" type="email" placeholder="cliente@correo.com" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="clntetelefono"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Teléfono</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Teléfono" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input placeholder="Ej. 0987654321" {...field} />
+                      <Input icon={Phone} className="h-11 rounded-xl" placeholder="Ej. 0987654321" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="clntedireccion"
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Dirección</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej. Av. Principal y Calle 10" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <div className="md:col-span-2">
+                    <ModalField label="Dirección" required error={fieldState.error?.message}>
+                      <FormControl>
+                        <Input icon={MapPin} className="h-11 rounded-xl" placeholder="Ej. Av. Principal y Calle 10" {...field} />
+                      </FormControl>
+                    </ModalField>
+                  </div>
                 )}
               />
             </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={isPending} className="bg-slate-900 hover:bg-slate-800">
-                {isPending ? 'Guardando...' : 'Guardar Cliente'}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          </ModalSection>
+        </form>
+      </Form>
+    </BaseModal>
   );
 };
