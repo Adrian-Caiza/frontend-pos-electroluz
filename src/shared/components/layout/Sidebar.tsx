@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import {
   LayoutDashboard,
@@ -11,7 +12,9 @@ import {
   UserCog,
   Monitor,
   Package,
-  Receipt
+  Receipt,
+  Pin,
+  PinOff
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
@@ -23,6 +26,17 @@ export interface SidebarProps {
 export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
   const location = useLocation();
   const { user } = useAuthStore();
+  
+  const [isPinned, setIsPinned] = useState(() => {
+    const saved = localStorage.getItem('sidebar_pinned');
+    return saved === 'true';
+  });
+
+  const togglePin = () => {
+    const newState = !isPinned;
+    setIsPinned(newState);
+    localStorage.setItem('sidebar_pinned', String(newState));
+  };
 
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
@@ -42,9 +56,12 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
   );
 
   return (
-    <aside className="group relative z-20 flex flex-col bg-[#0d1b2a] text-slate-300 w-20 hover:w-64 transition-all duration-300 ease-in-out border-r border-[#1a2f4c] hidden md:flex h-full shadow-2xl">
+    <aside className={cn(
+      "group relative z-20 flex flex-col bg-[#0d1b2a] text-slate-300 transition-all duration-300 ease-in-out border-r border-[#1a2f4c] hidden md:flex h-full shadow-2xl",
+      isPinned ? "w-64" : "w-20 hover:w-64"
+    )}>
       {/* Header section (POS Icon) */}
-      <div className="h-16 flex items-center px-5 border-b border-[#1a2f4c] overflow-hidden whitespace-nowrap shrink-0">
+      <div className="h-16 flex items-center px-5 border-b border-[#1a2f4c] overflow-hidden whitespace-nowrap shrink-0 relative">
         {/* Simple inline POS SVG instead of Lucide icon to match the plan */}
         <div className="flex items-center justify-center min-w-[40px] w-10 h-10 rounded-lg bg-[#00e676]/10 text-[#00e676]">
           <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -58,9 +75,25 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
             <path d="M30 56H34V60H30V56Z" fill="currentColor" fillOpacity="0.4"/>
           </svg>
         </div>
-        <span className="font-bold text-lg text-white ml-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
-          My Workspace
-        </span>
+        <div className={cn(
+          "flex items-center justify-between w-full ml-3 transition-opacity duration-300 delay-75",
+          isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        )}>
+          <span className="font-bold text-lg text-white">
+            My Workspace
+          </span>
+          <button
+            onClick={togglePin}
+            title={isPinned ? "Desfijar sidebar" : "Fijar sidebar"}
+            className="text-slate-400 hover:text-[#00e676] transition-colors p-1 rounded-md"
+          >
+            {isPinned ? (
+              <PinOff className="w-4 h-4" />
+            ) : (
+              <Pin className="w-4 h-4 -rotate-45" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Navigation Links */}
@@ -89,7 +122,8 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
                 />
               </div>
               <span className={cn(
-                "ml-3 text-[15px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75",
+                "ml-3 text-[15px] font-medium transition-opacity duration-300 delay-75",
+                isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100",
                 isActive ? "text-[#0d1b2a] font-bold" : ""
               )}>
                 {item.name}
@@ -114,7 +148,10 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
           </div>
           
           {/* User Details */}
-          <div className="ml-3 flex flex-col opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75 overflow-hidden">
+          <div className={cn(
+            "ml-3 flex flex-col transition-opacity duration-300 delay-75 overflow-hidden",
+            isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          )}>
             <span className="text-[14px] text-white font-semibold truncate leading-tight">
               {user?.usnombre || 'Usuario'}
             </span>
@@ -136,7 +173,10 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
           <div className="flex items-center justify-center min-w-[32px]">
             <LogOut className="flex-shrink-0 h-[22px] w-[22px] transition-transform duration-200 group-hover/logout:-translate-x-1" />
           </div>
-          <span className="ml-3 text-[15px] font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 delay-75">
+          <span className={cn(
+            "ml-3 text-[15px] font-medium transition-opacity duration-300 delay-75",
+            isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          )}>
             Cerrar Sesión
           </span>
         </button>
