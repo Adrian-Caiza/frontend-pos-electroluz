@@ -4,28 +4,34 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Button } from '../../../../shared/components/ui/button';
 import { Input } from '../../../../shared/components/ui/input';
+import { 
+  PackageMinus, 
+  FolderTree, 
+  Tag, 
+  Truck, 
+  Scale, 
+  Barcode, 
+  Package, 
+  DollarSign, 
+  ArrowDownToLine, 
+  ArrowUpToLine, 
+  Upload, 
+  X,
+  Activity
+} from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../../../../shared/components/ui/dialog';
+  BaseModal,
+  ModalFooter,
+  ModalSection,
+  ModalField,
+  ModalEntityCard,
+  ModalChipGroup
+} from '../../../../shared/components/ui/modal';
 import {
   Form,
   FormControl,
   FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from '../../../../shared/components/ui/form';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '../../../../shared/components/ui/select';
-import { Loader2, Upload } from 'lucide-react';
 import { useUpdateProducto } from '../hooks/useUpdateProducto';
 import { useCategorias } from '../../../categoria/presentation/hooks/useCategorias';
 import { useMarcas } from '../../../marca/presentation/hooks/useMarcas';
@@ -68,6 +74,7 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       prdtoestado: 'activo',
     },
@@ -142,274 +149,284 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
     });
   };
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-bold">Editar Producto</DialogTitle>
-        </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+  const footer = (
+    <ModalFooter 
+      onCancel={() => onOpenChange(false)} 
+      onConfirm={form.handleSubmit(onSubmit)} 
+      isLoading={updateMutation.isPending}
+      confirmLabel="Guardar Cambios"
+    />
+  );
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Relaciones */}
+  return (
+    <BaseModal 
+      isOpen={open} 
+      onClose={() => onOpenChange(false)}
+      title="Editar Producto"
+      subtitle={`Modificando información del producto ${producto?.prdtocodigo || ''}.`}
+      size="2xl"
+      footer={footer}
+    >
+      <ModalEntityCard 
+        icon={PackageMinus}
+        title={producto?.prdtonombre || 'Cargando producto...'}
+        subtitle={`Código: ${producto?.prdtocodigo || ''}`}
+        iconClassName="text-amber-600 bg-amber-50"
+      />
+
+      <Form {...form}>
+        <form id="edit-producto-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+
+          <ModalSection title="Clasificación">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
                 control={form.control}
                 name="prdtoctgriaid"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Categoría</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingCat}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione una categoría" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {categoriasData?.items.map(cat => (
-                          <SelectItem key={cat.ctgriaid} value={cat.ctgriaid}>{cat.ctgnombre}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Categoría" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <div className="relative">
+                        <FolderTree className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <select
+                          {...field}
+                          disabled={loadingCat}
+                          className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="">Seleccione una categoría</option>
+                          {categoriasData?.items.map(cat => (
+                            <option key={cat.ctgriaid} value={cat.ctgriaid}>{cat.ctgnombre}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </FormControl>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="prdtomrcid"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Marca</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingMarcas}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione una marca" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {marcasData?.items.map(mrc => (
-                          <SelectItem key={mrc.mrcid} value={mrc.mrcid}>{mrc.mrcnombre}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Marca" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <div className="relative">
+                        <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <select
+                          {...field}
+                          disabled={loadingMarcas}
+                          className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="">Seleccione una marca</option>
+                          {marcasData?.items.map(mrc => (
+                            <option key={mrc.mrcid} value={mrc.mrcid}>{mrc.mrcnombre}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </FormControl>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="prdtoprovid"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Proveedor</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingProv}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione un proveedor" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {proveedoresData?.items.map(prov => (
-                          <SelectItem key={prov.provid} value={prov.provid}>{prov.provnombre}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Proveedor" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <div className="relative">
+                        <Truck className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <select
+                          {...field}
+                          disabled={loadingProv}
+                          className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="">Seleccione un proveedor</option>
+                          {proveedoresData?.items.map(prov => (
+                            <option key={prov.provid} value={prov.provid}>{prov.provnombre}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </FormControl>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="prdtomdiaid"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Medida</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value} disabled={loadingMedidas}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione una medida" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {medidasData?.items.map(mdia => (
-                          <SelectItem key={mdia.mdiaid} value={mdia.mdiaid}>{mdia.mdianombre}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Medida" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <div className="relative">
+                        <Scale className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <select
+                          {...field}
+                          disabled={loadingMedidas}
+                          className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="">Seleccione una medida</option>
+                          {medidasData?.items.map(mdia => (
+                            <option key={mdia.mdiaid} value={mdia.mdiaid}>{mdia.mdianombre}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </FormControl>
+                  </ModalField>
                 )}
               />
             </div>
+          </ModalSection>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Text Inputs */}
+          <ModalSection title="Detalles Principales">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
                 control={form.control}
                 name="prdtocodigo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Código</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Código" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input placeholder="Ej. PRD-001" {...field} />
+                      <Input icon={Barcode} className="h-11 rounded-xl" placeholder="Ej. PRD-001" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="prdtonombre"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre del Producto</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Nombre del Producto" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input placeholder="Ej. Taladro Percutor 20V" {...field} />
+                      <Input icon={Package} className="h-11 rounded-xl" placeholder="Ej. Taladro Percutor 20V" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="prdtopreciocompra"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Precio Compra ($)</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Precio Compra ($)" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} />
+                      <Input icon={DollarSign} type="number" step="0.01" className="h-11 rounded-xl" placeholder="0.00" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="prdtoprecioventa"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Precio Venta ($)</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Precio Venta ($)" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input type="number" step="0.01" {...field} />
+                      <Input icon={DollarSign} type="number" step="0.01" className="h-11 rounded-xl" placeholder="0.00" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="prdtostockminimo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stock Mínimo</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Stock Mínimo" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <Input icon={ArrowDownToLine} type="number" className="h-11 rounded-xl" placeholder="5" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
 
               <FormField
                 control={form.control}
                 name="prdtostockmaximo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Stock Máximo</FormLabel>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Stock Máximo" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input type="number" {...field} />
+                      <Input icon={ArrowUpToLine} type="number" className="h-11 rounded-xl" placeholder="50" {...field} />
                     </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                  </ModalField>
                 )}
               />
             </div>
+          </ModalSection>
 
-            {/* Imagen e Estado */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <ModalSection title="Estado e Imagen">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <FormField
                 control={form.control}
                 name="prdtoestado"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Estado</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccione un estado" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="activo">Activo</SelectItem>
-                        <SelectItem value="inactivo">Inactivo</SelectItem>
-                        <SelectItem value="eliminado">Eliminado</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
+                render={({ field, fieldState }) => (
+                  <ModalField label="Estado" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <ModalChipGroup
+                        options={[
+                          { label: 'Activo', value: 'activo' },
+                          { label: 'Inactivo', value: 'inactivo' },
+                          { label: 'Eliminado', value: 'eliminado' }
+                        ]}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                  </ModalField>
                 )}
               />
 
-              <div>
-                <FormLabel className="block mb-2">Imagen (Opcional)</FormLabel>
+              <div className="space-y-2">
+                <label className="text-xs font-semibold text-slate-600">
+                  Imagen del Producto (Opcional)
+                </label>
                 <div className="flex items-center gap-4">
-                  <div className="relative w-16 h-16 border-2 border-dashed border-slate-300 rounded-xl overflow-hidden flex items-center justify-center bg-slate-50 hover:bg-slate-100 transition-colors shrink-0">
-                    {imagePreview ? (
-                      <img src={getImageUrl(imagePreview)!} alt="Preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <Upload className="w-6 h-6 text-slate-400" />
-                    )}
-                    <input 
-                      type="file" 
-                      accept="image/png, image/jpeg" 
-                      onChange={handleImageChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                    />
-                  </div>
-                  <div className="text-xs text-slate-500 flex flex-col justify-center items-start">
-                    {imagePreview ? (
-                      <Button 
-                        type="button" 
-                        variant="destructive" 
-                        size="sm" 
-                        className="h-6 px-2 text-[10px]" 
+                  <div className="relative">
+                    <label className="cursor-pointer block">
+                      {imagePreview ? (
+                        <div className="w-24 h-24 rounded-xl overflow-hidden border border-slate-200 hover:opacity-80 transition-opacity">
+                          <img src={getImageUrl(imagePreview)!} alt="Preview" className="w-full h-full object-cover" />
+                        </div>
+                      ) : (
+                        <div className="w-24 h-24 rounded-xl border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 text-slate-500 hover:bg-slate-100 hover:border-indigo-400 transition-colors">
+                          <Upload className="w-6 h-6" />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/png, image/jpeg"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                    </label>
+                    {imagePreview && (
+                      <button
+                        type="button"
                         onClick={() => {
                           setImageFile(null);
                           setImagePreview(null);
-                          const fileInputs = document.querySelectorAll('input[type="file"]');
-                          fileInputs.forEach(input => { (input as HTMLInputElement).value = ''; });
+                          const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+                          if (fileInput) fileInput.value = '';
                         }}
+                        className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-sm hover:bg-rose-600 transition-colors z-10"
+                        title="Eliminar foto"
                       >
-                        Quitar imagen
-                      </Button>
-                    ) : (
-                      <p>Click para cambiar foto</p>
+                        <X className="w-4 h-4" />
+                      </button>
                     )}
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs text-slate-500">
+                      Haga clic en el recuadro para subir una imagen.<br />
+                      Formatos: JPG, PNG. Máximo: 5MB
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
-
-            <div className="flex justify-end gap-3 pt-4 border-t">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-                Cancelar
-              </Button>
-              <Button type="submit" disabled={updateMutation.isPending}>
-                {updateMutation.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                Actualizar
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          </ModalSection>
+        </form>
+      </Form>
+    </BaseModal>
   );
 };

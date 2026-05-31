@@ -5,24 +5,20 @@ import * as z from 'zod';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useCreateSucursal } from '../hooks/useCreateSucursal';
 import { Button } from '../../../../shared/components/ui/button';
+import { Building2, Hash, MapPin, Mail, Plus } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '../../../../shared/components/ui/dialog';
+  BaseModal,
+  ModalFooter,
+  ModalSection,
+  ModalField,
+  ModalEntityCard
+} from '../../../../shared/components/ui/modal';
 import {
   Form,
   FormControl,
   FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
 } from '../../../../shared/components/ui/form';
 import { Input } from '../../../../shared/components/ui/input';
-import { Plus } from 'lucide-react';
 
 const formSchema = z.object({
   sunombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
@@ -38,6 +34,7 @@ export const CreateSucursalModal = () => {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       sunombre: '',
       suidentificador: '',
@@ -71,92 +68,95 @@ export const CreateSucursalModal = () => {
     if (!newOpen) form.reset();
   };
 
+  const footer = (
+    <ModalFooter 
+      onCancel={() => handleOpenChange(false)} 
+      onConfirm={form.handleSubmit(onSubmit)} 
+      isLoading={isPending}
+      confirmLabel="Guardar Sucursal"
+    />
+  );
+
   return (
     <>
       <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700">
         <Plus className="w-4 h-4 mr-2" /> Nueva Sucursal
       </Button>
 
-      <Dialog open={open} onOpenChange={handleOpenChange}>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Registrar Nueva Sucursal</DialogTitle>
-            <DialogDescription>
-              Añade una nueva sucursal a tu empresa. El identificador debe ser único.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              
-              <FormField
-                control={form.control}
-                name="sunombre"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Nombre de la Sucursal</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Ej: Sucursal Centro" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+      <BaseModal 
+        isOpen={open} 
+        onClose={() => handleOpenChange(false)}
+        title="Registrar Nueva Sucursal"
+        subtitle="Añade una nueva sucursal a tu empresa. El identificador debe ser único."
+        size="md"
+        footer={footer}
+      >
+        <ModalEntityCard 
+          icon={Building2}
+          title="Nueva Sucursal"
+          subtitle="Comience a operar en una nueva ubicación"
+        />
+        
+        <Form {...form}>
+          <form id="create-sucursal-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            <ModalSection title="Información Básica">
+              <div className="grid grid-cols-1 gap-5">
+                <FormField
+                  control={form.control}
+                  name="sunombre"
+                  render={({ field, fieldState }) => (
+                    <ModalField label="Nombre de la Sucursal" required error={fieldState.error?.message}>
+                      <FormControl>
+                        <Input icon={Building2} className="h-11 rounded-xl" placeholder="Ej: Sucursal Centro" {...field} />
+                      </FormControl>
+                    </ModalField>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="suidentificador"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Identificador (Ej: 001)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="001" maxLength={3} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="suidentificador"
+                  render={({ field, fieldState }) => (
+                    <ModalField label="Identificador (Ej: 001)" required error={fieldState.error?.message}>
+                      <FormControl>
+                        <Input icon={Hash} className="h-11 rounded-xl" placeholder="001" maxLength={3} {...field} />
+                      </FormControl>
+                    </ModalField>
+                  )}
+                />
+              </div>
+            </ModalSection>
 
-              <FormField
-                control={form.control}
-                name="sudireccion"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Dirección (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Av. Principal 123..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <ModalSection title="Datos de Contacto (Opcional)">
+              <div className="grid grid-cols-1 gap-5">
+                <FormField
+                  control={form.control}
+                  name="sudireccion"
+                  render={({ field, fieldState }) => (
+                    <ModalField label="Dirección" error={fieldState.error?.message}>
+                      <FormControl>
+                        <Input icon={MapPin} className="h-11 rounded-xl" placeholder="Av. Principal 123..." {...field} />
+                      </FormControl>
+                    </ModalField>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="sucorreo"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Correo Electrónico (Opcional)</FormLabel>
-                    <FormControl>
-                      <Input placeholder="sucursal@empresa.com" type="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <DialogFooter className="pt-4">
-                <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
-                  Cancelar
-                </Button>
-                <Button type="submit" disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700">
-                  {isPending ? 'Guardando...' : 'Guardar Sucursal'}
-                </Button>
-              </DialogFooter>
-            </form>
-          </Form>
-        </DialogContent>
-      </Dialog>
+                <FormField
+                  control={form.control}
+                  name="sucorreo"
+                  render={({ field, fieldState }) => (
+                    <ModalField label="Correo Electrónico" error={fieldState.error?.message}>
+                      <FormControl>
+                        <Input icon={Mail} className="h-11 rounded-xl" placeholder="sucursal@empresa.com" type="email" {...field} />
+                      </FormControl>
+                    </ModalField>
+                  )}
+                />
+              </div>
+            </ModalSection>
+          </form>
+        </Form>
+      </BaseModal>
     </>
   );
 };

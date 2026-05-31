@@ -2,15 +2,21 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { PackageMinus, Hash, Activity } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '../../../../shared/components/ui/dialog';
-import { Button } from '../../../../shared/components/ui/button';
+  BaseModal,
+  ModalFooter,
+  ModalSection,
+  ModalField,
+  ModalEntityCard,
+  ModalChipGroup
+} from '../../../../shared/components/ui/modal';
 import { Input } from '../../../../shared/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+} from '../../../../shared/components/ui/form';
 import { useUpdateStock } from '../hooks/useUpdateStock';
 import type { Stock } from '../../domain/entities/Stock';
 
@@ -30,13 +36,9 @@ interface EditStockModalProps {
 export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProps) => {
   const { mutate: updateStock, isPending } = useUpdateStock();
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = useForm<FormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       stckcantidad: Number(stock.stckcantidad) || 0,
       stckestado: stock.stckestado,
@@ -45,12 +47,12 @@ export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProp
 
   useEffect(() => {
     if (open) {
-      reset({
+      form.reset({
         stckcantidad: Number(stock.stckcantidad) || 0,
         stckestado: stock.stckestado,
       });
     }
-  }, [open, reset, stock]);
+  }, [open, form.reset, stock]);
 
   const onSubmit = (values: FormValues) => {
     const payload: any = { stcksuid: stock.sucursal.suid }; // Obligatorio para API
@@ -79,54 +81,77 @@ export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProp
     );
   };
 
+  const footer = (
+    <ModalFooter 
+      onCancel={() => onOpenChange(false)} 
+      onConfirm={form.handleSubmit(onSubmit)} 
+      isLoading={isPending}
+      confirmLabel="Guardar Ajuste"
+    />
+  );
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Ajuste de Bodega</DialogTitle>
-          <DialogDescription>
-            Modifica la cantidad o estado del producto <b>{stock.producto.prdtonombre}</b> en la <b>{stock.sucursal.sunombre}</b>.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Nueva Cantidad</label>
-            <Input 
-              type="number" 
-              {...register('stckcantidad', { valueAsNumber: true })} 
-              min="0"
-              step="0.01"
-            />
-            {errors.stckcantidad && <p className="text-sm text-red-500">{errors.stckcantidad.message}</p>}
-          </div>
+    <BaseModal 
+      isOpen={open} 
+      onClose={() => onOpenChange(false)}
+      title="Ajuste de Bodega"
+      subtitle={`Modifica la cantidad o estado del producto en la ${stock.sucursal.sunombre}.`}
+      size="md"
+      footer={footer}
+    >
+      <ModalEntityCard 
+        icon={PackageMinus}
+        title={stock.producto.prdtonombre || 'Producto Cargando...'}
+        subtitle={`Sucursal: ${stock.sucursal.sunombre || ''}`}
+        iconClassName="text-amber-600 bg-amber-50"
+      />
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Estado del Lote</label>
-            <select
-              {...register('stckestado')}
-              className="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
-            >
-              <option value="activo">Activo</option>
-              <option value="inactivo">Inactivo</option>
-            </select>
-            {errors.stckestado && <p className="text-sm text-red-500">{errors.stckestado.message}</p>}
-          </div>
+      <Form {...form}>
+        <form id="edit-stock-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <ModalSection title="Ajuste de Inventario">
+            <div className="grid grid-cols-1 gap-5">
+              <FormField
+                control={form.control}
+                name="stckcantidad"
+                render={({ field, fieldState }) => (
+                  <ModalField label="Nueva Cantidad" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <Input 
+                        icon={Hash}
+                        type="number" 
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="h-11 rounded-xl"
+                        min="0"
+                        step="0.01"
+                      />
+                    </FormControl>
+                  </ModalField>
+                )}
+              />
 
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700">
-              {isPending ? 'Guardando...' : 'Guardar Ajuste'}
-            </Button>
-          </div>
+              <FormField
+                control={form.control}
+                name="stckestado"
+                render={({ field, fieldState }) => (
+                  <ModalField label="Estado del Lote" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <ModalChipGroup
+                        options={[
+                          { label: 'Activo', value: 'activo' },
+                          { label: 'Inactivo', value: 'inactivo' }
+                        ]}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </FormControl>
+                  </ModalField>
+                )}
+              />
+            </div>
+          </ModalSection>
         </form>
-      </DialogContent>
-    </Dialog>
+      </Form>
+    </BaseModal>
   );
 };

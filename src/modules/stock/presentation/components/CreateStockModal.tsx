@@ -2,15 +2,20 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { PackagePlus, Building2, Package, Hash } from 'lucide-react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from '../../../../shared/components/ui/dialog';
-import { Button } from '../../../../shared/components/ui/button';
+  BaseModal,
+  ModalFooter,
+  ModalSection,
+  ModalField,
+  ModalEntityCard
+} from '../../../../shared/components/ui/modal';
 import { Input } from '../../../../shared/components/ui/input';
+import {
+  Form,
+  FormControl,
+  FormField,
+} from '../../../../shared/components/ui/form';
 import { useCreateStock } from '../hooks/useCreateStock';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useSucursales } from '../../../sucursal/presentation/hooks/useSucursales';
@@ -38,14 +43,9 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
   const { data: sucursalesData } = useSucursales(1, 100);
   const { data: productosData } = useProductos(1, 100);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<FormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
+    mode: 'onChange',
     defaultValues: {
       stcksuid: defaultSucursalId || '',
       stckprdtoid: '',
@@ -55,13 +55,13 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
 
   useEffect(() => {
     if (open) {
-      reset({
+      form.reset({
         stcksuid: defaultSucursalId || '',
         stckprdtoid: '',
         stckcantidad: 0,
       });
     }
-  }, [open, reset, defaultSucursalId]);
+  }, [open, form.reset, defaultSucursalId]);
 
   const onSubmit = (values: FormValues) => {
     if (!company?.emid) return;
@@ -76,81 +76,113 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
       {
         onSuccess: () => {
           onOpenChange(false);
-          reset();
+          form.reset();
         },
       }
     );
   };
 
+  const footer = (
+    <ModalFooter 
+      onCancel={() => onOpenChange(false)} 
+      onConfirm={form.handleSubmit(onSubmit)} 
+      isLoading={isPending}
+      confirmLabel="Registrar Stock"
+    />
+  );
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Ingreso de Mercancía</DialogTitle>
-          <DialogDescription>
-            Registra un nuevo lote de producto para una sucursal.
-          </DialogDescription>
-        </DialogHeader>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
-          
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Sucursal de Destino</label>
-            <select
-              {...register('stcksuid')}
-              className="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">Seleccione una sucursal</option>
-              {sucursalesData?.items.map((sucursal) => (
-                <option key={sucursal.suid} value={sucursal.suid}>
-                  {sucursal.sunombre} (Identificador: {sucursal.suidentificador})
-                </option>
-              ))}
-            </select>
-            {errors.stcksuid && <p className="text-sm text-red-500">{errors.stcksuid.message}</p>}
-          </div>
+    <BaseModal 
+      isOpen={open} 
+      onClose={() => onOpenChange(false)}
+      title="Ingreso de Mercancía"
+      subtitle="Registra un nuevo lote de producto para una sucursal."
+      size="md"
+      footer={footer}
+    >
+      <ModalEntityCard 
+        icon={PackagePlus}
+        title="Nuevo Stock"
+        subtitle="Complete los detalles del inventario"
+      />
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Producto</label>
-            <select
-              {...register('stckprdtoid')}
-              className="flex h-10 w-full rounded-md border border-slate-300 bg-transparent px-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <option value="">Seleccione un producto</option>
-              {productosData?.items.map((producto) => (
-                <option key={producto.prdtoid} value={producto.prdtoid}>
-                  {producto.prdtocodigo} - {producto.prdtonombre}
-                </option>
-              ))}
-            </select>
-            {errors.stckprdtoid && <p className="text-sm text-red-500">{errors.stckprdtoid.message}</p>}
-          </div>
+      <Form {...form}>
+        <form id="create-stock-form" onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          <ModalSection title="Detalles del Producto">
+            <div className="grid grid-cols-1 gap-5">
+              <FormField
+                control={form.control}
+                name="stcksuid"
+                render={({ field, fieldState }) => (
+                  <ModalField label="Sucursal de Destino" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <div className="relative">
+                        <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <select
+                          {...field}
+                          className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="">Seleccione una sucursal</option>
+                          {sucursalesData?.items.map((sucursal) => (
+                            <option key={sucursal.suid} value={sucursal.suid}>
+                              {sucursal.sunombre} (Identificador: {sucursal.suidentificador})
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </FormControl>
+                  </ModalField>
+                )}
+              />
 
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-slate-700">Cantidad Inicial</label>
-            <Input 
-              type="number" 
-              {...register('stckcantidad', { valueAsNumber: true })} 
-              placeholder="0" 
-              min="0"
-            />
-            {errors.stckcantidad && <p className="text-sm text-red-500">{errors.stckcantidad.message}</p>}
-          </div>
+              <FormField
+                control={form.control}
+                name="stckprdtoid"
+                render={({ field, fieldState }) => (
+                  <ModalField label="Producto" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <div className="relative">
+                        <Package className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                        <select
+                          {...field}
+                          className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          <option value="">Seleccione un producto</option>
+                          {productosData?.items.map((producto) => (
+                            <option key={producto.prdtoid} value={producto.prdtoid}>
+                              {producto.prdtocodigo} - {producto.prdtonombre}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </FormControl>
+                  </ModalField>
+                )}
+              />
 
-          <div className="flex justify-end space-x-2 pt-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isPending}
-            >
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={isPending} className="bg-indigo-600 hover:bg-indigo-700">
-              {isPending ? 'Guardando...' : 'Registrar Stock'}
-            </Button>
-          </div>
+              <FormField
+                control={form.control}
+                name="stckcantidad"
+                render={({ field, fieldState }) => (
+                  <ModalField label="Cantidad Inicial" required error={fieldState.error?.message}>
+                    <FormControl>
+                      <Input 
+                        icon={Hash}
+                        type="number" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="h-11 rounded-xl"
+                        placeholder="0" 
+                        min="0"
+                      />
+                    </FormControl>
+                  </ModalField>
+                )}
+              />
+            </div>
+          </ModalSection>
         </form>
-      </DialogContent>
-    </Dialog>
+      </Form>
+    </BaseModal>
   );
 };
