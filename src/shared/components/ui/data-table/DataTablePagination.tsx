@@ -95,7 +95,7 @@ export function DataTablePagination({
       
       {/* Center */}
       <div className="text-sm text-slate-600 font-medium hidden md:block">
-        Mostrando {currentRows} de {rowCount} productos
+        Mostrando {currentRows} de {rowCount} registros
       </div>
 
       {/* Right side */}

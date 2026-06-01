@@ -14,8 +14,15 @@ import {
   Package,
   Receipt,
   Pin,
-  PinOff
+  PinOff,
+  ChevronsUpDown
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../ui/dropdown-menu';
 import { cn } from '../../lib/utils';
 
 export interface SidebarProps {
@@ -33,6 +40,9 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
     const saved = localStorage.getItem('sidebar_pinned');
     return saved === 'true';
   });
+
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const isExpanded = isPinned || isDropdownOpen;
 
   const togglePin = () => {
     const newState = !isPinned;
@@ -81,7 +91,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
   return (
     <aside className={cn(
       "group relative z-20 flex flex-col bg-transparent transition-all duration-300 ease-in-out hidden md:flex h-full",
-      isPinned ? "w-56" : "w-[72px] hover:w-56"
+      isExpanded ? "w-56" : "w-[72px] hover:w-56"
     )}>
       {/* Header section (Company Logo) */}
       <div className="h-16 flex items-center px-4 overflow-hidden shrink-0 relative">
@@ -105,7 +115,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
         )}
         <div className={cn(
           "flex items-center justify-between w-[130px] shrink-0 ml-3 transition-opacity duration-300 delay-75",
-          isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          isExpanded ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         )}>
           <span className="font-bold text-[15px] text-slate-800 leading-tight whitespace-normal line-clamp-2 break-words">
             {companyName || 'My Workspace'}
@@ -138,13 +148,13 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
               {index > 0 && (
                 <div className={cn(
                   "absolute h-[2px] w-8 bg-slate-300 rounded-full transition-all duration-300",
-                  isPinned ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100 group-hover:opacity-0 group-hover:scale-x-0"
+                  isExpanded ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100 group-hover:opacity-0 group-hover:scale-x-0"
                 )} />
               )}
               {/* Texto de cabecera visible cuando está expandido */}
               <div className={cn(
                 "w-full px-3 text-[10px] font-bold text-slate-400 tracking-wider uppercase transition-opacity duration-300 whitespace-nowrap",
-                isPinned ? "opacity-100 delay-75" : "opacity-0 group-hover:opacity-100 group-hover:delay-75"
+                isExpanded ? "opacity-100 delay-75" : "opacity-0 group-hover:opacity-100 group-hover:delay-75"
               )}>
                 {group.group}
               </div>
@@ -158,7 +168,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
                   title={item.name}
                   className={cn(
                     'flex items-center py-2 rounded-xl transition-all duration-200 overflow-hidden whitespace-nowrap group/item',
-                    isPinned ? 'px-3' : 'px-2 group-hover:px-3',
+                    isExpanded ? 'px-3' : 'px-2 group-hover:px-3',
                     isActive
                       ? 'bg-white text-slate-800 font-semibold shadow-sm border border-slate-200/50'
                       : 'text-slate-500 hover:bg-white/60 hover:text-slate-800'
@@ -175,7 +185,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
                   </div>
                   <div className={cn(
                     "transition-all duration-300 overflow-hidden whitespace-nowrap flex items-center",
-                    isPinned ? "w-auto opacity-100 ml-3" : "w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 group-hover:ml-3"
+                    isExpanded ? "w-auto opacity-100 ml-3" : "w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 group-hover:ml-3"
                   )}>
                     <span className={cn(
                       "text-[13px]",
@@ -197,35 +207,54 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
       </div>
 
       {/* User Section */}
-      <div className="p-3 shrink-0">
-        <div className="flex items-center px-2 py-3 rounded-xl overflow-hidden whitespace-nowrap mb-2">
-          {/* Avatar */}
-          <div className="flex items-center justify-center min-w-[32px] w-[32px] h-[32px] rounded-full ring-2 ring-emerald-500/20 overflow-hidden bg-white shrink-0 shadow-sm border border-slate-200">
-            {userImage ? (
-              <img src={userImage} alt={user?.usnombre || 'User'} className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-emerald-600 font-bold text-sm uppercase">
-                {user?.usnombre?.charAt(0) || 'U'}
-              </span>
-            )}
-          </div>
+      <div className="p-3 shrink-0 mt-auto flex flex-col space-y-2">
+        <DropdownMenu onOpenChange={setIsDropdownOpen}>
+          <DropdownMenuTrigger asChild>
+            <button className="w-full flex items-center justify-between p-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/60 shadow-sm transition-colors outline-none ring-0 group/user">
+              <div className="flex items-center overflow-hidden">
+                {/* Avatar */}
+                <div className="flex items-center justify-center min-w-[36px] w-[36px] h-[36px] rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200/50">
+                  {userImage ? (
+                    <img src={userImage} alt={user?.usnombre || 'User'} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-emerald-600 font-bold text-sm uppercase">
+                      {user?.usnombre?.charAt(0) || 'U'}
+                    </span>
+                  )}
+                </div>
+                
+                {/* User Details */}
+                <div className={cn(
+                  "flex flex-col text-left transition-all duration-300 delay-75 overflow-hidden",
+                  isExpanded ? "w-[100px] ml-2.5 opacity-100" : "w-0 ml-0 opacity-0 group-hover:w-[100px] group-hover:ml-2.5 group-hover:opacity-100"
+                )}>
+                  <span className="text-[13px] text-slate-800 font-semibold truncate leading-tight">
+                    {user?.usnombre || 'Usuario'}
+                  </span>
+                  <span className="text-[11px] text-slate-500 truncate leading-tight mt-0.5">
+                    {user?.uscorreo || 'correo@empresa.com'}
+                  </span>
+                  <span className="text-[10px] text-emerald-700 font-bold tracking-wider uppercase mt-1.5 bg-emerald-100 w-max px-2 py-0.5 rounded-md">
+                    {user?.usrol || 'Rol'}
+                  </span>
+                </div>
+              </div>
 
-          {/* User Details */}
-          <div className={cn(
-            "ml-2.5 flex flex-col transition-opacity duration-300 delay-75 overflow-hidden w-[120px] shrink-0",
-            isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          )}>
-            <span className="text-[14px] text-slate-800 font-semibold truncate leading-tight">
-              {user?.usnombre || 'Usuario'}
-            </span>
-            <span className="text-[12px] text-slate-500 truncate leading-tight mt-0.5">
-              {user?.uscorreo || 'correo@empresa.com'}
-            </span>
-            <span className="text-[10px] text-emerald-600 font-bold tracking-wider uppercase mt-1 bg-emerald-100 w-max px-1.5 py-0.5 rounded-md">
-              {user?.usrol || 'Rol'}
-            </span>
-          </div>
-        </div>
+              {/* Chevrons */}
+              <div className={cn(
+                "transition-all duration-300 delay-75 text-slate-400 overflow-hidden",
+                isExpanded ? "w-4 px-1 opacity-100" : "w-0 px-0 opacity-0 group-hover:w-4 group-hover:px-1 group-hover:opacity-100"
+              )}>
+                <ChevronsUpDown className="w-4 h-4" />
+              </div>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" side="right" sideOffset={16} className="w-56 rounded-xl">
+            <DropdownMenuItem className="cursor-pointer rounded-lg text-slate-600">
+              <span>Configuración de Perfil</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
 
         {/* Log Out */}
         <button
@@ -238,7 +267,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
           </div>
           <span className={cn(
             "ml-3 text-[15px] font-medium transition-opacity duration-300 delay-75",
-            isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            isExpanded ? "opacity-100" : "opacity-0 group-hover:opacity-100"
           )}>
             Cerrar Sesión
           </span>
