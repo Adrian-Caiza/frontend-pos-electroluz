@@ -67,13 +67,13 @@ export const MainLayout = () => {
   const userImage = getImageUrl(user?.usimagen as string | undefined);
 
   return (
-    <div className="h-screen w-full bg-slate-50 flex overflow-hidden">
+    <div className="h-screen w-full bg-slate-100 flex overflow-hidden p-2 md:p-4 gap-4">
       <Sidebar onLogout={handleLogout} userImage={userImage} />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      {/* Main Content Card */}
+      <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-3xl shadow-sm border border-slate-200/60">
         {/* Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6">
+        <header className="h-16 bg-white flex items-center justify-between px-6 shrink-0 rounded-t-3xl border-b border-slate-100">
           <div className="flex items-center md:hidden">
             <span className="font-bold text-lg text-slate-800">
               {company?.emrznsocial || 'POS App'}
@@ -123,7 +123,7 @@ export const MainLayout = () => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto bg-slate-50 p-6">
+        <main className="flex-1 overflow-auto bg-white p-6 rounded-b-3xl">
           <div className="w-full max-w-[1600px] mx-auto min-h-full flex flex-col pb-8">
             <Outlet />
           </div>
