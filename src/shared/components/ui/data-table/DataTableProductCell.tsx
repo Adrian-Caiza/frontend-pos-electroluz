@@ -1,5 +1,4 @@
 import { ImageOff } from "lucide-react"
-import { Avatar, AvatarFallback, AvatarImage } from "../avatar"
 
 interface DataTableProductCellProps {
   name: string
@@ -29,15 +28,18 @@ export function DataTableProductCell({ name, sku, imageUrl }: DataTableProductCe
 
   return (
     <div className="flex items-center gap-3">
-      <Avatar className="h-10 w-10 border border-border/50 rounded-lg shrink-0">
-        <AvatarImage src={imageUrl || undefined} alt={name} className="object-cover" />
-        <AvatarFallback 
-          className="rounded-lg text-xs font-medium text-white shadow-inner"
-          style={{ backgroundColor: bgColor }}
-        >
-          {imageUrl === null ? <ImageOff className="h-4 w-4 opacity-50 text-white" /> : initials}
-        </AvatarFallback>
-      </Avatar>
+      <div className="relative h-11 w-11 rounded-lg border border-slate-200 overflow-hidden shrink-0 shadow-sm bg-slate-50">
+        {imageUrl ? (
+          <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
+        ) : (
+          <div 
+            className="w-full h-full flex items-center justify-center text-xs font-semibold text-white shadow-inner"
+            style={{ backgroundColor: bgColor }}
+          >
+            {initials}
+          </div>
+        )}
+      </div>
       <div className="flex flex-col overflow-hidden">
         <span className="font-semibold text-sm truncate">{name}</span>
         {sku && <span className="text-xs text-muted-foreground truncate">{sku}</span>}
