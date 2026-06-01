@@ -2,6 +2,9 @@ import * as React from "react"
 import type {
   ColumnDef,
   PaginationState,
+  RowSelectionState,
+  OnChangeFn,
+  Row,
 } from "@tanstack/react-table"
 import {
   flexRender,
@@ -28,6 +31,9 @@ interface DataTableProps<TData, TValue> {
   rowCount?: number
   pagination?: PaginationState
   onPaginationChange?: (pagination: PaginationState) => void
+  rowSelection?: RowSelectionState
+  onRowSelectionChange?: OnChangeFn<RowSelectionState>
+  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string
   toolbar?: DataTableToolbarProps
   meta?: any
 }
@@ -40,6 +46,9 @@ export function DataTable<TData, TValue>({
   rowCount,
   pagination,
   onPaginationChange,
+  rowSelection,
+  onRowSelectionChange,
+  getRowId,
   toolbar,
   meta,
 }: DataTableProps<TData, TValue>) {
@@ -49,6 +58,7 @@ export function DataTable<TData, TValue>({
     pageCount: pageCount ?? -1,
     state: {
       pagination: pagination || { pageIndex: 0, pageSize: 10 },
+      rowSelection,
     },
     onPaginationChange: (updater) => {
       if (onPaginationChange && pagination) {
@@ -56,6 +66,8 @@ export function DataTable<TData, TValue>({
         onPaginationChange(newPagination)
       }
     },
+    onRowSelectionChange,
+    getRowId,
     getCoreRowModel: getCoreRowModel(),
     // If not controlled externally, uncomment below line
     // getPaginationRowModel: pagination ? undefined : getPaginationRowModel(),

@@ -13,7 +13,7 @@ import { DataTableRowActions, type DataTableRowActionItem } from "../../../../sh
 // Helper para parsear la URL de la imagen
 export const getImageUrl = (rawPath: string | null) => {
   if (!rawPath || rawPath === 'null' || rawPath === 'undefined' || rawPath.trim() === '') return null;
-  
+
   const imagePath = rawPath.replace(/\\/g, '/');
   if (imagePath.startsWith('blob:')) return imagePath;
 
@@ -23,7 +23,7 @@ export const getImageUrl = (rawPath: string | null) => {
       const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
       const isApiHost = import.meta.env.VITE_API_URL && url.hostname === new URL(import.meta.env.VITE_API_URL).hostname;
       const isKnownIP = url.hostname === '163.245.192.54';
-      
+
       if (isLocalhost || isApiHost || isKnownIP) {
         return `/api-proxy${url.pathname}`;
       }
@@ -32,7 +32,7 @@ export const getImageUrl = (rawPath: string | null) => {
       return imagePath;
     }
   }
-  
+
   const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
   return `/api-proxy${path}`;
 };
@@ -92,7 +92,7 @@ export const columns: ColumnDef<Producto>[] = [
     cell: ({ row }) => {
       const producto = row.original;
       return (
-        <DataTableProductCell 
+        <DataTableProductCell
           name={producto.prdtonombre}
           sku={producto.prdtocodigo}
           imageUrl={getImageUrl(producto.prdtoimagen)}
@@ -124,7 +124,7 @@ export const columns: ColumnDef<Producto>[] = [
     cell: ({ row }) => {
       const producto = row.original;
       return (
-        <DataTablePriceCell 
+        <DataTablePriceCell
           price={producto.prdtoprecioventa}
           cost={producto.prdtopreciocompra}
         />
@@ -139,7 +139,7 @@ export const columns: ColumnDef<Producto>[] = [
     cell: ({ row }) => {
       const producto = row.original;
       return (
-        <DataTableStockCell 
+        <DataTableStockCell
           stock={Number(producto.prdtostockmaximo)}
           minStock={Number(producto.prdtostockminimo)}
           unit={producto.medida?.mdiaabreviatura}
@@ -150,10 +150,12 @@ export const columns: ColumnDef<Producto>[] = [
   {
     accessorKey: "prdtoestado",
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Estado" />
+      <DataTableColumnHeader column={column} title="Estado" className="justify-center" />
     ),
     cell: ({ row }) => (
-      <DataTableStatusBadge status={row.original.prdtoestado} />
+      <div className="flex w-full justify-center">
+        <DataTableStatusBadge status={row.original.prdtoestado} />
+      </div>
     ),
   },
   {
@@ -165,7 +167,7 @@ export const columns: ColumnDef<Producto>[] = [
     cell: ({ row, table }) => {
       const producto = row.original;
       const meta = table.options.meta as ProductoTableMeta | undefined;
-      
+
       if (!meta?.isJefe) return null;
 
       const actions: DataTableRowActionItem[] = [

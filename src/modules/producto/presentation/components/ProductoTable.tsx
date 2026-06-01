@@ -1,4 +1,8 @@
 import { useState, useMemo } from 'react';
+import type { RowSelectionState } from '@tanstack/react-table';
+import { toast } from 'sonner';
+import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { Button } from '../../../../shared/components/ui/button';
 
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useProductos } from '../hooks/useProductos';
@@ -30,6 +34,8 @@ export const ProductoTable = () => {
 
   const [selectedProducto, setSelectedProducto] = useState<Producto | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
   // Client-side filtering of the current page data (since API doesn't support it yet)
   const filteredData = useMemo(() => {
@@ -69,6 +75,25 @@ export const ProductoTable = () => {
     });
   };
 
+  const handleBulkAction = async (newStatus: 'activo' | 'inactivo' | 'eliminado') => {
+    const selectedIds = Object.keys(rowSelection);
+    if (selectedIds.length === 0) return;
+
+    setIsProcessingBulk(true);
+    try {
+      // Run updates in parallel
+      await Promise.all(
+        selectedIds.map(id => updateMutation.mutateAsync({ id, data: { prdtoestado: newStatus } }))
+      );
+      setRowSelection({});
+    } catch (error) {
+      console.error("Bulk update failed", error);
+      // Let the mutation's onError handle the toast
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
   const meta: ProductoTableMeta = {
     isJefe,
     onEdit: (producto) => {
@@ -91,6 +116,9 @@ export const ProductoTable = () => {
           setPage(newPagination.pageIndex + 1);
           setPageSize(newPagination.pageSize);
         }}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={(row) => row.prdtoid}
         meta={meta}
         toolbar={{
           globalFilter,
@@ -99,16 +127,51 @@ export const ProductoTable = () => {
           onAdvancedFilterClick: () => {}, // Adding this will render the "Filtros" button
           children: (
             <div className="flex gap-2">
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px] bg-background">
-                  <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos los Estados</SelectItem>
-                  <SelectItem value="activo">Activo</SelectItem>
-                  <SelectItem value="inactivo">Inactivo</SelectItem>
-                </SelectContent>
-              </Select>
+              {Object.keys(rowSelection).length > 0 ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                    onClick={() => handleBulkAction('activo')}
+                    disabled={isProcessingBulk}
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Activar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                    onClick={() => handleBulkAction('inactivo')}
+                    disabled={isProcessingBulk}
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Inactivar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                    onClick={() => handleBulkAction('eliminado')}
+                    disabled={isProcessingBulk}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar
+                  </Button>
+                </>
+              ) : (
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px] bg-background">
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los Estados</SelectItem>
+                    <SelectItem value="activo">Activo</SelectItem>
+                    <SelectItem value="inactivo">Inactivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
           )
         }}
