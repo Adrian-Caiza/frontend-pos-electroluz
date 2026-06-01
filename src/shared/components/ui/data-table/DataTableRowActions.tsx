@@ -9,6 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "../dropdown-menu"
 import { cn } from "../../../lib/utils"
+import { DropdownMenuLabel } from "../dropdown-menu"
 
 export interface DataTableRowActionItem {
   label: string
@@ -20,9 +21,10 @@ export interface DataTableRowActionItem {
 
 interface DataTableRowActionsProps {
   actions: DataTableRowActionItem[]
+  title?: string
 }
 
-export function DataTableRowActions({ actions }: DataTableRowActionsProps) {
+export function DataTableRowActions({ actions, title }: DataTableRowActionsProps) {
   if (!actions.length) return null
 
   return (
@@ -36,16 +38,36 @@ export function DataTableRowActions({ actions }: DataTableRowActionsProps) {
           <span className="sr-only">Abrir menú</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[160px]">
+      <DropdownMenuContent align="end" className="w-[240px] p-2 rounded-xl border border-slate-200 shadow-lg">
+        {title && (
+          <>
+            <DropdownMenuLabel className="px-3 py-2.5 text-[15px] font-semibold text-slate-400/80">
+              {title}
+            </DropdownMenuLabel>
+          </>
+        )}
         {actions.map((action, index) => (
           <div key={index}>
-            {action.separatorAbove && <DropdownMenuSeparator />}
+            {action.separatorAbove && <DropdownMenuSeparator className="-mx-2 my-1 bg-slate-100" />}
             <DropdownMenuItem 
               onClick={action.onClick}
-              className={cn(action.variant === 'danger' && "text-rose-600 focus:text-rose-700")}
+              className={cn(
+                "px-3 py-2.5 rounded-lg cursor-pointer transition-colors",
+                action.variant === 'danger' 
+                  ? "text-rose-600 focus:text-rose-700 focus:bg-rose-50" 
+                  : "text-slate-700 focus:bg-slate-100"
+              )}
             >
-              {action.icon && <span className="mr-2">{action.icon}</span>}
-              {action.label}
+              {action.icon && (
+                <span className={cn(
+                  "mr-3 flex items-center justify-center",
+                  action.variant === 'danger' ? "text-rose-500" : "text-slate-400",
+                  "[&>svg]:h-5 [&>svg]:w-5"
+                )}>
+                  {action.icon}
+                </span>
+              )}
+              <span className="font-medium text-[14px]">{action.label}</span>
             </DropdownMenuItem>
           </div>
         ))}

@@ -1,4 +1,5 @@
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import type {
   ColumnDef,
   PaginationState,
@@ -22,6 +23,12 @@ import {
 } from "../table"
 import { DataTablePagination } from "./DataTablePagination"
 import { DataTableToolbar, type DataTableToolbarProps } from "./DataTableToolbar"
+import { 
+  tableBodyVariants, 
+  tableRowVariants, 
+  tableHeaderVariants, 
+  tableHeadVariants 
+} from "./table-animations"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -35,6 +42,7 @@ interface DataTableProps<TData, TValue> {
   onRowSelectionChange?: OnChangeFn<RowSelectionState>
   getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string
   toolbar?: DataTableToolbarProps
+  disableAnimations?: boolean
   meta?: any
 }
 
@@ -50,6 +58,7 @@ export function DataTable<TData, TValue>({
   onRowSelectionChange,
   getRowId,
   toolbar,
+  disableAnimations = false,
   meta,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
@@ -81,62 +90,154 @@ export function DataTable<TData, TValue>({
       
       <div className="w-full">
         <Table className="border-0 border-collapse">
-          <TableHeader className="border-0">
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="h-12 px-1 py-2 align-middle">
-                      <div className="h-full w-full bg-slate-100 rounded-lg flex items-center px-3">
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(
-                              header.column.columnDef.header,
-                              header.getContext()
-                            )}
+          {disableAnimations ? (
+            <TableHeader className="border-0">
+              {table.getHeaderGroups().map((headerGroup) => (
+                <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <TableHead key={header.id} className="h-12 px-1 py-2 align-middle">
+                        <div className="h-full w-full bg-slate-100 rounded-lg flex items-center px-3">
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </div>
+                      </TableHead>
+                    )
+                  })}
+                </TableRow>
+              ))}
+            </TableHeader>
+          ) : (
+            <motion.thead 
+              className="[&_tr]:border-b border-0"
+              variants={tableHeaderVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id} className="border-b transition-colors hover:bg-transparent border-0">
+                  {headerGroup.headers.map((header) => {
+                    return (
+                      <motion.th 
+                        key={header.id} 
+                        variants={tableHeadVariants}
+                        className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 h-12 py-2"
+                      >
+                        <div className="h-full w-full bg-slate-100 rounded-lg flex items-center px-3">
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
+                        </div>
+                      </motion.th>
+                    )
+                  })}
+                </tr>
+              ))}
+            </motion.thead>
+          )}
+
+          {disableAnimations ? (
+            <TableBody className="border-0">
+              {isLoading ? (
+                // Skeleton Rows
+                Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
+                  <TableRow key={`skeleton-${i}`} className="border-b border-slate-200 hover:bg-transparent">
+                    {columns.map((_, j) => (
+                      <TableCell key={`skeleton-cell-${i}-${j}`} className="py-4 px-4">
+                        <div className="h-5 bg-slate-100 rounded animate-pulse w-3/4"></div>
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                    className="hover:bg-slate-50 transition-colors border-b border-slate-200"
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id} className="py-4 px-4">
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={columns.length} className="h-32 text-center">
+                    <div className="flex flex-col items-center justify-center text-muted-foreground">
+                      <p className="text-sm">No hay resultados.</p>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          ) : (
+            <AnimatePresence mode="popLayout">
+              <motion.tbody 
+                className="[&_tr:last-child]:border-0 border-0"
+                key={`page-${table.getState().pagination.pageIndex}`}
+                variants={tableBodyVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+              >
+                {isLoading ? (
+                  // Skeleton Rows
+                  Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
+                    <motion.tr 
+                      key={`skeleton-${i}`} 
+                      variants={tableRowVariants}
+                      className="border-b transition-colors hover:bg-transparent border-slate-200"
+                    >
+                      {columns.map((_, j) => (
+                        <td key={`skeleton-cell-${i}-${j}`} className="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4">
+                          <div className="h-5 bg-slate-100 rounded animate-pulse w-3/4"></div>
+                        </td>
+                      ))}
+                    </motion.tr>
+                  ))
+                ) : table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <motion.tr
+                      key={row.id}
+                      layout
+                      variants={tableRowVariants}
+                      data-state={row.getIsSelected() && "selected"}
+                      transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                      className="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted hover:bg-slate-50 border-slate-200"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4">
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </motion.tr>
+                  ))
+                ) : (
+                  <motion.tr 
+                    key="empty-state"
+                    variants={tableRowVariants}
+                    className="border-b transition-colors hover:bg-transparent border-slate-200"
+                  >
+                    <td colSpan={columns.length} className="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 h-32 text-center">
+                      <div className="flex flex-col items-center justify-center text-muted-foreground">
+                        <p className="text-sm">No hay resultados.</p>
                       </div>
-                    </TableHead>
-                  )
-                })}
-              </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody className="border-0">
-            {isLoading ? (
-              // Skeleton Rows
-              Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
-                <TableRow key={`skeleton-${i}`} className="border-b border-slate-200 hover:bg-transparent">
-                  {columns.map((_, j) => (
-                    <TableCell key={`skeleton-cell-${i}-${j}`} className="py-4 px-4">
-                      <div className="h-5 bg-slate-100 rounded animate-pulse w-3/4"></div>
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="hover:bg-slate-50 transition-colors border-b border-slate-200"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="py-4 px-4">
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
-            ) : (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={columns.length} className="h-32 text-center">
-                  <div className="flex flex-col items-center justify-center text-muted-foreground">
-                    <p className="text-sm">No hay resultados.</p>
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+                    </td>
+                  </motion.tr>
+                )}
+              </motion.tbody>
+            </AnimatePresence>
+          )}
         </Table>
       </div>
 

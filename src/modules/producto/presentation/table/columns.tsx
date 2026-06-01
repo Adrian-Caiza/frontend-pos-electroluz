@@ -74,15 +74,21 @@ export const columns: ColumnDef<Producto>[] = [
     enableHiding: false,
   },
   {
-    id: "indicator",
-    header: () => <div className="w-2"></div>,
-    cell: ({ row }) => (
-      <div className="flex w-full justify-center">
-        <DataTableRowIndicator status={row.original.prdtoestado} />
-      </div>
+    accessorKey: "prdtocodigo",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Código" />
     ),
-    enableSorting: false,
-    enableHiding: false,
+    cell: ({ row }) => {
+      const producto = row.original;
+      return (
+        <div className="flex items-center gap-3">
+          <DataTableRowIndicator status={producto.prdtoestado} />
+          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+            {producto.prdtocodigo}
+          </span>
+        </div>
+      )
+    },
   },
   {
     accessorKey: "prdtonombre",
@@ -94,7 +100,6 @@ export const columns: ColumnDef<Producto>[] = [
       return (
         <DataTableProductCell
           name={producto.prdtonombre}
-          sku={producto.prdtocodigo}
           imageUrl={getImageUrl(producto.prdtoimagen)}
         />
       )
@@ -202,7 +207,7 @@ export const columns: ColumnDef<Producto>[] = [
 
       return (
         <div className="flex justify-center">
-          <DataTableRowActions actions={actions} />
+          <DataTableRowActions title="Acciones" actions={actions} />
         </div>
       )
     },

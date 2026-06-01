@@ -159,6 +159,15 @@ export const ProductoTable = () => {
                     <Trash2 className="mr-2 h-4 w-4" />
                     Eliminar
                   </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-9 text-slate-500 hover:text-slate-700"
+                    onClick={() => setRowSelection({})}
+                    disabled={isProcessingBulk}
+                  >
+                    Cancelar
+                  </Button>
                 </>
               ) : (
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
