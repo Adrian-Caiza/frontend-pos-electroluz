@@ -81,10 +81,10 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
   return (
     <aside className={cn(
       "group relative z-20 flex flex-col bg-transparent transition-all duration-300 ease-in-out hidden md:flex h-full",
-      isPinned ? "w-64" : "w-20 hover:w-64"
+      isPinned ? "w-56" : "w-[72px] hover:w-56"
     )}>
       {/* Header section (Company Logo) */}
-      <div className="h-16 flex items-center px-5 overflow-hidden shrink-0 relative">
+      <div className="h-16 flex items-center px-4 overflow-hidden shrink-0 relative">
         {companyLogo ? (
           <div className="flex items-center justify-center min-w-[40px] w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shadow-sm bg-white shrink-0 p-1">
             <img src={companyLogo} alt={companyName || 'Logo'} className="w-full h-full object-contain" />
@@ -104,7 +104,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
           </div>
         )}
         <div className={cn(
-          "flex items-center justify-between w-[160px] shrink-0 ml-3 transition-opacity duration-300 delay-75",
+          "flex items-center justify-between w-[130px] shrink-0 ml-3 transition-opacity duration-300 delay-75",
           isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         )}>
           <span className="font-bold text-[15px] text-slate-800 leading-tight whitespace-normal line-clamp-2 break-words">
@@ -124,15 +124,30 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
         </div>
       </div>
 
+      {/* Top Separator */}
+      <div className="px-4 shrink-0">
+        <div className="h-px w-full bg-slate-300 rounded-full" />
+      </div>
+
       {/* Navigation Links */}
-      <nav className="flex-1 overflow-x-hidden overflow-y-auto py-6 px-3 space-y-6 flex flex-col custom-scrollbar">
-        {authorizedNavGroups.map((group) => (
-          <div key={group.group} className="flex flex-col space-y-1">
-            <div className={cn(
-              "px-3 text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1 transition-opacity duration-300 delay-75 whitespace-nowrap",
-              isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-            )}>
-              {group.group}
+      <nav className="flex-1 overflow-x-hidden overflow-y-auto py-4 px-3 space-y-4 flex flex-col custom-scrollbar">
+        {authorizedNavGroups.map((group, index) => (
+          <div key={group.group} className="flex flex-col space-y-0.5">
+            <div className="relative flex items-center justify-center mb-0.5 min-h-[16px]">
+              {/* Separador visible solo cuando está colapsado */}
+              {index > 0 && (
+                <div className={cn(
+                  "absolute h-[2px] w-8 bg-slate-300 rounded-full transition-all duration-300",
+                  isPinned ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100 group-hover:opacity-0 group-hover:scale-x-0"
+                )} />
+              )}
+              {/* Texto de cabecera visible cuando está expandido */}
+              <div className={cn(
+                "w-full px-3 text-[10px] font-bold text-slate-400 tracking-wider uppercase transition-opacity duration-300 whitespace-nowrap",
+                isPinned ? "opacity-100 delay-75" : "opacity-0 group-hover:opacity-100 group-hover:delay-75"
+              )}>
+                {group.group}
+              </div>
             </div>
             {group.items.map((item) => {
               const isActive = location.pathname.startsWith(item.path);
@@ -142,7 +157,8 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
                   to={item.path}
                   title={item.name}
                   className={cn(
-                    'flex items-center px-3 py-3 rounded-xl transition-all duration-200 overflow-hidden whitespace-nowrap group/item',
+                    'flex items-center py-2 rounded-xl transition-all duration-200 overflow-hidden whitespace-nowrap group/item',
+                    isPinned ? 'px-3' : 'px-2 group-hover:px-3',
                     isActive
                       ? 'bg-white text-slate-800 font-semibold shadow-sm border border-slate-200/50'
                       : 'text-slate-500 hover:bg-white/60 hover:text-slate-800'
@@ -151,25 +167,34 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
                   <div className="flex items-center justify-center min-w-[32px]">
                     <item.icon
                       className={cn(
-                        'flex-shrink-0 h-[22px] w-[22px] transition-transform duration-200 group-hover/item:scale-110',
+                        'flex-shrink-0 h-[20px] w-[20px] transition-transform duration-200 group-hover/item:scale-110',
                         isActive ? 'text-emerald-600' : 'text-slate-400 group-hover/item:text-slate-600'
                       )}
                       aria-hidden="true"
                     />
                   </div>
-                  <span className={cn(
-                    "ml-3 text-[15px] transition-opacity duration-300 delay-75",
-                    isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100",
-                    isActive ? "font-bold" : "font-medium"
+                  <div className={cn(
+                    "transition-all duration-300 overflow-hidden whitespace-nowrap flex items-center",
+                    isPinned ? "w-auto opacity-100 ml-3" : "w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 group-hover:ml-3"
                   )}>
-                    {item.name}
-                  </span>
+                    <span className={cn(
+                      "text-[13px]",
+                      isActive ? "font-bold" : "font-medium"
+                    )}>
+                      {item.name}
+                    </span>
+                  </div>
                 </Link>
               );
             })}
           </div>
         ))}
       </nav>
+
+      {/* Bottom Separator */}
+      <div className="px-4 shrink-0">
+        <div className="h-px w-full bg-slate-300 rounded-full" />
+      </div>
 
       {/* User Section */}
       <div className="p-3 shrink-0">
@@ -187,7 +212,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
 
           {/* User Details */}
           <div className={cn(
-            "ml-3 flex flex-col transition-opacity duration-300 delay-75 overflow-hidden",
+            "ml-2.5 flex flex-col transition-opacity duration-300 delay-75 overflow-hidden w-[120px] shrink-0",
             isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
           )}>
             <span className="text-[14px] text-slate-800 font-semibold truncate leading-tight">
