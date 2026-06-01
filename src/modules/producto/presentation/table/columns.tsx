@@ -152,6 +152,10 @@ export const columns: ColumnDef<Producto>[] = [
   },
   {
     id: "actions",
+    enableSorting: false,
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Acciones" className="text-center w-full block" />
+    ),
     cell: ({ row, table }) => {
       const producto = row.original;
       const meta = table.options.meta as ProductoTableMeta | undefined;
@@ -188,7 +192,11 @@ export const columns: ColumnDef<Producto>[] = [
         separatorAbove: true
       });
 
-      return <DataTableRowActions actions={actions} />
+      return (
+        <div className="flex justify-center">
+          <DataTableRowActions actions={actions} />
+        </div>
+      )
     },
   },
 ]
