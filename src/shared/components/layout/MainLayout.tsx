@@ -65,10 +65,16 @@ export const MainLayout = () => {
   };
 
   const userImage = getImageUrl(user?.usimagen as string | undefined);
+  const companyLogo = getImageUrl(company?.emlogo as string | undefined);
 
   return (
     <div className="h-screen w-full bg-slate-100 flex overflow-hidden p-2 md:p-4 gap-4">
-      <Sidebar onLogout={handleLogout} userImage={userImage} />
+      <Sidebar 
+        onLogout={handleLogout} 
+        userImage={userImage} 
+        companyName={company?.emrznsocial}
+        companyLogo={companyLogo}
+      />
 
       {/* Main Content Card */}
       <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-3xl shadow-sm border border-slate-200/60">

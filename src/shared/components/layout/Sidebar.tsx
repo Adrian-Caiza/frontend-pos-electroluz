@@ -21,12 +21,14 @@ import { cn } from '../../lib/utils';
 export interface SidebarProps {
   onLogout: () => void;
   userImage?: string | null;
+  companyName?: string;
+  companyLogo?: string | null;
 }
 
-export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
+export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: SidebarProps) => {
   const location = useLocation();
   const { user } = useAuthStore();
-  
+
   const [isPinned, setIsPinned] = useState(() => {
     const saved = localStorage.getItem('sidebar_pinned');
     return saved === 'true';
@@ -38,49 +40,75 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
     localStorage.setItem('sidebar_pinned', String(newState));
   };
 
-  const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
-    { name: 'Terminal POS', path: '/terminal', icon: Monitor, roles: ['jefe', 'empleado', 'cajero'] },
-    { name: 'Historial Ventas', path: '/proformas', icon: Receipt, roles: ['jefe', 'empleado', 'cajero'] },
-    { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
-    { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
-    { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
-    { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe'] },
-    { name: 'Clientes', path: '/clientes', icon: Users, roles: ['jefe', 'empleado'] },
-    { name: 'Métodos de Pago', path: '/metodos-pago', icon: WalletCards, roles: ['jefe', 'empleado'] },
-    { name: 'Personal', path: '/usuarios', icon: UserCog, roles: ['jefe'] },
+  const navGroups = [
+    {
+      group: 'Principal',
+      items: [
+        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
+      ]
+    },
+    {
+      group: 'Ventas y Caja',
+      items: [
+        { name: 'Terminal POS', path: '/terminal', icon: Monitor, roles: ['jefe', 'empleado', 'cajero'] },
+        { name: 'Historial Ventas', path: '/proformas', icon: Receipt, roles: ['jefe', 'empleado', 'cajero'] },
+        { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
+        { name: 'Clientes', path: '/clientes', icon: Users, roles: ['jefe', 'empleado'] },
+      ]
+    },
+    {
+      group: 'Catálogo e Inventario',
+      items: [
+        { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe'] },
+        { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
+      ]
+    },
+    {
+      group: 'Administración',
+      items: [
+        { name: 'Personal', path: '/usuarios', icon: UserCog, roles: ['jefe'] },
+        { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
+        { name: 'Métodos de Pago', path: '/metodos-pago', icon: WalletCards, roles: ['jefe', 'empleado'] },
+      ]
+    }
   ];
 
-  const authorizedNavItems = navItems.filter((item) =>
-    item.roles.includes(user?.usrol || '')
-  );
+  const authorizedNavGroups = navGroups.map(group => ({
+    ...group,
+    items: group.items.filter(item => item.roles.includes(user?.usrol || ''))
+  })).filter(group => group.items.length > 0);
 
   return (
     <aside className={cn(
       "group relative z-20 flex flex-col bg-transparent transition-all duration-300 ease-in-out hidden md:flex h-full",
       isPinned ? "w-64" : "w-20 hover:w-64"
     )}>
-      {/* Header section (POS Icon) */}
-      <div className="h-16 flex items-center px-5 overflow-hidden whitespace-nowrap shrink-0 relative">
-        {/* Simple inline POS SVG instead of Lucide icon to match the plan */}
-        <div className="flex items-center justify-center min-w-[40px] w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600">
-          <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="12" y="12" width="40" height="28" rx="4" fill="currentColor" fillOpacity="0.8"/>
-            <rect x="16" y="16" width="32" height="14" rx="2" fill="white"/>
-            <path d="M20 40L24 56H40L44 40H20Z" fill="currentColor" fillOpacity="0.6"/>
-            <rect x="24" y="34" width="16" height="4" fill="currentColor"/>
-            <circle cx="22" cy="36" r="2" fill="white"/>
-            <circle cx="32" cy="36" r="2" fill="white"/>
-            <circle cx="42" cy="36" r="2" fill="white"/>
-            <path d="M30 56H34V60H30V56Z" fill="currentColor" fillOpacity="0.4"/>
-          </svg>
-        </div>
+      {/* Header section (Company Logo) */}
+      <div className="h-16 flex items-center px-5 overflow-hidden shrink-0 relative">
+        {companyLogo ? (
+          <div className="flex items-center justify-center min-w-[40px] w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shadow-sm bg-white shrink-0 p-1">
+            <img src={companyLogo} alt={companyName || 'Logo'} className="w-full h-full object-contain" />
+          </div>
+        ) : (
+          <div className="flex items-center justify-center min-w-[40px] w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 shrink-0">
+            <svg width="24" height="24" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="12" y="12" width="40" height="28" rx="4" fill="currentColor" fillOpacity="0.8" />
+              <rect x="16" y="16" width="32" height="14" rx="2" fill="white" />
+              <path d="M20 40L24 56H40L44 40H20Z" fill="currentColor" fillOpacity="0.6" />
+              <rect x="24" y="34" width="16" height="4" fill="currentColor" />
+              <circle cx="22" cy="36" r="2" fill="white" />
+              <circle cx="32" cy="36" r="2" fill="white" />
+              <circle cx="42" cy="36" r="2" fill="white" />
+              <path d="M30 56H34V60H30V56Z" fill="currentColor" fillOpacity="0.4" />
+            </svg>
+          </div>
+        )}
         <div className={cn(
-          "flex items-center justify-between w-full ml-3 transition-opacity duration-300 delay-75",
+          "flex items-center justify-between w-[160px] shrink-0 ml-3 transition-opacity duration-300 delay-75",
           isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         )}>
-          <span className="font-bold text-lg text-slate-800">
-            My Workspace
+          <span className="font-bold text-[15px] text-slate-800 leading-tight whitespace-normal line-clamp-2 break-words">
+            {companyName || 'My Workspace'}
           </span>
           <button
             onClick={togglePin}
@@ -97,40 +125,50 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
       </div>
 
       {/* Navigation Links */}
-      <nav className="flex-1 overflow-x-hidden overflow-y-auto py-6 px-3 space-y-2 flex flex-col custom-scrollbar">
-        {authorizedNavItems.map((item) => {
-          const isActive = location.pathname.startsWith(item.path);
-          return (
-            <Link
-              key={item.path}
-              to={item.path}
-              title={item.name}
-              className={cn(
-                'flex items-center px-3 py-3 rounded-xl transition-all duration-200 overflow-hidden whitespace-nowrap group/item',
-                isActive
-                  ? 'bg-white text-slate-800 font-semibold shadow-sm border border-slate-200/50'
-                  : 'text-slate-500 hover:bg-white/60 hover:text-slate-800'
-              )}
-            >
-              <div className="flex items-center justify-center min-w-[32px]">
-                <item.icon
+      <nav className="flex-1 overflow-x-hidden overflow-y-auto py-6 px-3 space-y-6 flex flex-col custom-scrollbar">
+        {authorizedNavGroups.map((group) => (
+          <div key={group.group} className="flex flex-col space-y-1">
+            <div className={cn(
+              "px-3 text-[10px] font-bold text-slate-400 tracking-wider uppercase mb-1 transition-opacity duration-300 delay-75 whitespace-nowrap",
+              isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+            )}>
+              {group.group}
+            </div>
+            {group.items.map((item) => {
+              const isActive = location.pathname.startsWith(item.path);
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  title={item.name}
                   className={cn(
-                    'flex-shrink-0 h-[22px] w-[22px] transition-transform duration-200 group-hover/item:scale-110',
-                    isActive ? 'text-emerald-600' : 'text-slate-400 group-hover/item:text-slate-600'
+                    'flex items-center px-3 py-3 rounded-xl transition-all duration-200 overflow-hidden whitespace-nowrap group/item',
+                    isActive
+                      ? 'bg-white text-slate-800 font-semibold shadow-sm border border-slate-200/50'
+                      : 'text-slate-500 hover:bg-white/60 hover:text-slate-800'
                   )}
-                  aria-hidden="true"
-                />
-              </div>
-              <span className={cn(
-                "ml-3 text-[15px] transition-opacity duration-300 delay-75",
-                isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100",
-                isActive ? "font-bold" : "font-medium"
-              )}>
-                {item.name}
-              </span>
-            </Link>
-          );
-        })}
+                >
+                  <div className="flex items-center justify-center min-w-[32px]">
+                    <item.icon
+                      className={cn(
+                        'flex-shrink-0 h-[22px] w-[22px] transition-transform duration-200 group-hover/item:scale-110',
+                        isActive ? 'text-emerald-600' : 'text-slate-400 group-hover/item:text-slate-600'
+                      )}
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <span className={cn(
+                    "ml-3 text-[15px] transition-opacity duration-300 delay-75",
+                    isPinned ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+                    isActive ? "font-bold" : "font-medium"
+                  )}>
+                    {item.name}
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        ))}
       </nav>
 
       {/* User Section */}
@@ -146,7 +184,7 @@ export const Sidebar = ({ onLogout, userImage }: SidebarProps) => {
               </span>
             )}
           </div>
-          
+
           {/* User Details */}
           <div className={cn(
             "ml-3 flex flex-col transition-opacity duration-300 delay-75 overflow-hidden",
