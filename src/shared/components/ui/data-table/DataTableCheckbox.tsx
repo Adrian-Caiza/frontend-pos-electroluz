@@ -16,7 +16,7 @@ export function DataTableCheckbox({
       checked={checked}
       onCheckedChange={onCheckedChange}
       aria-label={ariaLabel}
-      className="translate-y-[2px]"
+      className="translate-y-[2px] border-slate-300 shadow-sm data-[state=checked]:border-primary"
     />
   )
 }

@@ -47,33 +47,39 @@ export const columns: ColumnDef<Producto>[] = [
   {
     id: "select",
     header: ({ table }) => (
-      <DataTableCheckbox
-        checked={
-          table.getIsAllPageRowsSelected()
-            ? true
-            : table.getIsSomePageRowsSelected()
-              ? "indeterminate"
-              : false
-        }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        ariaLabel="Seleccionar todos"
-      />
+      <div className="flex w-full justify-center px-1">
+        <DataTableCheckbox
+          checked={
+            table.getIsAllPageRowsSelected()
+              ? true
+              : table.getIsSomePageRowsSelected()
+                ? "indeterminate"
+                : false
+          }
+          onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+          ariaLabel="Seleccionar todos"
+        />
+      </div>
     ),
     cell: ({ row }) => (
-      <DataTableCheckbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        ariaLabel="Seleccionar fila"
-      />
+      <div className="flex w-full justify-center px-1">
+        <DataTableCheckbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          ariaLabel="Seleccionar fila"
+        />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,
   },
   {
     id: "indicator",
-    header: () => null,
+    header: () => <div className="w-2"></div>,
     cell: ({ row }) => (
-      <DataTableRowIndicator status={row.original.prdtoestado} />
+      <div className="flex w-full justify-center">
+        <DataTableRowIndicator status={row.original.prdtoestado} />
+      </div>
     ),
     enableSorting: false,
     enableHiding: false,

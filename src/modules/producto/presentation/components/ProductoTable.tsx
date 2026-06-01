@@ -22,7 +22,8 @@ export const ProductoTable = () => {
   const [globalFilter, setGlobalFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
 
-  const { data, isLoading } = useProductos(page, pageSize);
+  // Fetch all products since we are doing client-side filtering
+  const { data, isLoading } = useProductos(1, 10000);
   const updateMutation = useUpdateProducto();
   const { user } = useAuthStore();
   const isJefe = user?.usrol === 'jefe';
@@ -52,6 +53,15 @@ export const ProductoTable = () => {
     return items;
   }, [data?.items, statusFilter, globalFilter]);
 
+  // Handle pagination locally from the filtered dataset
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredData.slice(startIndex, startIndex + pageSize);
+  }, [filteredData, page, pageSize]);
+
+  const totalFilteredItems = filteredData.length;
+  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+
   const handleStatusChange = (producto: Producto, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
     updateMutation.mutate({
       id: producto.prdtoid,
@@ -72,10 +82,10 @@ export const ProductoTable = () => {
     <>
       <DataTable
         columns={columns}
-        data={filteredData}
+        data={paginatedData}
         isLoading={isLoading}
-        pageCount={data?.totalPages ?? -1}
-        rowCount={data?.totalItems ?? filteredData.length}
+        pageCount={pageCount}
+        rowCount={totalFilteredItems}
         pagination={{ pageIndex: page - 1, pageSize }}
         onPaginationChange={(newPagination) => {
           setPage(newPagination.pageIndex + 1);
