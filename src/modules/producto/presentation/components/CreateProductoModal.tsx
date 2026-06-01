@@ -54,8 +54,18 @@ const formSchema = z.object({
 
 type FormValues = z.infer<typeof formSchema>;
 
-export const CreateProductoModal = () => {
-  const [open, setOpen] = useState(false);
+export interface CreateProductoModalProps {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setControlledOpen }: CreateProductoModalProps = {}) => {
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled && setControlledOpen ? setControlledOpen : setInternalOpen;
+
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   
@@ -121,10 +131,12 @@ export const CreateProductoModal = () => {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
-        <Plus className="w-4 h-4 mr-2" />
-        Nuevo Producto
-      </Button>
+      {!isControlled && (
+        <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+          <Plus className="w-4 h-4 mr-2" />
+          Nuevo Producto
+        </Button>
+      )}
 
       <BaseModal 
         isOpen={open} 

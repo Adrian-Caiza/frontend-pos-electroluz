@@ -124,7 +124,7 @@ export const MainLayout = () => {
         </header>
 
         <main className="flex-1 overflow-auto bg-slate-50 p-6">
-          <div className="w-full max-w-[1600px] mx-auto h-full">
+          <div className="w-full max-w-[1600px] mx-auto min-h-full flex flex-col pb-8">
             <Outlet />
           </div>
         </main>

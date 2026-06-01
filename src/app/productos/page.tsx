@@ -26,10 +26,8 @@ export default function ProductosPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-        <div className="p-1">
-          <ProductoTable />
-        </div>
+      <div className="w-full bg-white rounded-xl">
+        <ProductoTable />
       </div>
     </div>
   );
