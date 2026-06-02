@@ -53,11 +53,6 @@ export const columns: ColumnDef<Checkout>[] = [
     },
   },
   {
-    accessorKey: 'cjestado',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" />,
-    cell: ({ row }) => <DataTableStatusBadge status={row.getValue('cjestado')} />,
-  },
-  {
     accessorKey: 'cjfchregistro',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Fecha Registro" />,
     cell: ({ row }) => {
@@ -66,8 +61,17 @@ export const columns: ColumnDef<Checkout>[] = [
     },
   },
   {
+    accessorKey: 'cjestado',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" className="justify-center" />,
+    cell: ({ row }) => (
+      <div className="flex w-full justify-center">
+        <DataTableStatusBadge status={row.getValue('cjestado')} />
+      </div>
+    ),
+  },
+  {
     id: 'actions',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Acciones" className="justify-end" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Acciones" className="text-center w-full block" />,
     cell: ({ row, table }) => {
       const meta = table.options.meta as CheckoutTableMeta;
       const checkout = row.original;
@@ -103,8 +107,8 @@ export const columns: ColumnDef<Checkout>[] = [
       }
 
       return (
-        <div className="flex justify-end">
-          <DataTableRowActions actions={actions} />
+        <div className="flex justify-center">
+          <DataTableRowActions title="Acciones" actions={actions} />
         </div>
       );
     },

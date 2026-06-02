@@ -20,7 +20,9 @@ export default function MetodosPagoPage() {
         </div>
       </div>
 
-      <MetodoPagoTable />
+      <div className="w-full bg-white rounded-xl">
+        <MetodoPagoTable />
+      </div>
     </div>
   );
 }

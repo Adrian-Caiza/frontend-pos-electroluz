@@ -83,12 +83,16 @@ export const columns: ColumnDef<Cliente>[] = [
   },
   {
     accessorKey: 'clnteestado',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" />,
-    cell: ({ row }) => <DataTableStatusBadge status={row.getValue('clnteestado')} />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Estado" className="justify-center" />,
+    cell: ({ row }) => (
+      <div className="flex w-full justify-center">
+        <DataTableStatusBadge status={row.getValue('clnteestado')} />
+      </div>
+    ),
   },
   {
     id: 'actions',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Acciones" className="justify-end" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Acciones" className="text-center w-full block" />,
     cell: ({ row, table }) => {
       const meta = table.options.meta as ClienteTableMeta;
       const cliente = row.original;
@@ -124,8 +128,8 @@ export const columns: ColumnDef<Cliente>[] = [
       });
 
       return (
-        <div className="flex justify-end">
-          <DataTableRowActions actions={actions} />
+        <div className="flex justify-center">
+          <DataTableRowActions title="Acciones" actions={actions} />
         </div>
       );
     },

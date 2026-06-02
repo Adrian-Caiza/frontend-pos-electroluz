@@ -1,166 +1,173 @@
-import { useState } from 'react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { Wallet, MoreHorizontal, Pencil } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import type { RowSelectionState } from '@tanstack/react-table';
 import { useMetodosPago } from '../hooks/useMetodosPago';
+import { useUpdateMetodoPago } from '../hooks/useUpdateMetodoPago';
+import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { EditMetodoPagoModal } from './EditMetodoPagoModal';
 import type { MetodoPago } from '../../domain/MetodoPago';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../../shared/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../../../shared/components/ui/dropdown-menu';
+import { DataTable } from '../../../../shared/components/ui/data-table/DataTable';
+import { columns } from '../table/columns';
+import type { MetodoPagoTableMeta } from '../table/columns';
+import { CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '../../../../shared/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../shared/components/ui/select';
 
 export const MetodoPagoTable = () => {
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useMetodosPago(page, 10);
-  
+  const [pageSize, setPageSize] = useState(10);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('todos');
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+
+  const { data, isLoading } = useMetodosPago(page, 1000);
+  const updateMutation = useUpdateMetodoPago();
+  const { mutate: updateMetodo } = updateMutation;
+  const { user } = useAuthStore();
+  const isJefe = user?.usrol === 'jefe';
+
   const [selectedMetodo, setSelectedMetodo] = useState<MetodoPago | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const handleEdit = (metodo: MetodoPago) => {
     setSelectedMetodo(metodo);
     setIsEditModalOpen(true);
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+  const handleStatusChange = (metodo: MetodoPago, newStatus: 'activo' | 'inactivo') => {
+    if (confirm(`¿Estás seguro de cambiar el estado de ${metodo.mpnombre} a ${newStatus}?`)) {
+      updateMetodo({ id: metodo.mpid, data: { mpestado: newStatus } });
+    }
+  };
 
-  const metodos = data?.items || [];
+  const handleBulkAction = async (newStatus: 'activo' | 'inactivo') => {
+    const selectedIds = Object.keys(rowSelection);
+    if (selectedIds.length === 0) return;
+
+    setIsProcessingBulk(true);
+    try {
+      await Promise.all(
+        selectedIds.map(id => updateMutation.mutateAsync({ id, data: { mpestado: newStatus } }))
+      );
+      setRowSelection({});
+    } catch (error) {
+      console.error("Bulk update failed", error);
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  // Filtrado local
+  const filteredData = useMemo(() => {
+    if (!data?.items) return [];
+    let items = data.items;
+    
+    if (statusFilter !== 'todos') {
+      items = items.filter((m) => m.mpestado === statusFilter);
+    }
+    
+    if (globalFilter) {
+      const lowerQuery = globalFilter.toLowerCase();
+      items = items.filter((m) => 
+        m.mpnombre.toLowerCase().includes(lowerQuery)
+      );
+    }
+    
+    return items;
+  }, [data?.items, globalFilter, statusFilter]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredData.slice(startIndex, startIndex + pageSize);
+  }, [filteredData, page, pageSize]);
+
+  const totalFilteredItems = filteredData.length;
+  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+
+  const meta: MetodoPagoTableMeta = {
+    isJefe,
+    onEdit: handleEdit,
+    onStatusChange: handleStatusChange,
+  };
 
   return (
     <>
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50">
-              <TableHead className="font-semibold text-slate-700">Nombre del Método</TableHead>
-              <TableHead className="font-semibold text-slate-700 text-center">Estado</TableHead>
-              <TableHead className="font-semibold text-slate-700">Fecha Registro</TableHead>
-              <TableHead className="text-right font-semibold text-slate-700">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {metodos.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center text-slate-500">
-                  No hay métodos de pago registrados.
-                </TableCell>
-              </TableRow>
-            ) : (
-              metodos.map((metodo) => (
-                <TableRow key={metodo.mpid} className="hover:bg-slate-50">
-                  <TableCell>
-                    <div className="flex items-center">
-                      <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center mr-3 text-indigo-600">
-                        <Wallet className="w-4 h-4" />
-                      </div>
-                      <span className="font-medium text-slate-900">{metodo.mpnombre}</span>
-                    </div>
-                  </TableCell>
-                  
-                  <TableCell className="text-center">
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        metodo.mpestado === 'activo'
-                          ? 'bg-emerald-100 text-emerald-800'
-                          : 'bg-rose-100 text-rose-800'
-                      }`}
-                    >
-                      {metodo.mpestado === 'activo' ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </TableCell>
-
-                  <TableCell className="text-slate-500 text-sm">
-                    {format(new Date(metodo.mpfchregistro), "d 'de' MMMM, yyyy", { locale: es })}
-                  </TableCell>
-
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(metodo)}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          <span>Actualizar / Cambiar Estado</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-
-        {/* Pagination */}
-        {data && data.totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 sm:px-6">
-            <div className="flex flex-1 justify-between sm:hidden">
-              <Button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page === 1}
-                variant="outline"
-              >
-                Anterior
-              </Button>
-              <Button
-                onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
-                disabled={page === data.totalPages}
-                variant="outline"
-              >
-                Siguiente
-              </Button>
-            </div>
-            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm text-slate-700">
-                  Mostrando página <span className="font-medium">{page}</span> de{' '}
-                  <span className="font-medium">{data.totalPages}</span>
-                </p>
-              </div>
-              <div>
-                <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                  <Button
-                    onClick={() => setPage(p => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                    variant="outline"
-                    className="rounded-l-md rounded-r-none"
+      <DataTable
+        columns={columns}
+        data={paginatedData}
+        meta={meta}
+        isLoading={isLoading}
+        pageCount={pageCount}
+        rowCount={totalFilteredItems}
+        pagination={{ pageIndex: page - 1, pageSize }}
+        onPaginationChange={(newPagination) => {
+          setPage(newPagination.pageIndex + 1);
+          setPageSize(newPagination.pageSize);
+        }}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={(row) => row.mpid}
+        toolbar={{
+          globalFilter,
+          onGlobalFilterChange: setGlobalFilter,
+          searchPlaceholder: "Buscar por nombre del método...",
+          onAdvancedFilterClick: () => {},
+          children: (
+            <div className="flex gap-2">
+              {Object.keys(rowSelection).length > 0 ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                    onClick={() => handleBulkAction('activo')}
+                    disabled={isProcessingBulk}
                   >
-                    Anterior
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Activar
                   </Button>
-                  <Button
-                    onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
-                    disabled={page === data.totalPages}
-                    variant="outline"
-                    className="rounded-r-md rounded-l-none"
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                    onClick={() => handleBulkAction('inactivo')}
+                    disabled={isProcessingBulk}
                   >
-                    Siguiente
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Inactivar
                   </Button>
-                </nav>
-              </div>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-9 text-slate-500 hover:text-slate-700"
+                    onClick={() => setRowSelection({})}
+                    disabled={isProcessingBulk}
+                  >
+                    Cancelar
+                  </Button>
+                </>
+              ) : (
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px] bg-background">
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los Estados</SelectItem>
+                    <SelectItem value="activo">Activo</SelectItem>
+                    <SelectItem value="inactivo">Inactivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
             </div>
-          </div>
-        )}
-      </div>
+          )
+        }}
+      />
 
       <EditMetodoPagoModal
         metodoPago={selectedMetodo}
