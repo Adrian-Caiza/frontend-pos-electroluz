@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../shared/components/ui/select';
-import { Plus, MonitorSmartphone, Building2, Fingerprint } from 'lucide-react';
+import { Store, Hash, MonitorSmartphone, Plus, Building2, Fingerprint } from 'lucide-react';
 
 const formSchema = z.object({
   cjidentificador: z.string().length(3, 'El identificador debe tener exactamente 3 dígitos').regex(/^\d+$/, 'Solo se permiten números'),
@@ -90,7 +90,7 @@ export const CreateCheckoutModal = () => {
   return (
     <>
       <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 shadow-md text-white">
-        <Plus className="w-4 h-4 mr-2" /> Nueva Caja
+        <Store className="w-4 h-4 mr-2" /> Nueva Caja
       </Button>
 
       <BaseModal 

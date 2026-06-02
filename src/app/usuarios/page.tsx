@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '../../shared/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Users, UserPlus } from 'lucide-react';
 import { UsuarioTable } from '../../modules/usuario/presentation/components/UsuarioTable';
 import { CreateUsuarioModal } from '../../modules/usuario/presentation/components/CreateUsuarioModal';
 
@@ -18,7 +18,7 @@ export default function UsuariosPage() {
           onClick={() => setIsCreateOpen(true)}
           className="bg-slate-900 hover:bg-slate-800"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <UserPlus className="w-4 h-4 mr-2" />
           Registrar Usuario
         </Button>
       </div>

@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
-import { Wallet, Plus } from 'lucide-react';
+import { WalletCards, Type, Hash, Plus, Wallet } from 'lucide-react';
 import { useCreateMetodoPago } from '../hooks/useCreateMetodoPago';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import {
@@ -70,7 +70,7 @@ export const CreateMetodoPagoModal = () => {
   return (
     <>
       <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
-        <Plus className="w-4 h-4 mr-2" />
+        <WalletCards className="w-4 h-4 mr-2" />
         Nuevo Método de Pago
       </Button>
 

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Users, UserPlus } from 'lucide-react';
 import { Button } from '../../shared/components/ui/button';
 import { ClienteTable } from '../../modules/cliente/presentation/components/ClienteTable';
 import { CreateClienteModal } from '../../modules/cliente/presentation/components/CreateClienteModal';
@@ -20,7 +20,7 @@ export const ClientesPage = () => {
           onClick={() => setIsCreateModalOpen(true)}
           className="bg-indigo-600 hover:bg-indigo-700"
         >
-          <Plus className="w-4 h-4 mr-2" />
+          <UserPlus className="w-4 h-4 mr-2" />
           Registrar Cliente
         </Button>
       </div>

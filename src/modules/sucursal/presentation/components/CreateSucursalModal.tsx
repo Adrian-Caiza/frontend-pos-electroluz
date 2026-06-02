@@ -5,7 +5,7 @@ import * as z from 'zod';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useCreateSucursal } from '../hooks/useCreateSucursal';
 import { Button } from '../../../../shared/components/ui/button';
-import { Building2, Hash, MapPin, Mail, Plus } from 'lucide-react';
+import { Building2, Hash, MapPin, Mail, Store } from 'lucide-react';
 import {
   BaseModal,
   ModalFooter,
@@ -80,7 +80,7 @@ export const CreateSucursalModal = () => {
   return (
     <>
       <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700">
-        <Plus className="w-4 h-4 mr-2" /> Nueva Sucursal
+        <Store className="w-4 h-4 mr-2" /> Nueva Sucursal
       </Button>
 
       <BaseModal 
