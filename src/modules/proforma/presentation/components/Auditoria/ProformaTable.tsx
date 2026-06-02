@@ -1,24 +1,30 @@
-import { useState } from 'react';
-import { format } from 'date-fns';
-import { es } from 'date-fns/locale';
-import { Receipt, Search, FileText, CheckCircle2, XCircle } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import type { RowSelectionState } from '@tanstack/react-table';
 import { useProformas } from '../../hooks/useProformas';
 import { useCancelProforma } from '../../hooks/useCancelProforma';
 import { usePayProforma } from '../../hooks/usePayProforma';
-import type { Proforma } from '../../../domain/Proforma';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../../../shared/components/ui/table';
+import { DataTable } from '../../../../../shared/components/ui/data-table/DataTable';
+import { columns } from '../../table/columns';
+import type { ProformaTableMeta } from '../../table/columns';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { Button } from '../../../../../shared/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../../shared/components/ui/select';
 
 export const ProformaTable = () => {
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useProformas(page, 10);
+  const [pageSize, setPageSize] = useState(10);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('todos');
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const { data, isLoading } = useProformas(page, 1000); // Fetch all for local filtering
   const { mutateAsync: cancelProforma, isPending: isCanceling } = useCancelProforma();
   const { mutateAsync: payProforma, isPending: isPaying } = usePayProforma();
 
@@ -34,167 +40,133 @@ export const ProformaTable = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-      </div>
-    );
-  }
+  const handleBulkAction = async (action: 'cancelar' | 'pagar') => {
+    const selectedIds = Object.keys(rowSelection);
+    if (selectedIds.length === 0) return;
 
-  const proformas = data?.items || [];
+    if (action === 'cancelar' && !window.confirm(`¿Estás seguro de CANCELAR ${selectedIds.length} proformas?`)) return;
+    if (action === 'pagar' && !window.confirm(`¿Confirmas el PAGO de ${selectedIds.length} proformas?`)) return;
+
+    setIsProcessingBulk(true);
+    try {
+      await Promise.all(
+        selectedIds.map(id => action === 'cancelar' ? cancelProforma(id) : payProforma(id))
+      );
+      setRowSelection({});
+    } catch (error) {
+      console.error("Bulk action failed", error);
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  // Filtrado local
+  const filteredData = useMemo(() => {
+    if (!data?.items) return [];
+    let items = data.items;
+    
+    if (statusFilter !== 'todos') {
+      items = items.filter((p) => p.prfmaestado === statusFilter);
+    }
+    
+    if (globalFilter) {
+      const lowerQuery = globalFilter.toLowerCase();
+      items = items.filter((p) => 
+        p.prfmaidentificador.toLowerCase().includes(lowerQuery) || 
+        p.receptor.clntenombre.toLowerCase().includes(lowerQuery) ||
+        p.receptor.clnteidentificacion.toLowerCase().includes(lowerQuery)
+      );
+    }
+    
+    return items;
+  }, [data?.items, globalFilter, statusFilter]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredData.slice(startIndex, startIndex + pageSize);
+  }, [filteredData, page, pageSize]);
+
+  const totalFilteredItems = filteredData.length;
+  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+
+  const meta: ProformaTableMeta = {
+    onCancel: handleCancel,
+    onPay: handlePay,
+    isCanceling,
+    isPaying,
+  };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-slate-50">
-            <TableHead className="font-semibold text-slate-700">Comprobante</TableHead>
-            <TableHead className="font-semibold text-slate-700">Cliente</TableHead>
-            <TableHead className="font-semibold text-slate-700">Método de Pago</TableHead>
-            <TableHead className="font-semibold text-slate-700 text-center">Estado</TableHead>
-            <TableHead className="font-semibold text-slate-700 text-right">Total</TableHead>
-            <TableHead className="text-right font-semibold text-slate-700">Acciones</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {proformas.length === 0 ? (
-            <TableRow>
-              <TableCell colSpan={6} className="h-24 text-center text-slate-500">
-                No hay transacciones registradas.
-              </TableCell>
-            </TableRow>
-          ) : (
-            proformas.map((proforma) => (
-              <TableRow key={proforma.prfmaid} className="hover:bg-slate-50">
-                <TableCell>
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mr-3 text-slate-600">
-                      <Receipt className="w-4 h-4" />
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-slate-900">{proforma.prfmaidentificador}</span>
-                      <span className="text-xs text-slate-500">
-                        {format(new Date(proforma.prfmafchregistro), "d MMM yyyy, HH:mm", { locale: es })}
-                      </span>
-                    </div>
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex flex-col">
-                    <span className="text-sm font-medium text-slate-900">{proforma.receptor.clntenombre}</span>
-                    <span className="text-xs text-slate-500">CI/RUC: {proforma.receptor.clnteidentificacion}</span>
-                  </div>
-                </TableCell>
-
-                <TableCell className="text-slate-600 text-sm">
-                  {proforma.metodoPago.mpnombre}
-                </TableCell>
-                
-                <TableCell className="text-center">
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      proforma.prfmaestado === 'pagada'
-                        ? 'bg-emerald-100 text-emerald-800'
-                        : proforma.prfmaestado === 'cancelada'
-                        ? 'bg-rose-100 text-rose-800'
-                        : 'bg-amber-100 text-amber-800' // emitida
-                    }`}
-                  >
-                    {proforma.prfmaestado.charAt(0).toUpperCase() + proforma.prfmaestado.slice(1)}
-                  </span>
-                </TableCell>
-
-                <TableCell className="text-right">
-                  <span className="font-bold text-slate-900">
-                    ${proforma.total.prfmatotal.toFixed(2)}
-                  </span>
-                </TableCell>
-
-                <TableCell className="text-right">
-                  {proforma.prfmaestado === 'emitida' && (
-                    <div className="flex justify-end space-x-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handleCancel(proforma.prfmaid)}
-                        disabled={isCanceling || isPaying}
-                        className="text-rose-600 hover:text-rose-700 hover:bg-rose-50 border-rose-200"
-                        title="Cancelar Proforma"
-                      >
-                        <XCircle className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handlePay(proforma.prfmaid)}
-                        disabled={isCanceling || isPaying}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        title="Registrar Pago"
-                      >
-                        <CheckCircle2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  )}
-                  {proforma.prfmaestado !== 'emitida' && (
-                    <span className="text-xs text-slate-400 italic">Sin acciones</span>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))
-          )}
-        </TableBody>
-      </Table>
-
-      {/* Pagination */}
-      {data && data.totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 sm:px-6">
-          <div className="flex flex-1 justify-between sm:hidden">
-            <Button
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-              variant="outline"
-            >
-              Anterior
-            </Button>
-            <Button
-              onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
-              disabled={page === data.totalPages}
-              variant="outline"
-            >
-              Siguiente
-            </Button>
-          </div>
-          <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm text-slate-700">
-                Mostrando página <span className="font-medium">{page}</span> de{' '}
-                <span className="font-medium">{data.totalPages}</span>
-              </p>
-            </div>
-            <div>
-              <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                <Button
-                  onClick={() => setPage(p => Math.max(1, p - 1))}
-                  disabled={page === 1}
-                  variant="outline"
-                  className="rounded-l-md rounded-r-none"
+    <DataTable
+      columns={columns}
+      data={paginatedData}
+      meta={meta}
+      isLoading={isLoading}
+      pageCount={pageCount}
+      rowCount={totalFilteredItems}
+      pagination={{ pageIndex: page - 1, pageSize }}
+      onPaginationChange={(newPagination) => {
+        setPage(newPagination.pageIndex + 1);
+        setPageSize(newPagination.pageSize);
+      }}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      getRowId={(row) => row.prfmaid}
+      toolbar={{
+        globalFilter,
+        onGlobalFilterChange: setGlobalFilter,
+        searchPlaceholder: "Buscar por comprobante, cliente o CI/RUC...",
+        onAdvancedFilterClick: () => {},
+        children: (
+          <div className="flex gap-2">
+            {Object.keys(rowSelection).length > 0 ? (
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                  onClick={() => handleBulkAction('pagar')}
+                  disabled={isProcessingBulk || isCanceling || isPaying}
                 >
-                  Anterior
+                  <CheckCircle2 className="mr-2 h-4 w-4" />
+                  Pagar Seleccionadas
                 </Button>
-                <Button
-                  onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
-                  disabled={page === data.totalPages}
-                  variant="outline"
-                  className="rounded-r-md rounded-l-none"
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                  onClick={() => handleBulkAction('cancelar')}
+                  disabled={isProcessingBulk || isCanceling || isPaying}
                 >
-                  Siguiente
+                  <XCircle className="mr-2 h-4 w-4" />
+                  Cancelar Seleccionadas
                 </Button>
-              </nav>
-            </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm"
+                  className="h-9 text-slate-500 hover:text-slate-700"
+                  onClick={() => setRowSelection({})}
+                  disabled={isProcessingBulk || isCanceling || isPaying}
+                >
+                  Deseleccionar
+                </Button>
+              </>
+            ) : (
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-[180px] bg-background">
+                  <SelectValue placeholder="Estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todos">Todos los Estados</SelectItem>
+                  <SelectItem value="emitida">Emitida</SelectItem>
+                  <SelectItem value="pagada">Pagada</SelectItem>
+                  <SelectItem value="cancelada">Cancelada</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }}
+    />
   );
 };

@@ -16,7 +16,9 @@ export default function ProformasPage() {
         </div>
       </div>
 
-      <ProformaTable />
+      <div className="w-full bg-white rounded-xl">
+        <ProformaTable />
+      </div>
     </div>
   );
 }
