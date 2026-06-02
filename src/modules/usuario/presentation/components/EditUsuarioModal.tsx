@@ -196,7 +196,7 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
                     <label className="cursor-pointer block w-full h-full">
                       {imagePreview ? (
                         <div className="w-full h-full rounded-full overflow-hidden border border-slate-200 hover:opacity-80 transition-opacity">
-                          <img src={getImageUrl(imagePreview)!} alt="Preview" className="w-full h-full object-cover" />
+                          <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
                         </div>
                       ) : (
                         <div className="w-full h-full rounded-full border-2 border-dashed border-slate-300 flex items-center justify-center bg-slate-50 text-slate-500 hover:bg-slate-100 hover:border-indigo-400 transition-colors">

@@ -57,11 +57,11 @@ export function BaseModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={handleBackdropClick}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200" onClick={handleBackdropClick}>
       <div 
         ref={modalRef} 
         className={cn(
-          "bg-white rounded-[20px] shadow-2xl flex flex-col max-h-[90vh] w-full animate-in zoom-in-95 duration-200",
+          "bg-white rounded-[20px] shadow-2xl flex flex-col w-full max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] overflow-hidden animate-in zoom-in-95 duration-200",
           sizeClasses[size]
         )}
       >
@@ -82,7 +82,7 @@ export function BaseModal({
         </div>
 
         {/* Body */}
-        <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+        <div className="px-6 py-5 overflow-y-auto flex-1 min-h-0">
           <div className="flex flex-col space-y-6">
             {children}
           </div>
