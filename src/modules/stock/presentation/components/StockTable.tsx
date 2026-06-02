@@ -1,27 +1,21 @@
-import { useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../../shared/components/ui/table';
-import { Badge } from '../../../../shared/components/ui/badge';
-import { Button } from '../../../../shared/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '../../../../shared/components/ui/dropdown-menu';
-import { MoreHorizontal, Edit, PackageCheck, PackageX, Trash2, Tag, Calendar } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import type { RowSelectionState } from '@tanstack/react-table';
 import { useStocks } from '../hooks/useStocks';
 import { useUpdateStock } from '../hooks/useUpdateStock';
 import { EditStockModal } from './EditStockModal';
 import type { Stock } from '../../domain/entities/Stock';
+import { DataTable } from '../../../../shared/components/ui/data-table/DataTable';
+import { columns } from '../table/columns';
+import type { StockTableMeta } from '../table/columns';
+import { PackageCheck, PackageX, Trash2 } from 'lucide-react';
+import { Button } from '../../../../shared/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../shared/components/ui/select';
 
 interface StockTableProps {
   sucursalId: string;
@@ -29,13 +23,21 @@ interface StockTableProps {
 
 export const StockTable = ({ sucursalId }: StockTableProps) => {
   const [page, setPage] = useState(1);
-  const pageSize = 10;
-  
-  // Consultamos stocks enviando `stcksuid`. El primer argumento (`suidentificador`) va undefined.
-  const { data, isLoading } = useStocks(undefined, sucursalId, page, pageSize);
-  const { mutate: updateStock } = useUpdateStock();
+  const [pageSize, setPageSize] = useState(10);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('todos');
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
+
+  // Fetch all for local pagination/filtering if possible
+  const { data, isLoading } = useStocks(undefined, sucursalId, page, 1000);
+  const { mutate: updateStock, mutateAsync: updateStockAsync } = useUpdateStock();
 
   const [stockToEdit, setStockToEdit] = useState<Stock | null>(null);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
+  const handleEdit = (stock: Stock) => {
+    setStockToEdit(stock);
+  };
 
   const handleStatusChange = (stock: Stock, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
     if (confirm(`¿Estás seguro de marcar el stock de ${stock.producto.prdtonombre} como ${newStatus}?`)) {
@@ -43,144 +45,139 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
     }
   };
 
-  if (isLoading) {
-    return <div className="text-center py-10 text-slate-500">Cargando inventario...</div>;
-  }
+  const handleBulkAction = async (newStatus: 'activo' | 'inactivo' | 'eliminado') => {
+    const selectedIds = Object.keys(rowSelection);
+    if (selectedIds.length === 0) return;
 
-  const visibleStocks = data?.items.filter((s) => s.stckestado !== 'eliminado') || [];
+    setIsProcessingBulk(true);
+    try {
+      await Promise.all(
+        selectedIds.map(id => updateStockAsync({ id, data: { stcksuid: sucursalId, stckestado: newStatus } }))
+      );
+      setRowSelection({});
+    } catch (error) {
+      console.error("Bulk update failed", error);
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  // Filtrado local
+  const filteredData = useMemo(() => {
+    if (!data?.items) return [];
+    let items = data.items.filter((s) => s.stckestado !== 'eliminado');
+    
+    if (statusFilter !== 'todos') {
+      items = items.filter((s) => s.stckestado === statusFilter);
+    }
+    
+    if (globalFilter) {
+      const lowerQuery = globalFilter.toLowerCase();
+      items = items.filter((s) => 
+        s.producto.prdtonombre.toLowerCase().includes(lowerQuery) || 
+        s.producto.prdtocodigo.toLowerCase().includes(lowerQuery)
+      );
+    }
+    
+    return items;
+  }, [data?.items, globalFilter, statusFilter]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredData.slice(startIndex, startIndex + pageSize);
+  }, [filteredData, page, pageSize]);
+
+  const totalFilteredItems = filteredData.length;
+  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+
+  const meta: StockTableMeta = {
+    sucursalId,
+    onEdit: handleEdit,
+    onStatusChange: handleStatusChange,
+  };
 
   return (
-    <div className="bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden">
-      <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-50 hover:bg-slate-50">
-              <TableHead className="font-semibold text-slate-700">Producto</TableHead>
-              <TableHead className="font-semibold text-slate-700 text-center">Cantidad Mínima</TableHead>
-              <TableHead className="font-semibold text-slate-700 text-right">Existencias</TableHead>
-              <TableHead className="font-semibold text-slate-700 text-center">Estado</TableHead>
-              <TableHead className="text-right font-semibold text-slate-700">Acciones</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {visibleStocks.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={5} className="h-24 text-center text-slate-500">
-                  No hay existencias registradas en esta sucursal.
-                </TableCell>
-              </TableRow>
-            ) : (
-              visibleStocks.map((stock) => (
-                <TableRow key={stock.stckid} className="hover:bg-slate-50 transition-colors">
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-medium text-slate-900">{stock.producto.prdtonombre}</span>
-                      <span className="text-xs text-slate-500 mt-1 flex items-center">
-                        <Tag className="w-3 h-3 mr-1" />
-                        Código: {stock.producto.prdtocodigo}
-                      </span>
-                    </div>
-                  </TableCell>
-                  
-                  {/* Aquí podría ir un "stock mínimo" si el producto lo tuviera, lo simulamos/dejamos genérico por ahora */}
-                  <TableCell className="text-center text-slate-500">
-                    N/A
-                  </TableCell>
-
-                  <TableCell className="text-right">
-                    <span className={`text-lg font-bold ${Number(stock.stckcantidad) <= 10 ? 'text-rose-600' : 'text-slate-700'}`}>
-                      {Number(stock.stckcantidad)}
-                    </span>
-                  </TableCell>
-
-                  <TableCell className="text-center">
-                    <Badge
-                      variant={stock.stckestado === 'activo' ? 'default' : 'secondary'}
-                      className={
-                        stock.stckestado === 'activo'
-                          ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200'
-                          : 'bg-amber-100 text-amber-700 hover:bg-amber-200'
-                      }
-                    >
-                      {stock.stckestado === 'activo' ? 'Disponible' : 'Inactivo'}
-                    </Badge>
-                  </TableCell>
-                  
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Abrir menú</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-48">
-                        <DropdownMenuLabel>Acciones de Bodega</DropdownMenuLabel>
-                        <DropdownMenuItem onClick={() => setStockToEdit(stock)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Ajustar cantidad
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        {stock.stckestado === 'activo' ? (
-                          <DropdownMenuItem
-                            onClick={() => handleStatusChange(stock, 'inactivo')}
-                            className="text-amber-600"
-                          >
-                            <PackageX className="mr-2 h-4 w-4" />
-                            Bloquear lote (inactivo)
-                          </DropdownMenuItem>
-                        ) : (
-                          <DropdownMenuItem
-                            onClick={() => handleStatusChange(stock, 'activo')}
-                            className="text-emerald-600"
-                          >
-                            <PackageCheck className="mr-2 h-4 w-4" />
-                            Liberar lote (activo)
-                          </DropdownMenuItem>
-                        )}
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleStatusChange(stock, 'eliminado')}
-                          className="text-rose-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Dar de baja
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {data && data.totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 bg-slate-50">
-          <div className="text-sm text-slate-500">
-            Mostrando página {page} de {data.totalPages} ({data.totalItems} registros)
-          </div>
-          <div className="flex space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-            >
-              Anterior
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage((p) => p + 1)}
-              disabled={page === data.totalPages}
-            >
-              Siguiente
-            </Button>
-          </div>
-        </div>
-      )}
+    <>
+      <DataTable
+        columns={columns}
+        data={paginatedData}
+        meta={meta}
+        isLoading={isLoading}
+        pageCount={pageCount}
+        rowCount={totalFilteredItems}
+        pagination={{ pageIndex: page - 1, pageSize }}
+        onPaginationChange={(newPagination) => {
+          setPage(newPagination.pageIndex + 1);
+          setPageSize(newPagination.pageSize);
+        }}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={(row) => row.stckid}
+        toolbar={{
+          globalFilter,
+          onGlobalFilterChange: setGlobalFilter,
+          searchPlaceholder: "Buscar por nombre de producto o código...",
+          onAdvancedFilterClick: () => {},
+          children: (
+            <div className="flex gap-2">
+              {Object.keys(rowSelection).length > 0 ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                    onClick={() => handleBulkAction('activo')}
+                    disabled={isProcessingBulk}
+                  >
+                    <PackageCheck className="mr-2 h-4 w-4" />
+                    Activar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                    onClick={() => handleBulkAction('inactivo')}
+                    disabled={isProcessingBulk}
+                  >
+                    <PackageX className="mr-2 h-4 w-4" />
+                    Inactivar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                    onClick={() => handleBulkAction('eliminado')}
+                    disabled={isProcessingBulk}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Dar de baja
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-9 text-slate-500 hover:text-slate-700"
+                    onClick={() => setRowSelection({})}
+                    disabled={isProcessingBulk}
+                  >
+                    Cancelar
+                  </Button>
+                </>
+              ) : (
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px] bg-background">
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los Estados</SelectItem>
+                    <SelectItem value="activo">Disponible</SelectItem>
+                    <SelectItem value="inactivo">Inactivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )
+        }}
+      />
 
       {stockToEdit && (
         <EditStockModal
@@ -189,6 +186,6 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
           onOpenChange={(open) => !open && setStockToEdit(null)}
         />
       )}
-    </div>
+    </>
   );
 };

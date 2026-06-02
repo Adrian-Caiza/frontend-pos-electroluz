@@ -52,7 +52,9 @@ export const StockPage = () => {
       </div>
 
       {selectedSucursalId ? (
-        <StockTable sucursalId={selectedSucursalId} />
+        <div className="w-full bg-white rounded-xl">
+          <StockTable sucursalId={selectedSucursalId} />
+        </div>
       ) : (
         <div className="text-center py-16 bg-slate-50 rounded-lg border border-slate-200 border-dashed">
           <Building2 className="w-12 h-12 text-slate-300 mx-auto mb-3" />
