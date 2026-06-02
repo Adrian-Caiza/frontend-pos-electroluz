@@ -23,8 +23,9 @@ export default function UsuariosPage() {
         </Button>
       </div>
 
-      <UsuarioTable />
-      
+      <div className="w-full bg-white rounded-xl">
+        <UsuarioTable />
+      </div>
       <CreateUsuarioModal 
         open={isCreateOpen} 
         onOpenChange={setIsCreateOpen} 

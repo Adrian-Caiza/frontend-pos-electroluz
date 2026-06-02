@@ -26,10 +26,8 @@ export default function SucursalesPage() {
         )}
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-slate-200">
-        <div className="p-1">
-          <SucursalTable />
-        </div>
+      <div className="w-full bg-white rounded-xl">
+        <SucursalTable />
       </div>
     </div>
   );

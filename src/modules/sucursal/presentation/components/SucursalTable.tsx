@@ -1,171 +1,184 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import type { RowSelectionState } from '@tanstack/react-table';
 import { useSucursales } from '../hooks/useSucursales';
 import { useUpdateSucursal } from '../hooks/useUpdateSucursal';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { EditSucursalModal } from './EditSucursalModal';
 import type { Sucursal } from '../../domain/entities/Sucursal';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../../shared/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../../../shared/components/ui/dropdown-menu';
+import { DataTable } from '../../../../shared/components/ui/data-table/DataTable';
+import { columns } from '../table/columns';
+import type { SucursalTableMeta } from '../table/columns';
+import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { Button } from '../../../../shared/components/ui/button';
-import { MoreHorizontal, ShieldOff, CheckCircle2, Trash2, ArrowLeft, ArrowRight, Edit2 } from 'lucide-react';
-import { Badge } from '../../../../shared/components/ui/badge';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../shared/components/ui/select';
 
 export const SucursalTable = () => {
   const [page, setPage] = useState(1);
-  const [editingSucursal, setEditingSucursal] = useState<Sucursal | null>(null);
+  const [pageSize, setPageSize] = useState(10);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('todos');
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  const { data, isLoading, isError } = useSucursales(page, 10);
-  const { mutate: updateSucursal } = useUpdateSucursal();
-  
+  const { data, isLoading } = useSucursales(page, 1000); // Fetch all for local pagination/filtering
+  const updateMutation = useUpdateSucursal();
   const { user } = useAuthStore();
   const isJefe = user?.usrol === 'jefe';
 
-  if (isLoading) return <div className="p-4 text-center text-slate-500">Cargando sucursales...</div>;
-  if (isError) return <div className="p-4 text-center text-red-500">Error al cargar las sucursales</div>;
+  const [editingSucursal, setEditingSucursal] = useState<Sucursal | null>(null);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const items = data?.items || [];
-  const totalPages = data?.totalPages || 1;
+  const handleEdit = (sucursal: Sucursal) => {
+    setEditingSucursal(sucursal);
+  };
 
-  const handleStatusChange = (id: string, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
-    updateSucursal({ id, data: { suestado: newStatus } });
+  const handleStatusChange = (sucursal: Sucursal, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
+    if (confirm(`¿Estás seguro de cambiar el estado de la sucursal ${sucursal.sunombre} a ${newStatus}?`)) {
+      updateMutation.mutate({ id: sucursal.suid, data: { suestado: newStatus } });
+    }
+  };
+
+  const handleBulkAction = async (newStatus: 'activo' | 'inactivo' | 'eliminado') => {
+    const selectedIds = Object.keys(rowSelection);
+    if (selectedIds.length === 0) return;
+
+    setIsProcessingBulk(true);
+    try {
+      await Promise.all(
+        selectedIds.map(id => updateMutation.mutateAsync({ id, data: { suestado: newStatus } }))
+      );
+      setRowSelection({});
+    } catch (error) {
+      console.error("Bulk update failed", error);
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  // Filtrado local
+  const filteredData = useMemo(() => {
+    if (!data?.items) return [];
+    let items = data.items.filter((s) => s.suestado !== 'eliminado');
+    
+    if (statusFilter !== 'todos') {
+      items = items.filter((s) => s.suestado === statusFilter);
+    }
+    
+    if (globalFilter) {
+      const lowerQuery = globalFilter.toLowerCase();
+      items = items.filter((s) => 
+        s.sunombre.toLowerCase().includes(lowerQuery) || 
+        s.suidentificador.toLowerCase().includes(lowerQuery) ||
+        (s.sudireccion && s.sudireccion.toLowerCase().includes(lowerQuery)) ||
+        (s.sucorreo && s.sucorreo.toLowerCase().includes(lowerQuery))
+      );
+    }
+    
+    return items;
+  }, [data?.items, globalFilter, statusFilter]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredData.slice(startIndex, startIndex + pageSize);
+  }, [filteredData, page, pageSize]);
+
+  const totalFilteredItems = filteredData.length;
+  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+
+  const meta: SucursalTableMeta = {
+    isJefe,
+    onEdit: handleEdit,
+    onStatusChange: handleStatusChange,
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-        <Table>
-          <TableHeader className="bg-slate-50">
-            <TableRow>
-              <TableHead>Identificador</TableHead>
-              <TableHead>Nombre</TableHead>
-              <TableHead>Dirección / Correo</TableHead>
-              <TableHead>Estado</TableHead>
-              {isJefe && <TableHead className="text-right">Acciones</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {items.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={isJefe ? 5 : 4} className="text-center h-24 text-slate-500">
-                  No hay sucursales registradas en esta empresa.
-                </TableCell>
-              </TableRow>
-            ) : (
-              items.map((sucursal) => (
-                <TableRow key={sucursal.suid}>
-                  <TableCell className="font-medium text-slate-900">
-                    ID: {sucursal.suidentificador}
-                  </TableCell>
-                  <TableCell className="text-slate-900 font-semibold">
-                    {sucursal.sunombre}
-                  </TableCell>
-                  <TableCell className="text-slate-500 text-sm">
-                    {sucursal.sudireccion ? <div>{sucursal.sudireccion}</div> : null}
-                    {sucursal.sucorreo ? <div className="text-slate-400">{sucursal.sucorreo}</div> : null}
-                    {!sucursal.sudireccion && !sucursal.sucorreo && <span className="text-slate-300">N/A</span>}
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant="outline" 
-                      className={
-                        sucursal.suestado === 'activo' 
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200' 
-                          : sucursal.suestado === 'inactivo'
-                          ? 'bg-amber-50 text-amber-700 border-amber-200'
-                          : 'bg-red-50 text-red-700 border-red-200'
-                      }
-                    >
-                      {sucursal.suestado}
-                    </Badge>
-                  </TableCell>
-                  {isJefe && (
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Abrir menú</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => setEditingSucursal(sucursal)}>
-                            <Edit2 className="mr-2 h-4 w-4 text-blue-600" />
-                            <span>Editar</span>
-                          </DropdownMenuItem>
-                          
-                          <DropdownMenuItem
-                            onClick={() => handleStatusChange(sucursal.suid, 'activo')}
-                            disabled={sucursal.suestado === 'activo' || sucursal.suestado === 'eliminado'}
-                          >
-                            <CheckCircle2 className="mr-2 h-4 w-4 text-emerald-600" />
-                            <span>Marcar Activo</span>
-                          </DropdownMenuItem>
+    <>
+      <DataTable
+        columns={columns}
+        data={paginatedData}
+        meta={meta}
+        isLoading={isLoading}
+        pageCount={pageCount}
+        rowCount={totalFilteredItems}
+        pagination={{ pageIndex: page - 1, pageSize }}
+        onPaginationChange={(newPagination) => {
+          setPage(newPagination.pageIndex + 1);
+          setPageSize(newPagination.pageSize);
+        }}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={(row) => row.suid}
+        toolbar={{
+          globalFilter,
+          onGlobalFilterChange: setGlobalFilter,
+          searchPlaceholder: "Buscar por nombre, ID o contacto...",
+          onAdvancedFilterClick: () => {},
+          children: (
+            <div className="flex gap-2">
+              {Object.keys(rowSelection).length > 0 ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                    onClick={() => handleBulkAction('activo')}
+                    disabled={isProcessingBulk}
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Activar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                    onClick={() => handleBulkAction('inactivo')}
+                    disabled={isProcessingBulk}
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Inactivar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                    onClick={() => handleBulkAction('eliminado')}
+                    disabled={isProcessingBulk}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-9 text-slate-500 hover:text-slate-700"
+                    onClick={() => setRowSelection({})}
+                    disabled={isProcessingBulk}
+                  >
+                    Cancelar
+                  </Button>
+                </>
+              ) : (
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px] bg-background">
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los Estados</SelectItem>
+                    <SelectItem value="activo">Activo</SelectItem>
+                    <SelectItem value="inactivo">Inactivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )
+        }}
+      />
 
-                          <DropdownMenuItem
-                            onClick={() => handleStatusChange(sucursal.suid, 'inactivo')}
-                            disabled={sucursal.suestado === 'inactivo' || sucursal.suestado === 'eliminado'}
-                          >
-                            <ShieldOff className="mr-2 h-4 w-4 text-amber-600" />
-                            <span>Marcar Inactivo</span>
-                          </DropdownMenuItem>
-                          
-                          <DropdownMenuItem
-                            onClick={() => handleStatusChange(sucursal.suid, 'eliminado')}
-                            disabled={sucursal.suestado === 'eliminado'}
-                            className="text-red-600"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            <span>Eliminar</span>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-slate-500">
-          Página {page} de {totalPages}
-        </p>
-        <div className="flex space-x-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" /> Anterior
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-            disabled={page === totalPages || totalPages === 0}
-          >
-            Siguiente <ArrowRight className="w-4 h-4 ml-2" />
-          </Button>
-        </div>
-      </div>
-
-      {/* Edit Modal Render */}
       {editingSucursal && (
         <EditSucursalModal
           sucursal={editingSucursal}
@@ -173,6 +186,6 @@ export const SucursalTable = () => {
           onOpenChange={(isOpen) => !isOpen && setEditingSucursal(null)}
         />
       )}
-    </div>
+    </>
   );
 };

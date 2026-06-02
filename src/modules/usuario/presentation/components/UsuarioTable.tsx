@@ -1,234 +1,202 @@
-import { useState } from 'react';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../../../../shared/components/ui/table';
-import { Button } from '../../../../shared/components/ui/button';
-import { Badge } from '../../../../shared/components/ui/badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../../../../shared/components/ui/dropdown-menu';
-import { MoreHorizontal, User, ArrowLeft, ArrowRight, Shield } from 'lucide-react';
-import { useAuthStore } from '../../../../shared/stores/useAuthStore';
+import { useState, useMemo } from 'react';
+import type { RowSelectionState } from '@tanstack/react-table';
 import { useUsuarios } from '../hooks/useUsuarios';
 import { useUpdateUsuarioStatus } from '../hooks/useUpdateUsuarioStatus';
+import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import type { Usuario } from '../../domain/entities/Usuario';
 import { EditUsuarioModal } from './EditUsuarioModal';
+import { DataTable } from '../../../../shared/components/ui/data-table/DataTable';
+import { columns } from '../table/columns';
+import type { UsuarioTableMeta } from '../table/columns';
+import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { Button } from '../../../../shared/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../shared/components/ui/select';
 
 export const UsuarioTable = () => {
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const [pageSize, setPageSize] = useState(10);
+  const [globalFilter, setGlobalFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState('todos');
+  const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  const { data, isLoading } = useUsuarios(page, pageSize);
+  const { data, isLoading } = useUsuarios(page, 1000); // Fetch all for local pagination/filtering if possible
   const updateStatusMutation = useUpdateUsuarioStatus();
   const { user: currentUser, company } = useAuthStore();
   const isJefe = currentUser?.usrol === 'jefe';
 
   const [selectedUsuario, setSelectedUsuario] = useState<Usuario | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
-      case 'activo':
-        return <Badge className="bg-emerald-100 text-emerald-800 hover:bg-emerald-100">Activo</Badge>;
-      case 'inactivo':
-        return <Badge className="bg-amber-100 text-amber-800 hover:bg-amber-100">Inactivo</Badge>;
-      case 'eliminado':
-        return <Badge className="bg-rose-100 text-rose-800 hover:bg-rose-100">Eliminado</Badge>;
-      default:
-        return <Badge variant="outline">{status}</Badge>;
-    }
-  };
-
-  const getRoleBadge = (role: string) => {
-    switch (role) {
-      case 'administrador':
-        return <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100"><Shield className="w-3 h-3 mr-1" />Admin</Badge>;
-      case 'jefe':
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Jefe</Badge>;
-      case 'empleado':
-        return <Badge className="bg-slate-100 text-slate-800 hover:bg-slate-100">Empleado</Badge>;
-      default:
-        return <Badge variant="outline">{role}</Badge>;
-    }
+  const handleEdit = (usuario: Usuario) => {
+    setSelectedUsuario(usuario);
+    setIsEditOpen(true);
   };
 
   const handleStatusChange = (usuario: Usuario, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
     if (!company?.emid) return;
     
-    updateStatusMutation.mutate({
-      id: usuario.usid,
-      data: { 
-        usemid: company.emid,
-        usestado: newStatus 
-      }
-    });
+    if (confirm(`¿Estás seguro de cambiar el estado de ${usuario.usnombre} a ${newStatus}?`)) {
+      updateStatusMutation.mutate({
+        id: usuario.usid,
+        data: { 
+          usemid: company.emid,
+          usestado: newStatus 
+        }
+      });
+    }
   };
 
-  const getImageUrl = (rawPath: string | null) => {
-    if (!rawPath || rawPath === 'null' || rawPath === 'undefined' || rawPath.trim() === '') return null;
+  const handleBulkAction = async (newStatus: 'activo' | 'inactivo' | 'eliminado') => {
+    if (!company?.emid) return;
     
-    const imagePath = rawPath.replace(/\\/g, '/');
-    if (imagePath.startsWith('blob:')) return imagePath;
+    const selectedIds = Object.keys(rowSelection);
+    if (selectedIds.length === 0) return;
 
-    if (imagePath.startsWith('http')) {
-      try {
-        const url = new URL(imagePath);
-        const isLocalhost = url.hostname === 'localhost' || url.hostname === '127.0.0.1';
-        const isApiHost = import.meta.env.VITE_API_URL && url.hostname === new URL(import.meta.env.VITE_API_URL).hostname;
-        const isKnownIP = url.hostname === '163.245.192.54';
-        
-        if (isLocalhost || isApiHost || isKnownIP) {
-          return `/api-proxy${url.pathname}`;
-        }
-        return imagePath;
-      } catch (e) {
-        return imagePath;
-      }
+    setIsProcessingBulk(true);
+    try {
+      await Promise.all(
+        selectedIds.map(id => 
+          updateStatusMutation.mutateAsync({ 
+            id, 
+            data: { 
+              usemid: company.emid,
+              usestado: newStatus 
+            } 
+          })
+        )
+      );
+      setRowSelection({});
+    } catch (error) {
+      console.error("Bulk update failed", error);
+    } finally {
+      setIsProcessingBulk(false);
+    }
+  };
+
+  // Filtrado local
+  const filteredData = useMemo(() => {
+    if (!data?.items) return [];
+    let items = data.items.filter((u) => u.usestado !== 'eliminado');
+    
+    if (statusFilter !== 'todos') {
+      items = items.filter((u) => u.usestado === statusFilter);
     }
     
-    const path = imagePath.startsWith('/') ? imagePath : `/${imagePath}`;
-    return `/api-proxy${path}`;
+    if (globalFilter) {
+      const lowerQuery = globalFilter.toLowerCase();
+      items = items.filter((u) => 
+        u.usnombre.toLowerCase().includes(lowerQuery) || 
+        u.usapodo.toLowerCase().includes(lowerQuery) ||
+        u.uscorreo.toLowerCase().includes(lowerQuery)
+      );
+    }
+    
+    return items;
+  }, [data?.items, globalFilter, statusFilter]);
+
+  const paginatedData = useMemo(() => {
+    const startIndex = (page - 1) * pageSize;
+    return filteredData.slice(startIndex, startIndex + pageSize);
+  }, [filteredData, page, pageSize]);
+
+  const totalFilteredItems = filteredData.length;
+  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+
+  const meta: UsuarioTableMeta = {
+    isJefe,
+    onEdit: handleEdit,
+    onStatusChange: handleStatusChange,
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-64 text-slate-500">
-        Cargando personal...
-      </div>
-    );
-  }
-
-  if (!data?.items.length) {
-    return (
-      <div className="flex flex-col justify-center items-center h-64 text-slate-500 space-y-4">
-        <p>No hay usuarios registrados en esta empresa.</p>
-      </div>
-    );
-  }
 
   return (
     <>
-      <div className="rounded-md overflow-x-auto bg-white border border-slate-200">
-        <Table>
-          <TableHeader className="bg-slate-50/50">
-            <TableRow>
-              <TableHead className="w-16">Avatar</TableHead>
-              <TableHead>Personal</TableHead>
-              <TableHead>Contacto</TableHead>
-              <TableHead>Rol Operativo</TableHead>
-              <TableHead>Estado</TableHead>
-              {isJefe && <TableHead className="w-16 text-right">Acciones</TableHead>}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {data.items.map((usuario) => (
-              <TableRow key={usuario.usid} className={usuario.usestado === 'eliminado' ? 'opacity-50 bg-slate-50' : ''}>
-                <TableCell>
-                  <div className="w-10 h-10 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center flex-shrink-0 relative">
-                    {usuario.usimagen ? (
-                      <img
-                        src={getImageUrl(usuario.usimagen)!}
-                        alt={usuario.usnombre}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          e.currentTarget.style.display = 'none';
-                          if (e.currentTarget.nextElementSibling) {
-                            (e.currentTarget.nextElementSibling as HTMLElement).style.display = 'flex';
-                          }
-                        }}
-                      />
-                    ) : null}
-                    <div
-                      className="absolute inset-0 flex items-center justify-center bg-slate-100"
-                      style={{ display: usuario.usimagen ? 'none' : 'flex' }}
-                    >
-                      <User className="w-5 h-5 text-slate-400" />
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="font-medium text-slate-900">{usuario.usnombre}</div>
-                  <div className="text-xs text-slate-500">@{usuario.usapodo}</div>
-                </TableCell>
-                <TableCell>
-                  <div className="text-sm text-slate-700">{usuario.uscorreo}</div>
-                </TableCell>
-                <TableCell>{getRoleBadge(usuario.usrol)}</TableCell>
-                <TableCell>{getStatusBadge(usuario.usestado)}</TableCell>
-                {isJefe && (
-                  <TableCell className="text-right">
-                    {usuario.usestado !== 'eliminado' && (
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <MoreHorizontal className="h-4 w-4 text-slate-500" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => {
-                            setSelectedUsuario(usuario);
-                            setIsEditOpen(true);
-                          }}>
-                            Editar Perfil / Rol
-                          </DropdownMenuItem>
-                          
-                          {usuario.usestado === 'activo' ? (
-                            <DropdownMenuItem className="text-amber-600" onClick={() => handleStatusChange(usuario, 'inactivo')}>
-                              Marcar como Inactivo
-                            </DropdownMenuItem>
-                          ) : (
-                            <DropdownMenuItem className="text-emerald-600" onClick={() => handleStatusChange(usuario, 'activo')}>
-                              Marcar como Activo
-                            </DropdownMenuItem>
-                          )}
-                          
-                          <DropdownMenuItem className="text-rose-600" onClick={() => handleStatusChange(usuario, 'eliminado')}>
-                            Dar de Baja (Eliminar)
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    )}
-                  </TableCell>
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      {data.totalPages > 1 && (
-        <div className="flex items-center justify-between px-2 py-4 border-t border-slate-200 mt-4">
-          <div className="text-sm text-slate-500">
-            Página {data.page} de {data.totalPages}
-          </div>
-          <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(p => Math.max(1, p - 1))}
-              disabled={page === 1}
-            >
-              <ArrowLeft className="w-4 h-4 mr-1" /> Anterior
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
-              disabled={page === data.totalPages}
-            >
-              Siguiente <ArrowRight className="w-4 h-4 ml-1" />
-            </Button>
-          </div>
-        </div>
-      )}
+      <DataTable
+        columns={columns}
+        data={paginatedData}
+        meta={meta}
+        isLoading={isLoading}
+        pageCount={pageCount}
+        rowCount={totalFilteredItems}
+        pagination={{ pageIndex: page - 1, pageSize }}
+        onPaginationChange={(newPagination) => {
+          setPage(newPagination.pageIndex + 1);
+          setPageSize(newPagination.pageSize);
+        }}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={(row) => row.usid}
+        toolbar={{
+          globalFilter,
+          onGlobalFilterChange: setGlobalFilter,
+          searchPlaceholder: "Buscar por nombre, apodo o correo...",
+          onAdvancedFilterClick: () => {},
+          children: (
+            <div className="flex gap-2">
+              {Object.keys(rowSelection).length > 0 ? (
+                <>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                    onClick={() => handleBulkAction('activo')}
+                    disabled={isProcessingBulk}
+                  >
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Activar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
+                    onClick={() => handleBulkAction('inactivo')}
+                    disabled={isProcessingBulk}
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Inactivar
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                    onClick={() => handleBulkAction('eliminado')}
+                    disabled={isProcessingBulk}
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Eliminar
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="sm"
+                    className="h-9 text-slate-500 hover:text-slate-700"
+                    onClick={() => setRowSelection({})}
+                    disabled={isProcessingBulk}
+                  >
+                    Cancelar
+                  </Button>
+                </>
+              ) : (
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger className="w-[180px] bg-background">
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los Estados</SelectItem>
+                    <SelectItem value="activo">Activo</SelectItem>
+                    <SelectItem value="inactivo">Inactivo</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )
+        }}
+      />
 
       <EditUsuarioModal
         usuario={selectedUsuario}
