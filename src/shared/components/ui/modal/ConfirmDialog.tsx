@@ -34,27 +34,27 @@ export function ConfirmDialog({
   variant = 'default',
   isLoading = false,
 }: ConfirmDialogProps) {
-  // Configuración visual basada en la variante
+  // Configuración visual basada en la variante (Soporte Light/Dark Mode)
   const variantConfig = {
     destructive: {
-      icon: <AlertCircle className="h-6 w-6 text-red-600" />,
-      iconBg: 'bg-red-100',
-      buttonVariant: 'destructive' as const,
+      icon: <AlertCircle className="h-8 w-8 text-rose-500 dark:text-rose-400" />,
+      iconBg: 'bg-rose-100 dark:bg-rose-500/20',
+      buttonClass: 'bg-rose-500 hover:bg-rose-600 text-white dark:bg-rose-600 dark:hover:bg-rose-700',
     },
     warning: {
-      icon: <AlertTriangle className="h-6 w-6 text-amber-600" />,
-      iconBg: 'bg-amber-100',
-      buttonVariant: 'default' as const, // Puedes cambiar a un botón amarillo si existe
+      icon: <AlertTriangle className="h-8 w-8 text-amber-500 dark:text-amber-400" />,
+      iconBg: 'bg-amber-100 dark:bg-amber-500/20',
+      buttonClass: 'bg-amber-500 hover:bg-amber-600 text-white dark:bg-amber-600 dark:hover:bg-amber-700',
     },
     info: {
-      icon: <Info className="h-6 w-6 text-blue-600" />,
-      iconBg: 'bg-blue-100',
-      buttonVariant: 'default' as const,
+      icon: <Info className="h-8 w-8 text-indigo-500 dark:text-indigo-400" />,
+      iconBg: 'bg-indigo-100 dark:bg-indigo-500/20',
+      buttonClass: 'bg-indigo-500 hover:bg-indigo-600 text-white dark:bg-indigo-600 dark:hover:bg-indigo-700',
     },
     default: {
-      icon: <HelpCircle className="h-6 w-6 text-slate-600" />,
-      iconBg: 'bg-slate-100',
-      buttonVariant: 'default' as const,
+      icon: <HelpCircle className="h-8 w-8 text-slate-500 dark:text-slate-400" />,
+      iconBg: 'bg-slate-100 dark:bg-slate-800',
+      buttonClass: 'bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900',
     },
   };
 
@@ -76,43 +76,42 @@ export function ConfirmDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className="sm:max-w-[425px] overflow-hidden bg-white p-0 shadow-lg rounded-2xl" 
-        showCloseButton={!isLoading}
+        className="sm:max-w-[400px] overflow-hidden bg-white dark:bg-slate-950 p-8 shadow-2xl rounded-3xl border-0" 
+        showCloseButton={false}
       >
-        <div className="p-6">
-          <div className="flex items-start gap-4">
-            {/* Ícono dinámico */}
-            <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-full', currentConfig.iconBg)}>
-              {currentConfig.icon}
-            </div>
-
-            <DialogHeader className="text-left">
-              <DialogTitle className="text-lg font-bold text-slate-900">{title}</DialogTitle>
-              <DialogDescription className="mt-2 text-sm text-slate-500">
-                {description}
-              </DialogDescription>
-            </DialogHeader>
+        <div className="flex flex-col items-center text-center">
+          {/* Ícono dinámico y centrado */}
+          <div className={cn('flex h-20 w-20 shrink-0 items-center justify-center rounded-full mb-6', currentConfig.iconBg)}>
+            {currentConfig.icon}
           </div>
+
+          <DialogHeader className="text-center w-full">
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white w-full flex justify-center">
+              {title}
+            </DialogTitle>
+            <DialogDescription className="mt-3 text-[15px] leading-relaxed text-slate-500 dark:text-slate-400 w-full flex justify-center text-center max-w-[280px] mx-auto">
+              {description}
+            </DialogDescription>
+          </DialogHeader>
         </div>
 
-        <DialogFooter className="bg-slate-50 px-6 py-4 sm:justify-end border-t border-slate-100">
+        <DialogFooter className="mt-8 m-0 border-t-0 p-0 bg-transparent flex flex-row gap-3 w-full sm:justify-center">
           <Button
             type="button"
             variant="outline"
             onClick={handleCancel}
             disabled={isLoading}
-            className="w-full sm:w-auto bg-white"
+            className="flex-1 bg-white dark:bg-transparent h-12 text-[15px] font-medium rounded-xl border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors m-0"
           >
             {cancelText}
           </Button>
           <Button
             type="button"
-            variant={currentConfig.buttonVariant}
             onClick={handleConfirm}
             disabled={isLoading}
             className={cn(
-              "w-full sm:w-auto",
-              variant === 'warning' && "bg-amber-600 hover:bg-amber-700 text-white"
+              "flex-1 h-12 text-[15px] font-medium rounded-xl shadow-none transition-colors m-0",
+              currentConfig.buttonClass
             )}
           >
             {isLoading ? (
