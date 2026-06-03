@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/useAuthStore';
+import { toast } from 'sonner';
 
 export const apiClient = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
@@ -61,6 +62,9 @@ apiClient.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+
+    const errorMessage = error.response?.data?.message || error.response?.data?.error || "Ha ocurrido un error inesperado. Intente nuevamente.";
+    toast.error(errorMessage);
 
     return Promise.reject(error);
   }

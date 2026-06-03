@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, PackagePlus, Plus } from 'lucide-react';
 import { useTerminalCart } from '../../hooks/useTerminalCart';
 import { useStocks } from '../../../../stock/presentation/hooks/useStocks';
+import { toast } from 'sonner';
 import { useProductos } from '../../../../producto/presentation/hooks/useProductos';
 import { Input } from '../../../../../shared/components/ui/input';
 import { Button } from '../../../../../shared/components/ui/button';
@@ -40,8 +41,9 @@ export const ProductSearch = ({ selectedSucursalId }: ProductSearchProps) => {
 
   const handleAddProduct = (stock: any, productoData: any) => {
     // Only add if there is stock available
-    if (stock.stckcantidad <= 0) {
-      alert('No hay existencias disponibles para este producto en la sucursal seleccionada.');
+    const stockActual = Number(stock.stckcantidad);
+    if (stockActual <= 0) {
+      toast.error('No hay existencias disponibles para este producto en la sucursal seleccionada.');
       return;
     }
 

@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../shared/components/ui/select';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 
 export const UsuarioTable = () => {
   const [page, setPage] = useState(1);
@@ -39,18 +40,42 @@ export const UsuarioTable = () => {
     setIsEditOpen(true);
   };
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    variant: 'default' | 'destructive' | 'warning' | 'info';
+    action: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    variant: 'default',
+    action: () => {},
+  });
+
   const handleStatusChange = (usuario: Usuario, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
     if (!company?.emid) return;
     
-    if (confirm(`¿Estás seguro de cambiar el estado de ${usuario.usnombre} a ${newStatus}?`)) {
-      updateStatusMutation.mutate({
-        id: usuario.usid,
-        data: { 
-          usemid: company.emid,
-          usestado: newStatus 
-        }
-      });
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: `¿Cambiar estado?`,
+      description: `¿Estás seguro de cambiar el estado de ${usuario.usnombre} a ${newStatus}?`,
+      variant: newStatus === 'eliminado' ? 'destructive' : 'warning',
+      action: () => {
+        updateStatusMutation.mutate({
+          id: usuario.usid,
+          data: { 
+            usemid: company.emid,
+            usestado: newStatus 
+          }
+        }, {
+          onSuccess: () => {
+            setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+          }
+        });
+      }
+    });
   };
 
   const handleBulkAction = async (newStatus: 'activo' | 'inactivo' | 'eliminado') => {
@@ -202,6 +227,15 @@ export const UsuarioTable = () => {
         usuario={selectedUsuario}
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
+      />
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmDialog.action}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        variant={confirmDialog.variant}
+        isLoading={updateStatusMutation.isPending}
       />
     </>
   );

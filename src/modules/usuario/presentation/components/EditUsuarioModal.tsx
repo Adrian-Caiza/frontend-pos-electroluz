@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { UserCog, User, Mail, Lock, Shield, UploadCloud, X, Camera } from 'lucide-react';
+import { toast } from 'sonner';
 import {
   BaseModal,
   ModalFooter,
@@ -93,7 +94,7 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        alert('La imagen no debe superar los 5MB');
+        toast.error('La imagen no debe superar los 5MB');
         return;
       }
       setSelectedImage(file);

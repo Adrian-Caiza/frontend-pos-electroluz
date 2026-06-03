@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../shared/components/ui/select';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 
 interface StockTableProps {
   sucursalId: string;
@@ -35,14 +36,38 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
   const [stockToEdit, setStockToEdit] = useState<Stock | null>(null);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    variant: 'default' | 'destructive' | 'warning' | 'info';
+    action: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    variant: 'default',
+    action: () => {},
+  });
+
   const handleEdit = (stock: Stock) => {
     setStockToEdit(stock);
   };
 
   const handleStatusChange = (stock: Stock, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
-    if (confirm(`¿Estás seguro de marcar el stock de ${stock.producto.prdtonombre} como ${newStatus}?`)) {
-      updateStock({ id: stock.stckid, data: { stcksuid: sucursalId, stckestado: newStatus } });
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: `¿Cambiar estado?`,
+      description: `¿Estás seguro de marcar el stock de ${stock.producto.prdtonombre} como ${newStatus}?`,
+      variant: newStatus === 'eliminado' ? 'destructive' : 'warning',
+      action: () => {
+        updateStock({ id: stock.stckid, data: { stcksuid: sucursalId, stckestado: newStatus } }, {
+          onSuccess: () => {
+            setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+          }
+        });
+      }
+    });
   };
 
   const handleBulkAction = async (newStatus: 'activo' | 'inactivo' | 'eliminado') => {
@@ -186,6 +211,15 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
           onOpenChange={(open) => !open && setStockToEdit(null)}
         />
       )}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmDialog.action}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        variant={confirmDialog.variant}
+        isLoading={false} // useUpdateStock doesn't easily expose isPending for the non-async version in this component structure unless we use mutateAsync or extract it, but it's quick.
+      />
     </>
   );
 };

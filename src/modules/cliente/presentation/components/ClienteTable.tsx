@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../shared/components/ui/select';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 
 export const ClienteTable = () => {
   const [page, setPage] = useState(1);
@@ -33,10 +34,34 @@ export const ClienteTable = () => {
   const [clienteToEdit, setClienteToEdit] = useState<Cliente | null>(null);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    variant: 'default' | 'destructive' | 'warning' | 'info';
+    action: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    variant: 'default',
+    action: () => {},
+  });
+
   const handleStatusChange = (cliente: Cliente, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
-    if (confirm(`¿Estás seguro de marcar a ${cliente.clntenombre} como ${newStatus}?`)) {
-      updateCliente({ id: cliente.clnteid, data: { clnteestado: newStatus } });
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: `¿Cambiar estado?`,
+      description: `¿Estás seguro de marcar a ${cliente.clntenombre} como ${newStatus}?`,
+      variant: newStatus === 'eliminado' ? 'destructive' : 'warning',
+      action: () => {
+        updateCliente({ id: cliente.clnteid, data: { clnteestado: newStatus } }, {
+          onSuccess: () => {
+            setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+          }
+        });
+      }
+    });
   };
 
   const handleBulkAction = async (newStatus: 'activo' | 'inactivo' | 'eliminado') => {
@@ -179,6 +204,15 @@ export const ClienteTable = () => {
           onOpenChange={(open) => !open && setClienteToEdit(null)}
         />
       )}
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmDialog.action}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        variant={confirmDialog.variant}
+        isLoading={updateMutation.isPending}
+      />
     </div>
   );
 };

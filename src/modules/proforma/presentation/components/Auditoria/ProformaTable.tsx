@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../../shared/components/ui/select';
+import { ConfirmDialog } from '../../../../../shared/components/ui/modal/ConfirmDialog';
 
 export const ProformaTable = () => {
   const [page, setPage] = useState(1);
@@ -28,36 +29,72 @@ export const ProformaTable = () => {
   const { mutateAsync: cancelProforma, isPending: isCanceling } = useCancelProforma();
   const { mutateAsync: payProforma, isPending: isPaying } = usePayProforma();
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    variant: 'default' | 'destructive' | 'warning' | 'info';
+    action: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    variant: 'default',
+    action: () => {},
+  });
+
   const handleCancel = async (id: string) => {
-    if (window.confirm('¿Estás seguro de que deseas CANCELAR esta proforma? Esta acción devolverá el inventario a bodega.')) {
-      await cancelProforma(id);
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: '¿Cancelar Proforma?',
+      description: '¿Estás seguro de que deseas CANCELAR esta proforma? Esta acción devolverá el inventario a bodega.',
+      variant: 'destructive',
+      action: async () => {
+        await cancelProforma(id);
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handlePay = async (id: string) => {
-    if (window.confirm('¿Confirmas el PAGO de esta proforma? Se marcará como completada.')) {
-      await payProforma(id);
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: '¿Pagar Proforma?',
+      description: '¿Confirmas el PAGO de esta proforma? Se marcará como completada.',
+      variant: 'info',
+      action: async () => {
+        await payProforma(id);
+        setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+      }
+    });
   };
 
   const handleBulkAction = async (action: 'cancelar' | 'pagar') => {
     const selectedIds = Object.keys(rowSelection);
     if (selectedIds.length === 0) return;
 
-    if (action === 'cancelar' && !window.confirm(`¿Estás seguro de CANCELAR ${selectedIds.length} proformas?`)) return;
-    if (action === 'pagar' && !window.confirm(`¿Confirmas el PAGO de ${selectedIds.length} proformas?`)) return;
-
-    setIsProcessingBulk(true);
-    try {
-      await Promise.all(
-        selectedIds.map(id => action === 'cancelar' ? cancelProforma(id) : payProforma(id))
-      );
-      setRowSelection({});
-    } catch (error) {
-      console.error("Bulk action failed", error);
-    } finally {
-      setIsProcessingBulk(false);
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: action === 'cancelar' ? '¿Cancelar Proformas?' : '¿Pagar Proformas?',
+      description: action === 'cancelar' 
+        ? `¿Estás seguro de CANCELAR ${selectedIds.length} proformas?`
+        : `¿Confirmas el PAGO de ${selectedIds.length} proformas?`,
+      variant: action === 'cancelar' ? 'destructive' : 'info',
+      action: async () => {
+        setIsProcessingBulk(true);
+        try {
+          await Promise.all(
+            selectedIds.map(id => action === 'cancelar' ? cancelProforma(id) : payProforma(id))
+          );
+          setRowSelection({});
+        } catch (error) {
+          console.error("Bulk action failed", error);
+        } finally {
+          setIsProcessingBulk(false);
+          setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+        }
+      }
+    });
   };
 
   // Filtrado local
@@ -97,6 +134,7 @@ export const ProformaTable = () => {
   };
 
   return (
+    <>
     <DataTable
       columns={columns}
       data={paginatedData}
@@ -168,5 +206,15 @@ export const ProformaTable = () => {
         )
       }}
     />
+    <ConfirmDialog
+      isOpen={confirmDialog.isOpen}
+      onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+      onConfirm={confirmDialog.action}
+      title={confirmDialog.title}
+      description={confirmDialog.description}
+      variant={confirmDialog.variant}
+      isLoading={isCanceling || isPaying || isProcessingBulk}
+    />
+    </>
   );
 };

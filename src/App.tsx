@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Toaster } from 'sonner';
+import { Toaster } from './shared/components/ui/sonner';
 import { useAuthStore } from './shared/stores/useAuthStore';
 import { AuthLayout } from './shared/components/layout/AuthLayout';
 import { MainLayout } from './shared/components/layout/MainLayout';

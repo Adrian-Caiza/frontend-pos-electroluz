@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../../../shared/components/ui/select';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 
 export const MetodoPagoTable = () => {
   const [page, setPage] = useState(1);
@@ -35,15 +36,39 @@ export const MetodoPagoTable = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
+  const [confirmDialog, setConfirmDialog] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    variant: 'default' | 'destructive' | 'warning' | 'info';
+    action: () => void;
+  }>({
+    isOpen: false,
+    title: '',
+    description: '',
+    variant: 'default',
+    action: () => {},
+  });
+
   const handleEdit = (metodo: MetodoPago) => {
     setSelectedMetodo(metodo);
     setIsEditModalOpen(true);
   };
 
   const handleStatusChange = (metodo: MetodoPago, newStatus: 'activo' | 'inactivo') => {
-    if (confirm(`¿Estás seguro de cambiar el estado de ${metodo.mpnombre} a ${newStatus}?`)) {
-      updateMetodo({ id: metodo.mpid, data: { mpestado: newStatus } });
-    }
+    setConfirmDialog({
+      isOpen: true,
+      title: `¿Cambiar estado?`,
+      description: `¿Estás seguro de cambiar el estado de ${metodo.mpnombre} a ${newStatus}?`,
+      variant: newStatus === 'inactivo' ? 'warning' : 'info',
+      action: () => {
+        updateMetodo({ id: metodo.mpid, data: { mpestado: newStatus } }, {
+          onSuccess: () => {
+            setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+          }
+        });
+      }
+    });
   };
 
   const handleBulkAction = async (newStatus: 'activo' | 'inactivo') => {
@@ -173,6 +198,15 @@ export const MetodoPagoTable = () => {
         metodoPago={selectedMetodo}
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
+      />
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmDialog.action}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        variant={confirmDialog.variant}
+        isLoading={updateMutation.isPending}
       />
     </>
   );
