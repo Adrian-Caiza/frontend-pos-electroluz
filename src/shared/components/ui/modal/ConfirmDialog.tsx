@@ -40,21 +40,25 @@ export function ConfirmDialog({
       icon: <AlertCircle className="h-8 w-8 text-rose-500 dark:text-rose-400" />,
       iconBg: 'bg-rose-100 dark:bg-rose-500/20',
       buttonClass: 'bg-rose-500 hover:bg-rose-600 text-white dark:bg-rose-600 dark:hover:bg-rose-700',
+      gradientClass: 'bg-gradient-to-b from-rose-100/60 to-white dark:from-rose-950/40 dark:to-slate-950',
     },
     warning: {
       icon: <AlertTriangle className="h-8 w-8 text-amber-500 dark:text-amber-400" />,
       iconBg: 'bg-amber-100 dark:bg-amber-500/20',
       buttonClass: 'bg-amber-500 hover:bg-amber-600 text-white dark:bg-amber-600 dark:hover:bg-amber-700',
+      gradientClass: 'bg-gradient-to-b from-amber-100/60 to-white dark:from-amber-950/40 dark:to-slate-950',
     },
     info: {
       icon: <Info className="h-8 w-8 text-indigo-500 dark:text-indigo-400" />,
       iconBg: 'bg-indigo-100 dark:bg-indigo-500/20',
       buttonClass: 'bg-indigo-500 hover:bg-indigo-600 text-white dark:bg-indigo-600 dark:hover:bg-indigo-700',
+      gradientClass: 'bg-gradient-to-b from-indigo-100/60 to-white dark:from-indigo-950/40 dark:to-slate-950',
     },
     default: {
       icon: <HelpCircle className="h-8 w-8 text-slate-500 dark:text-slate-400" />,
       iconBg: 'bg-slate-100 dark:bg-slate-800',
       buttonClass: 'bg-slate-900 hover:bg-slate-800 text-white dark:bg-slate-100 dark:hover:bg-slate-200 dark:text-slate-900',
+      gradientClass: 'bg-gradient-to-b from-slate-100/60 to-white dark:from-slate-900/40 dark:to-slate-950',
     },
   };
 
@@ -76,7 +80,10 @@ export function ConfirmDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent 
-        className="sm:max-w-[400px] overflow-hidden bg-white dark:bg-slate-950 p-8 shadow-2xl rounded-3xl border-0" 
+        className={cn(
+          "sm:max-w-[400px] overflow-hidden bg-white dark:bg-slate-950 p-8 shadow-2xl rounded-3xl border-0",
+          currentConfig.gradientClass
+        )} 
         showCloseButton={false}
       >
         <div className="flex flex-col items-center text-center">
