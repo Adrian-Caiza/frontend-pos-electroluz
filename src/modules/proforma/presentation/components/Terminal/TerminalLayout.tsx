@@ -4,6 +4,7 @@ import { ProductSearch } from './ProductSearch';
 import { CartPanel } from './CartPanel';
 import { useProforma } from '../../hooks/useProforma';
 import { useTerminalCart } from '../../hooks/useTerminalCart';
+import { ConfirmDialog } from '../../../../../shared/components/ui/modal/ConfirmDialog';
 
 export interface TerminalConfig {
   sucursalId: string | null;
@@ -16,7 +17,7 @@ export const TerminalLayout = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const editId = searchParams.get('edit');
   const { data: proforma, isLoading } = useProforma(editId);
-  const { loadProforma, clearCart } = useTerminalCart();
+  const { loadProforma, clearCart, items } = useTerminalCart();
 
   const [config, setConfig] = useState<TerminalConfig>({
     sucursalId: null,
@@ -24,6 +25,9 @@ export const TerminalLayout = () => {
     clienteId: null,
     metodoPagoId: null,
   });
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingSucursalId, setPendingSucursalId] = useState<string | null>(null);
 
   useEffect(() => {
     if (proforma) {
@@ -38,7 +42,18 @@ export const TerminalLayout = () => {
   }, [proforma, loadProforma]);
 
   const handleChangeConfig = (key: keyof TerminalConfig, value: string | null) => {
-    setConfig(prev => ({ ...prev, [key]: value }));
+    if (key === 'sucursalId' && config.sucursalId !== value && items.length > 0) {
+      setPendingSucursalId(value);
+      setShowConfirm(true);
+    } else {
+      setConfig(prev => {
+        const next = { ...prev, [key]: value };
+        if (key === 'sucursalId' && prev.sucursalId !== value) {
+          next.cajaId = null; // Reset caja si cambia de sucursal
+        }
+        return next;
+      });
+    }
   };
 
   const handleSaleSuccess = () => {
@@ -72,6 +87,24 @@ export const TerminalLayout = () => {
         </div>
 
       </div>
+
+      <ConfirmDialog
+        isOpen={showConfirm}
+        onClose={() => {
+          setShowConfirm(false);
+          setPendingSucursalId(null);
+        }}
+        onConfirm={() => {
+          clearCart();
+          setConfig(prev => ({ ...prev, sucursalId: pendingSucursalId, cajaId: null }));
+          setShowConfirm(false);
+          setPendingSucursalId(null);
+        }}
+        title="¿Cambiar de sucursal?"
+        description="Esta acción vaciará los productos actuales del carrito ya que el inventario corresponde a la sucursal actual. ¿Deseas continuar?"
+        confirmText="Sí, vaciar y cambiar"
+        variant="warning"
+      />
     </div>
   );
 };
