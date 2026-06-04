@@ -55,9 +55,11 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
   const { data: productosData } = useProductos(1, 1000);
 
   const filteredItems = data?.items.filter(stock => 
-    !debouncedSearch || 
-    stock.producto.prdtonombre.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-    stock.producto.prdtocodigo.toLowerCase().includes(debouncedSearch.toLowerCase())
+    stock.stckestado === 'activo' && (
+      !debouncedSearch || 
+      stock.producto.prdtonombre.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
+      stock.producto.prdtocodigo.toLowerCase().includes(debouncedSearch.toLowerCase())
+    )
   ) || [];
 
   const handleAddProduct = (stock: any, productoData: any, availableStock: number) => {
