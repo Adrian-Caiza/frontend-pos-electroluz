@@ -111,9 +111,12 @@ export const ProformaTable = () => {
     if (globalFilter) {
       const lowerQuery = globalFilter.toLowerCase();
       items = items.filter((p) => {
-        const doc = p.receptor.clnteidentificacion || (p.receptor as any).identificacion || '';
+        const clienteObj = (p.receptor as any).cliente || p.receptor;
+        const doc = clienteObj.clnteidentificacion || clienteObj.identificacion || '';
+        const nombre = clienteObj.clntenombre || '';
+        
         return p.prfmaidentificador.toLowerCase().includes(lowerQuery) || 
-               p.receptor.clntenombre.toLowerCase().includes(lowerQuery) ||
+               nombre.toLowerCase().includes(lowerQuery) ||
                doc.toLowerCase().includes(lowerQuery);
       });
     }

@@ -30,7 +30,7 @@ export const TerminalLayout = () => {
       setConfig({
         sucursalId: proforma.emisor.sucursal.suid,
         cajaId: proforma.emisor.caja.cjid,
-        clienteId: proforma.receptor.clnteid,
+        clienteId: proforma.receptor.clnteid || (proforma.receptor as any).cliente?.clnteid,
         metodoPagoId: proforma.metodoPago.mpid,
       });
       loadProforma(proforma);

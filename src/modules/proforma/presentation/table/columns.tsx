@@ -58,14 +58,14 @@ export const columns: ColumnDef<Proforma>[] = [
   },
   {
     id: 'cliente',
-    accessorFn: (row) => `${row.receptor.clntenombre} ${row.receptor.clnteidentificacion || (row.receptor as any).identificacion || ''}`,
+    accessorFn: (row) => `${row.receptor.clntenombre || (row.receptor as any).cliente?.clntenombre} ${row.receptor.clnteidentificacion || (row.receptor as any).cliente?.clnteidentificacion || (row.receptor as any).identificacion || ''}`,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
     cell: ({ row }) => {
       const receptor = row.original.receptor;
       return (
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-900">{receptor.clntenombre}</span>
-          <span className="text-xs text-slate-500">CI/RUC: {receptor.clnteidentificacion || (receptor as any).identificacion || (receptor as any).clntedocumento || 'N/A'}</span>
+          <span className="text-sm font-medium text-slate-900">{receptor.clntenombre || (receptor as any).cliente?.clntenombre}</span>
+          <span className="text-xs text-slate-500">CI/RUC: {receptor.clnteidentificacion || (receptor as any).cliente?.clnteidentificacion || (receptor as any).identificacion || (receptor as any).clntedocumento || 'N/A'}</span>
         </div>
       );
     },
