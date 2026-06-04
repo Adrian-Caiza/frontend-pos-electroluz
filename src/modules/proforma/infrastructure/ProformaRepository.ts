@@ -1,7 +1,7 @@
 import type { IProformaRepository } from '../domain/IProformaRepository';
-import type { Proforma, CreateProformaDTO } from '../domain/Proforma';
+import type { Proforma, CreateProformaDTO, UpdateProformaDTO } from '../domain/Proforma';
 import type { PaginatedResult } from '../../../shared/types/PaginatedResult';
-import { fetchProformas, createProforma, cancelProforma, payProforma } from './proformaApi';
+import { fetchProformas, createProforma, cancelProforma, payProforma, fetchProformaById, updateProforma } from './proformaApi';
 
 export class ProformaRepository implements IProformaRepository {
   async getProformas(page: number, pageSize: number): Promise<PaginatedResult<Proforma>> {
@@ -10,6 +10,14 @@ export class ProformaRepository implements IProformaRepository {
 
   async createProforma(data: CreateProformaDTO): Promise<Proforma> {
     return await createProforma(data);
+  }
+
+  async fetchProformaById(id: string): Promise<Proforma> {
+    return await fetchProformaById(id);
+  }
+
+  async updateProforma(id: string, data: UpdateProformaDTO): Promise<Proforma> {
+    return await updateProforma(id, data);
   }
 
   async cancelProforma(id: string): Promise<void> {

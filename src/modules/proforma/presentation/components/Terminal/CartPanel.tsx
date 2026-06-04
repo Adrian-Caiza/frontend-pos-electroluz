@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useTerminalCart } from '../../hooks/useTerminalCart';
 import { useCreateProforma } from '../../hooks/useCreateProforma';
+import { useUpdateProforma } from '../../hooks/useUpdateProforma';
 import type { TerminalConfig } from './TerminalLayout';
 import { Button } from '../../../../../shared/components/ui/button';
 import { Input } from '../../../../../shared/components/ui/input';
@@ -11,12 +12,15 @@ import { ConfirmDialog } from '../../../../../shared/components/ui/modal/Confirm
 interface CartPanelProps {
   config: TerminalConfig;
   onSuccess: () => void;
+  editId?: string | null;
 }
 
-export const CartPanel = ({ config, onSuccess }: CartPanelProps) => {
+export const CartPanel = ({ config, onSuccess, editId }: CartPanelProps) => {
   const cart = useTerminalCart();
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const { mutate: createProforma, isPending } = useCreateProforma();
+  const { mutate: createProforma, isPending: isCreating } = useCreateProforma();
+  const { mutate: updateProforma, isPending: isUpdating } = useUpdateProforma();
+  const isPending = isCreating || isUpdating;
 
   const handleProcessSale = async () => {
     if (!config.sucursalId || !config.cajaId || !config.clienteId || !config.metodoPagoId) {
@@ -29,33 +33,57 @@ export const CartPanel = ({ config, onSuccess }: CartPanelProps) => {
       return;
     }
 
-    createProforma({
-      prfmasuid: config.sucursalId,
-      prfmacjid: config.cajaId,
-      prfmaclnteid: config.clienteId,
-      prfmampid: config.metodoPagoId,
-      prfmasubtotal: cart.subtotal,
-      prfmadescuento: cart.descuento,
-      prfmatotal: cart.total,
-      dprfmaproductos: cart.items.map(item => ({
-        dprfmaesinventariable: item.esInventariable,
-        dprfmacodigo: item.codigo,
-        dprfmadescripcion: item.descripcion,
-        dprfmacantidad: item.cantidad,
-        dprfmapreciounitario: item.precioUnitario,
-        dprfmapreciototal: item.precioTotal,
-      }))
-    }, {
-      onSuccess: () => {
-        toast.success('¡Venta procesada con éxito!');
-        cart.clearCart();
-        onSuccess();
-      },
-      onError: (error: any) => {
-        const backendError = error.response?.data?.message || error.response?.data?.error || error.message || 'Error desconocido';
-        toast.error(`Ocurrió un error al procesar la venta. Detalle: ${backendError}`);
-      }
-    });
+    const itemsPayload = cart.items.map(item => ({
+      dprfmaid: item.dprfmaid,
+      dprfmaesinventariable: item.esInventariable,
+      dprfmacodigo: item.codigo,
+      dprfmadescripcion: item.descripcion,
+      dprfmacantidad: item.cantidad,
+      dprfmapreciounitario: item.precioUnitario,
+      dprfmapreciototal: item.precioTotal,
+    }));
+
+    const handleMutateSuccess = () => {
+      toast.success(editId ? '¡Proforma actualizada con éxito!' : '¡Proforma generada con éxito!');
+      cart.clearCart();
+      onSuccess();
+    };
+
+    const handleMutateError = (error: any) => {
+      const backendError = error.response?.data?.message || error.response?.data?.error || error.message || 'Error desconocido';
+      toast.error(`Ocurrió un error al procesar la operación. Detalle: ${backendError}`);
+    };
+
+    if (editId) {
+      updateProforma({
+        id: editId,
+        data: {
+          prfmaclnteid: config.clienteId,
+          prfmampid: config.metodoPagoId,
+          prfmasubtotal: cart.subtotal,
+          prfmadescuento: cart.descuento,
+          prfmatotal: cart.total,
+          dprfmaproductos: itemsPayload
+        }
+      }, {
+        onSuccess: handleMutateSuccess,
+        onError: handleMutateError
+      });
+    } else {
+      createProforma({
+        prfmasuid: config.sucursalId,
+        prfmacjid: config.cajaId,
+        prfmaclnteid: config.clienteId,
+        prfmampid: config.metodoPagoId,
+        prfmasubtotal: cart.subtotal,
+        prfmadescuento: cart.descuento,
+        prfmatotal: cart.total,
+        dprfmaproductos: itemsPayload
+      }, {
+        onSuccess: handleMutateSuccess,
+        onError: handleMutateError
+      });
+    }
   };
 
   return (
@@ -173,10 +201,10 @@ export const CartPanel = ({ config, onSuccess }: CartPanelProps) => {
             onClick={handleProcessSale}
             disabled={cart.items.length === 0 || isPending}
           >
-            {isPending ? 'Procesando Venta...' : (
+            {isPending ? 'Procesando...' : (
               <>
                 <Send className="w-5 h-5 mr-3" />
-                COBRAR AHORA
+                {editId ? 'Guardar Cambios' : 'Generar Proforma'}
               </>
             )}
           </Button>

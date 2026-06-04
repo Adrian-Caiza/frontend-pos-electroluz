@@ -63,3 +63,16 @@ export interface CreateProformaDTO {
   prfmatotal: number;
   dprfmaproductos: CreateProformaItemDTO[];
 }
+
+export interface UpdateProformaItemDTO extends CreateProformaItemDTO {
+  dprfmaid?: string;
+}
+
+export interface UpdateProformaDTO {
+  prfmaclnteid: string;
+  prfmampid: string;
+  prfmasubtotal: number;
+  prfmadescuento: number;
+  prfmatotal: number;
+  dprfmaproductos: UpdateProformaItemDTO[];
+}

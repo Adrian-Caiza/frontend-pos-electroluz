@@ -1,6 +1,6 @@
 import { apiClient } from '../../../shared/lib/apiClient';
 import type { PaginatedResult } from '../../../shared/types/PaginatedResult';
-import type { Proforma, CreateProformaDTO } from '../domain/Proforma';
+import type { Proforma, CreateProformaDTO, UpdateProformaDTO } from '../domain/Proforma';
 
 export const fetchProformas = async (page: number, pageSize: number): Promise<PaginatedResult<Proforma>> => {
   const { data } = await apiClient.get<PaginatedResult<Proforma>>('/proformas', {
@@ -19,6 +19,16 @@ export const fetchProformas = async (page: number, pageSize: number): Promise<Pa
 
 export const createProforma = async (proforma: CreateProformaDTO): Promise<Proforma> => {
   const { data } = await apiClient.post<{proforma: Proforma}>('/proformas', proforma);
+  return data.proforma;
+};
+
+export const fetchProformaById = async (id: string): Promise<Proforma> => {
+  const { data } = await apiClient.get<{proforma: Proforma}>(`/proformas/${id}`);
+  return data.proforma;
+};
+
+export const updateProforma = async (id: string, proforma: UpdateProformaDTO): Promise<Proforma> => {
+  const { data } = await apiClient.put<{proforma: Proforma}>(`/proformas/${id}`, proforma);
   return data.proforma;
 };
 

@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 export interface CartItem {
   id: string; // unique local ID (could be product ID or a random UUID for manual items)
+  dprfmaid?: string; // Optional backend ID for updating existing items
   esInventariable: boolean;
   codigo?: string;
   descripcion: string;
@@ -22,6 +23,7 @@ interface TerminalCartState {
   updateQuantity: (id: string, cantidad: number) => void;
   setDescuento: (descuento: number) => void;
   clearCart: () => void;
+  loadProforma: (proforma: import('../../domain/Proforma').Proforma) => void;
 }
 
 export const useTerminalCart = create<TerminalCartState>((set, get) => ({
@@ -115,5 +117,25 @@ export const useTerminalCart = create<TerminalCartState>((set, get) => ({
     }));
   },
 
-  clearCart: () => set({ items: [], subtotal: 0, descuento: 0, total: 0 })
+  clearCart: () => set({ items: [], subtotal: 0, descuento: 0, total: 0 }),
+  
+  loadProforma: (proforma) => {
+    const items: CartItem[] = proforma.detalle.map(d => ({
+      id: d.producto.dprfmacodigo || d.dprfmaid || crypto.randomUUID(),
+      dprfmaid: d.dprfmaid,
+      esInventariable: d.dprfmatipoitem === 'inventariable',
+      codigo: d.producto.dprfmacodigo || undefined,
+      descripcion: d.producto.dprfmadescripcion || '',
+      cantidad: d.producto.dprfmacantidad,
+      precioUnitario: d.producto.dprfmapreciounitario,
+      precioTotal: d.producto.dprfmapreciototal
+    }));
+    
+    set({
+      items,
+      subtotal: proforma.total.prfmasubtotal,
+      descuento: proforma.total.prfmadescuento,
+      total: proforma.total.prfmatotal
+    });
+  }
 }));

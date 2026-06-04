@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import type { RowSelectionState } from '@tanstack/react-table';
 import { useProformas } from '../../hooks/useProformas';
 import { useCancelProforma } from '../../hooks/useCancelProforma';
@@ -18,6 +19,7 @@ import {
 import { ConfirmDialog } from '../../../../../shared/components/ui/modal/ConfirmDialog';
 
 export const ProformaTable = () => {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [globalFilter, setGlobalFilter] = useState('');
@@ -108,11 +110,12 @@ export const ProformaTable = () => {
     
     if (globalFilter) {
       const lowerQuery = globalFilter.toLowerCase();
-      items = items.filter((p) => 
-        p.prfmaidentificador.toLowerCase().includes(lowerQuery) || 
-        p.receptor.clntenombre.toLowerCase().includes(lowerQuery) ||
-        p.receptor.clnteidentificacion.toLowerCase().includes(lowerQuery)
-      );
+      items = items.filter((p) => {
+        const doc = p.receptor.clnteidentificacion || (p.receptor as any).identificacion || '';
+        return p.prfmaidentificador.toLowerCase().includes(lowerQuery) || 
+               p.receptor.clntenombre.toLowerCase().includes(lowerQuery) ||
+               doc.toLowerCase().includes(lowerQuery);
+      });
     }
     
     return items;
@@ -129,6 +132,7 @@ export const ProformaTable = () => {
   const meta: ProformaTableMeta = {
     onCancel: handleCancel,
     onPay: handlePay,
+    onEdit: (id: string) => navigate(`/terminal?edit=${id}`),
     isCanceling,
     isPaying,
   };

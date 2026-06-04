@@ -3,7 +3,7 @@ import type { Proforma } from '../../domain/Proforma';
 import { DataTableColumnHeader } from '../../../../shared/components/ui/data-table/DataTableColumnHeader';
 import { DataTableCheckbox } from '../../../../shared/components/ui/data-table/DataTableCheckbox';
 import { DataTableRowActions, type DataTableRowActionItem } from '../../../../shared/components/ui/data-table/DataTableRowActions';
-import { Receipt, CheckCircle2, XCircle } from 'lucide-react';
+import { Receipt, CheckCircle2, XCircle, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Badge } from '../../../../shared/components/ui/badge';
@@ -11,6 +11,7 @@ import { Badge } from '../../../../shared/components/ui/badge';
 export interface ProformaTableMeta {
   onCancel: (id: string) => void;
   onPay: (id: string) => void;
+  onEdit: (id: string) => void;
   isCanceling: boolean;
   isPaying: boolean;
 }
@@ -57,14 +58,14 @@ export const columns: ColumnDef<Proforma>[] = [
   },
   {
     id: 'cliente',
-    accessorFn: (row) => `${row.receptor.clntenombre} ${row.receptor.clnteidentificacion}`,
+    accessorFn: (row) => `${row.receptor.clntenombre} ${row.receptor.clnteidentificacion || (row.receptor as any).identificacion || ''}`,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cliente" />,
     cell: ({ row }) => {
       const receptor = row.original.receptor;
       return (
         <div className="flex flex-col">
           <span className="text-sm font-medium text-slate-900">{receptor.clntenombre}</span>
-          <span className="text-xs text-slate-500">CI/RUC: {receptor.clnteidentificacion}</span>
+          <span className="text-xs text-slate-500">CI/RUC: {receptor.clnteidentificacion || (receptor as any).identificacion || (receptor as any).clntedocumento || 'N/A'}</span>
         </div>
       );
     },
@@ -130,6 +131,11 @@ export const columns: ColumnDef<Proforma>[] = [
       }
 
       const actions: DataTableRowActionItem[] = [
+        {
+          label: 'Editar Proforma',
+          icon: <Pencil className="h-4 w-4 text-blue-600" />,
+          onClick: () => meta.onEdit(proforma.prfmaid),
+        },
         {
           label: 'Registrar Pago',
           icon: <CheckCircle2 className="h-4 w-4 text-emerald-600" />,
