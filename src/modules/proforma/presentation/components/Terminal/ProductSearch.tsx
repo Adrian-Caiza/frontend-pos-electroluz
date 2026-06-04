@@ -79,7 +79,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden min-h-0">
       
       {/* Settings Bar integrated directly */}
       <div className="p-3 border-b border-slate-100 bg-slate-50/50">

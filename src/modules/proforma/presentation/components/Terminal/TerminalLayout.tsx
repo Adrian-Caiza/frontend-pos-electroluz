@@ -75,14 +75,14 @@ export const TerminalLayout = () => {
       {/* Grid Principal: Buscador y Carrito */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-8rem)]">
         
-        <div className="lg:col-span-8 flex flex-col gap-4 overflow-hidden">
+        <div className="lg:col-span-8 flex flex-col min-h-0 gap-4 overflow-hidden">
           <ProductSearch 
             config={config} 
             onChangeConfig={handleChangeConfig} 
           />
         </div>
 
-        <div className="lg:col-span-4 flex flex-col gap-4">
+        <div className="lg:col-span-4 flex flex-col min-h-0 gap-4">
           <CartPanel config={config} onSuccess={handleSaleSuccess} editId={editId} />
         </div>
 

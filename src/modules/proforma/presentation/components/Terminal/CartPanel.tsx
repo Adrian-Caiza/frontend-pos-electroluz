@@ -88,7 +88,7 @@ export const CartPanel = ({ config, onSuccess, editId }: CartPanelProps) => {
 
   return (
     <>
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full relative">
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden min-h-0">
         <div className="p-4 border-b border-slate-100 flex items-center justify-between shrink-0">
           <h3 className="font-semibold text-slate-800 flex items-center">
             <ShoppingCart className="w-5 h-5 mr-2 text-indigo-500" />
