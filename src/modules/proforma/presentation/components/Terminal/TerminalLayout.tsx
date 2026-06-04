@@ -3,7 +3,7 @@ import { ConfigPanel } from './ConfigPanel';
 import type { TerminalConfig } from './ConfigPanel';
 import { ProductSearch } from './ProductSearch';
 import { CartPanel } from './CartPanel';
-import { ManualItemModal } from './ManualItemModal';
+
 
 export const TerminalLayout = () => {
   const [config, setConfig] = useState<TerminalConfig>({
@@ -28,18 +28,13 @@ export const TerminalLayout = () => {
       <ConfigPanel config={config} onChange={handleChangeConfig} />
 
       {/* 2. Grid Principal: Buscador y Carrito */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 h-[calc(100vh-8rem)]">
         
-        <div className="lg:col-span-7 flex flex-col space-y-4">
-          <div className="flex justify-between items-center">
-            <h2 className="text-lg font-bold text-slate-800">Catálogo / Búsqueda</h2>
-            <ManualItemModal />
-          </div>
+        <div className="lg:col-span-8 flex flex-col gap-4 overflow-hidden">
           <ProductSearch selectedSucursalId={config.sucursalId} />
         </div>
 
-        <div className="lg:col-span-5 flex flex-col space-y-4">
-          <h2 className="text-lg font-bold text-slate-800">Caja / Facturación</h2>
+        <div className="lg:col-span-4 flex flex-col gap-4">
           <CartPanel config={config} onSuccess={handleSaleSuccess} />
         </div>
 

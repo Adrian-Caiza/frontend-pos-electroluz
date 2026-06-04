@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { useProductos } from '../../../../producto/presentation/hooks/useProductos';
 import { Input } from '../../../../../shared/components/ui/input';
 import { Button } from '../../../../../shared/components/ui/button';
+import { ManualItemModal } from './ManualItemModal';
 
 interface ProductSearchProps {
   selectedSucursalId: string | null;
@@ -58,22 +59,19 @@ export const ProductSearch = ({ selectedSucursalId }: ProductSearchProps) => {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col h-[500px]">
-      <div className="p-4 border-b border-slate-100">
-        <h3 className="font-semibold text-slate-800 mb-3 flex items-center">
-          <Search className="w-4 h-4 mr-2 text-indigo-500" />
-          Buscador de Productos
-        </h3>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full">
+      <div className="p-4 border-b border-slate-100 flex items-center gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
           <Input
-            placeholder={selectedSucursalId ? "Buscar por código o nombre..." : "Selecciona una sucursal primero..."}
-            className="pl-9"
+            placeholder={selectedSucursalId ? "Buscar producto por código o nombre..." : "Selecciona una sucursal primero..."}
+            className="pl-11 h-12 text-lg bg-slate-50 border-slate-200 focus-visible:ring-indigo-500 rounded-xl"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             disabled={!selectedSucursalId}
           />
         </div>
+        <ManualItemModal />
       </div>
 
       <div className="flex-1 overflow-y-auto p-2">

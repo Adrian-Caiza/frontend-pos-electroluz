@@ -34,27 +34,25 @@ export const ConfigPanel = ({ config, onChange }: ConfigPanelProps) => {
   const cajas = cajasData?.items.filter(c => c.cjestado === 'activo' && (!config.sucursalId || c.cjsuid === config.sucursalId)) || [];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 mb-6">
-      <h2 className="font-semibold text-slate-800 mb-4 flex items-center">
-        Parámetros de Venta
-      </h2>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div className="flex flex-col lg:flex-row items-center gap-3 bg-slate-50 p-2 rounded-xl border border-slate-200 shrink-0">
+      <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 bg-white rounded-lg shadow-sm border border-slate-100 shrink-0">
+        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+        <span className="text-xs font-bold text-slate-700 tracking-wide">TERMINAL</span>
+      </div>
+
+      <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-2 w-full">
         {/* Sucursal */}
-        <div>
-          <label className="text-sm font-medium text-slate-700 flex items-center mb-1.5">
-            <Store className="w-4 h-4 mr-1.5 text-indigo-500" />
-            Sucursal
-          </label>
+        <div className="relative">
+          <Store className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           <select
-            className="flex h-10 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition-colors"
+            className="w-full h-9 pl-8 pr-8 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm"
             value={config.sucursalId || ''}
             onChange={(e) => {
               onChange('sucursalId', e.target.value || null);
-              // Reset caja when sucursal changes
               onChange('cajaId', null);
             }}
           >
-            <option value="">Seleccione Sucursal...</option>
+            <option value="">Seleccionar Sucursal...</option>
             {sucursales.map(s => (
               <option key={s.suid} value={s.suid}>{s.sunombre}</option>
             ))}
@@ -62,18 +60,15 @@ export const ConfigPanel = ({ config, onChange }: ConfigPanelProps) => {
         </div>
 
         {/* Caja */}
-        <div>
-          <label className="text-sm font-medium text-slate-700 flex items-center mb-1.5">
-            <ShoppingCart className="w-4 h-4 mr-1.5 text-indigo-500" />
-            Caja Registradora
-          </label>
+        <div className="relative">
+          <ShoppingCart className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           <select
-            className="flex h-10 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition-colors"
+            className="w-full h-9 pl-8 pr-8 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm"
             value={config.cajaId || ''}
             onChange={(e) => onChange('cajaId', e.target.value || null)}
             disabled={!config.sucursalId}
           >
-            <option value="">{config.sucursalId ? 'Seleccione Caja...' : 'Esperando Sucursal...'}</option>
+            <option value="">{config.sucursalId ? 'Caja Registradora...' : 'Esperando Sucursal...'}</option>
             {cajas.map(c => (
               <option key={c.cjid} value={c.cjid}>{c.cjidentificador}</option>
             ))}
@@ -81,45 +76,39 @@ export const ConfigPanel = ({ config, onChange }: ConfigPanelProps) => {
         </div>
 
         {/* Cliente */}
-        <div>
-          <label className="text-sm font-medium text-slate-700 flex items-center justify-between mb-1.5">
-            <span className="flex items-center">
-              <Users className="w-4 h-4 mr-1.5 text-indigo-500" />
-              Cliente
-            </span>
-            <button
-              type="button"
-              onClick={() => setClienteModalOpen(true)}
-              className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-semibold transition-colors"
+        <div className="relative flex items-center gap-1">
+          <div className="relative flex-1">
+            <Users className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <select
+              className="w-full h-9 pl-8 pr-8 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm"
+              value={config.clienteId || ''}
+              onChange={(e) => onChange('clienteId', e.target.value || null)}
             >
-              <UserPlus className="w-3 h-3" />
-              Nuevo
-            </button>
-          </label>
-          <select
-            className="flex h-10 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition-colors"
-            value={config.clienteId || ''}
-            onChange={(e) => onChange('clienteId', e.target.value || null)}
+              <option value="">Cliente (Consumidor Final)...</option>
+              {clientes.map(c => (
+                <option key={c.clnteid} value={c.clnteid}>{c.clntenombre}</option>
+              ))}
+            </select>
+          </div>
+          <button
+            type="button"
+            onClick={() => setClienteModalOpen(true)}
+            className="h-9 px-2.5 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors shrink-0 shadow-sm"
+            title="Nuevo Cliente"
           >
-            <option value="">Seleccione Cliente (Consumidor Final)...</option>
-            {clientes.map(c => (
-              <option key={c.clnteid} value={c.clnteid}>{c.clntenombre} - {c.clnteidentificacion}</option>
-            ))}
-          </select>
+            <UserPlus className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Método de Pago */}
-        <div>
-          <label className="text-sm font-medium text-slate-700 flex items-center mb-1.5">
-            <WalletCards className="w-4 h-4 mr-1.5 text-indigo-500" />
-            Método de Pago
-          </label>
+        <div className="relative">
+          <WalletCards className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           <select
-            className="flex h-10 w-full rounded-md border border-slate-300 bg-slate-50 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:bg-white transition-colors"
+            className="w-full h-9 pl-8 pr-8 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm"
             value={config.metodoPagoId || ''}
             onChange={(e) => onChange('metodoPagoId', e.target.value || null)}
           >
-            <option value="">Seleccione Método...</option>
+            <option value="">Método de Pago...</option>
             {metodos.map(m => (
               <option key={m.mpid} value={m.mpid}>{m.mpnombre}</option>
             ))}

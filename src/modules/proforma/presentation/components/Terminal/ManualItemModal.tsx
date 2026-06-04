@@ -68,9 +68,9 @@ export const ManualItemModal = () => {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} variant="outline" className="border-indigo-200 text-indigo-700 hover:bg-indigo-50 shadow-sm">
-        <PenTool className="w-4 h-4 mr-2" />
-        Servicio Manual
+      <Button onClick={() => setOpen(true)} variant="secondary" className="h-12 px-6 shadow-sm border border-slate-200">
+        <Plus className="w-5 h-5 mr-2" />
+        Ítem Manual
       </Button>
 
       <BaseModal 
