@@ -1,3 +1,4 @@
+import { Building2, User, Lock, AlertCircle } from 'lucide-react';
 import { useLoginForm } from '../hooks/useLoginForm';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -26,16 +27,24 @@ export const LoginForm = () => {
           <FormField
             control={form.control}
             name="emruc"
-            render={({ field }: { field: any }) => (
+            render={({ field, fieldState }: { field: any, fieldState: any }) => (
               <FormItem>
-                <FormControl>
-                  <Input 
-                    placeholder="RUC Empresa" 
-                    {...field} 
-                    className="h-12 bg-white dark:bg-gray-950" 
-                    disabled={isPending}
-                  />
-                </FormControl>
+                <div className="relative">
+                  <FormControl>
+                    <Input 
+                      placeholder="RUC Empresa" 
+                      {...field} 
+                      icon={Building2}
+                      className="h-12 bg-white dark:bg-gray-950" 
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  {fieldState.error && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-red-500 animate-in fade-in zoom-in">
+                      <AlertCircle className="w-5 h-5" />
+                    </div>
+                  )}
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -44,16 +53,24 @@ export const LoginForm = () => {
           <FormField
             control={form.control}
             name="usapodo"
-            render={({ field }: { field: any }) => (
+            render={({ field, fieldState }: { field: any, fieldState: any }) => (
               <FormItem>
-                <FormControl>
-                  <Input 
-                    placeholder="Usuario" 
-                    {...field} 
-                    className="h-12 bg-white dark:bg-gray-950"
-                    disabled={isPending}
-                  />
-                </FormControl>
+                <div className="relative">
+                  <FormControl>
+                    <Input 
+                      placeholder="Usuario" 
+                      {...field} 
+                      icon={User}
+                      className="h-12 bg-white dark:bg-gray-950"
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  {fieldState.error && (
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-red-500 animate-in fade-in zoom-in">
+                      <AlertCircle className="w-5 h-5" />
+                    </div>
+                  )}
+                </div>
                 <FormMessage />
               </FormItem>
             )}
@@ -62,16 +79,24 @@ export const LoginForm = () => {
           <FormField
             control={form.control}
             name="uspassword"
-            render={({ field }: { field: any }) => (
+            render={({ field, fieldState }: { field: any, fieldState: any }) => (
               <FormItem>
-                <FormControl>
-                  <PasswordInput 
-                    placeholder="Contraseña" 
-                    {...field} 
-                    className="h-12 bg-white dark:bg-gray-950"
-                    disabled={isPending}
-                  />
-                </FormControl>
+                <div className="relative">
+                  <FormControl>
+                    <PasswordInput 
+                      placeholder="Contraseña" 
+                      {...field} 
+                      icon={Lock}
+                      className="h-12 bg-white dark:bg-gray-950"
+                      disabled={isPending}
+                    />
+                  </FormControl>
+                  {fieldState.error && (
+                    <div className="absolute inset-y-0 right-10 flex items-center pr-3 pointer-events-none text-red-500 animate-in fade-in zoom-in">
+                      <AlertCircle className="w-5 h-5" />
+                    </div>
+                  )}
+                </div>
                 <FormMessage />
               </FormItem>
             )}

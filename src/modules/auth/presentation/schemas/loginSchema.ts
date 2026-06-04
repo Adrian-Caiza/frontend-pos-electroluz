@@ -2,8 +2,7 @@ import { z } from 'zod';
 
 export const loginSchema = z.object({
   emruc: z.string()
-    .min(10, 'El RUC debe tener al menos 10 dígitos')
-    .max(13, 'El RUC debe tener máximo 13 dígitos')
+    .length(13, 'El RUC debe tener exactamente 13 dígitos')
     .regex(/^[0-9]+$/, 'El RUC solo puede contener números'),
   usapodo: z.string()
     .min(3, 'El usuario debe tener al menos 3 caracteres')
