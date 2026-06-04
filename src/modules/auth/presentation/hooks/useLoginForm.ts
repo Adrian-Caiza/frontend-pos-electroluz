@@ -20,6 +20,7 @@ export const useLoginForm = () => {
 
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    mode: 'onChange',
     defaultValues: {
       emruc: '',
       usapodo: '',
