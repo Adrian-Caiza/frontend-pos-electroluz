@@ -4,12 +4,17 @@ import { DataTableColumnHeader } from '../../../../shared/components/ui/data-tab
 import { DataTableCheckbox } from '../../../../shared/components/ui/data-table/DataTableCheckbox';
 import { DataTableStatusBadge } from '../../../../shared/components/ui/data-table/DataTableStatusBadge';
 import { DataTableRowActions, type DataTableRowActionItem } from '../../../../shared/components/ui/data-table/DataTableRowActions';
-import { Edit, PackageCheck, PackageX, Trash2, Tag } from 'lucide-react';
+import { DataTableProductCell } from '../../../../shared/components/ui/data-table/DataTableProductCell';
+import { DataTableRowIndicator } from '../../../../shared/components/ui/data-table/DataTableRowIndicator';
+import { Edit, PackageCheck, PackageX, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import type { Producto } from '../../../producto/domain/entities/Producto';
+import { getImageUrl } from '../../../producto/presentation/table/columns';
 
 export interface StockTableMeta {
   sucursalId: string;
+  productos: Producto[];
   onEdit: (stock: Stock) => void;
   onStatusChange: (stock: Stock, newStatus: 'activo' | 'inactivo' | 'eliminado') => void;
 }
@@ -35,18 +40,33 @@ export const columns: ColumnDef<Stock>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'producto',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Producto" />,
+    id: "codigo",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Código" />,
     cell: ({ row }) => {
       const stock = row.original;
       return (
-        <div className="flex flex-col">
-          <span className="font-medium text-slate-900">{stock.producto.prdtonombre}</span>
-          <span className="text-xs text-slate-500 mt-1 flex items-center">
-            <Tag className="w-3 h-3 mr-1" />
-            Código: {stock.producto.prdtocodigo}
+        <div className="flex items-center gap-3">
+          <DataTableRowIndicator status={stock.stckestado} />
+          <span className="text-sm font-medium text-slate-600">
+            {stock.producto.prdtocodigo}
           </span>
         </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'producto',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Producto" />,
+    cell: ({ row, table }) => {
+      const stock = row.original;
+      const meta = table.options.meta as StockTableMeta;
+      const fullProduct = meta.productos?.find(p => p.prdtoid === stock.producto.prdtoid);
+      
+      return (
+        <DataTableProductCell 
+          name={stock.producto.prdtonombre}
+          imageUrl={getImageUrl(fullProduct?.prdtoimagen || null)}
+        />
       );
     },
   },
@@ -59,7 +79,7 @@ export const columns: ColumnDef<Stock>[] = [
   },
   {
     accessorKey: 'stckcantidad',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Existencias" className="justify-end" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Stock" className="justify-end" />,
     cell: ({ row }) => {
       const stock = row.original;
       return (

@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { useTerminalCart } from '../../hooks/useTerminalCart';
 import { useCreateProforma } from '../../hooks/useCreateProforma';
-import type { TerminalConfig } from './ConfigPanel';
+import type { TerminalConfig } from './TerminalLayout';
 import { Button } from '../../../../../shared/components/ui/button';
 import { Input } from '../../../../../shared/components/ui/input';
 import { ConfirmDialog } from '../../../../../shared/components/ui/modal/ConfirmDialog';

@@ -4,6 +4,7 @@ import { useStocks } from '../hooks/useStocks';
 import { useUpdateStock } from '../hooks/useUpdateStock';
 import { EditStockModal } from './EditStockModal';
 import type { Stock } from '../../domain/entities/Stock';
+import { useProductos } from '../../../producto/presentation/hooks/useProductos';
 import { DataTable } from '../../../../shared/components/ui/data-table/DataTable';
 import { columns } from '../table/columns';
 import type { StockTableMeta } from '../table/columns';
@@ -32,6 +33,7 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
   // Fetch all for local pagination/filtering if possible
   const { data, isLoading } = useStocks(undefined, sucursalId, page, 1000);
   const { mutate: updateStock, mutateAsync: updateStockAsync } = useUpdateStock();
+  const { data: productosData } = useProductos(1, 1000);
 
   const [stockToEdit, setStockToEdit] = useState<Stock | null>(null);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
@@ -117,6 +119,7 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
 
   const meta: StockTableMeta = {
     sucursalId,
+    productos: productosData?.items || [],
     onEdit: handleEdit,
     onStatusChange: handleStatusChange,
   };
