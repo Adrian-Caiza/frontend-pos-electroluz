@@ -150,7 +150,8 @@ export const CartPanel = ({ config, onSuccess, editId }: CartPanelProps) => {
                       <span className="text-sm font-bold w-8 text-center text-slate-700">{item.cantidad}</span>
                       <button 
                         onClick={() => cart.updateQuantity(item.id, item.cantidad + 1)}
-                        className="w-7 h-7 rounded-md bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 shadow-sm"
+                        disabled={item.stockMaximo !== undefined && item.cantidad >= item.stockMaximo}
+                        className="w-7 h-7 rounded-md bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                       >
                         <Plus className="w-3 h-3" />
                       </button>

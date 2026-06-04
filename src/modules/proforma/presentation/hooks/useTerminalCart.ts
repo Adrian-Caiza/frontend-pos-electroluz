@@ -9,6 +9,7 @@ export interface CartItem {
   cantidad: number;
   precioUnitario: number;
   precioTotal: number;
+  stockMaximo?: number; // Added to restrict quantity based on stock
 }
 
 interface TerminalCartState {
@@ -40,7 +41,12 @@ export const useTerminalCart = create<TerminalCartState>((set, get) => ({
         if (existingItemIndex >= 0) {
           const updatedItems = [...state.items];
           const item = updatedItems[existingItemIndex];
-          const newQuantity = item.cantidad + newItem.cantidad;
+          
+          let newQuantity = item.cantidad + newItem.cantidad;
+          if (item.stockMaximo !== undefined && newQuantity > item.stockMaximo) {
+            newQuantity = item.stockMaximo;
+          }
+
           updatedItems[existingItemIndex] = {
             ...item,
             cantidad: newQuantity,
@@ -57,9 +63,15 @@ export const useTerminalCart = create<TerminalCartState>((set, get) => ({
       }
 
       // Add new item
+      let initialQuantity = newItem.cantidad;
+      if (newItem.stockMaximo !== undefined && initialQuantity > newItem.stockMaximo) {
+        initialQuantity = newItem.stockMaximo;
+      }
+      
       const itemWithTotal = {
         ...newItem,
-        precioTotal: Number((newItem.cantidad * newItem.precioUnitario).toFixed(2))
+        cantidad: initialQuantity,
+        precioTotal: Number((initialQuantity * newItem.precioUnitario).toFixed(2))
       };
       const updatedItems = [...state.items, itemWithTotal];
       const newSubtotal = updatedItems.reduce((acc, curr) => acc + curr.precioTotal, 0);
@@ -91,10 +103,14 @@ export const useTerminalCart = create<TerminalCartState>((set, get) => ({
 
       const updatedItems = state.items.map(i => {
         if (i.id === id) {
+          let newQuantity = cantidad;
+          if (i.stockMaximo !== undefined && newQuantity > i.stockMaximo) {
+            newQuantity = i.stockMaximo;
+          }
           return {
             ...i,
-            cantidad,
-            precioTotal: Number((cantidad * i.precioUnitario).toFixed(2))
+            cantidad: newQuantity,
+            precioTotal: Number((newQuantity * i.precioUnitario).toFixed(2))
           };
         }
         return i;

@@ -23,7 +23,7 @@ interface ProductSearchProps {
 export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
-  const addItem = useTerminalCart(state => state.addItem);
+  const { addItem, items: cartItems } = useTerminalCart();
   const [isClienteModalOpen, setClienteModalOpen] = useState(false);
 
   // Fetch lists for selectors
@@ -60,10 +60,9 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
     stock.producto.prdtocodigo.toLowerCase().includes(debouncedSearch.toLowerCase())
   ) || [];
 
-  const handleAddProduct = (stock: any, productoData: any) => {
+  const handleAddProduct = (stock: any, productoData: any, availableStock: number) => {
     // Only add if there is stock available
-    const stockActual = Number(stock.stckcantidad);
-    if (stockActual <= 0) {
+    if (availableStock <= 0) {
       toast.error('No hay existencias disponibles para este producto en la sucursal seleccionada.');
       return;
     }
@@ -75,6 +74,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
       descripcion: stock.producto.prdtonombre,
       cantidad: 1, // Default add 1
       precioUnitario: productoData ? Number(productoData.prdtoprecioventa) : 0,
+      stockMaximo: Number(stock.stckcantidad)
     });
   };
 
@@ -196,6 +196,10 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
               const precio = productoData ? Number(productoData.prdtoprecioventa) : 0;
               const unidad = productoData?.medida.mdiaabreviatura || 'UND';
               const imageUrl = getImageUrl(productoData?.prdtoimagen || null);
+              
+              const stockTotal = Number(stock.stckcantidad);
+              const enCarrito = cartItems.find(i => i.id === stock.producto.prdtoid)?.cantidad || 0;
+              const stockDisponible = stockTotal - enCarrito;
 
               return (
               <div 
@@ -231,16 +235,16 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
                       <div className="font-black text-indigo-700 text-lg leading-none">
                         ${precio.toFixed(2)}
                       </div>
-                      <div className={`text-[10px] mt-1 font-semibold uppercase ${Number(stock.stckcantidad) <= 0 ? 'text-rose-500' : 'text-emerald-600'}`}>
-                        Stock: {stock.stckcantidad} {unidad}
+                      <div className={`text-[10px] mt-1 font-semibold uppercase ${stockDisponible <= 0 ? 'text-rose-500' : 'text-emerald-600'}`}>
+                        Stock: {stockDisponible} {unidad}
                       </div>
                     </div>
                     <Button
                       size="icon"
-                      variant={Number(stock.stckcantidad) > 0 ? "default" : "secondary"}
-                      disabled={Number(stock.stckcantidad) <= 0}
-                      className={Number(stock.stckcantidad) > 0 ? "bg-indigo-600 hover:bg-indigo-700 h-9 w-9 rounded-xl shadow-sm shrink-0" : "h-9 w-9 rounded-xl shrink-0"}
-                      onClick={() => handleAddProduct(stock, productoData)}
+                      variant={stockDisponible > 0 ? "default" : "secondary"}
+                      disabled={stockDisponible <= 0}
+                      className={stockDisponible > 0 ? "bg-indigo-600 hover:bg-indigo-700 h-9 w-9 rounded-xl shadow-sm shrink-0" : "h-9 w-9 rounded-xl shrink-0"}
+                      onClick={() => handleAddProduct(stock, productoData, stockDisponible)}
                     >
                       <Plus className="w-5 h-5" />
                     </Button>
