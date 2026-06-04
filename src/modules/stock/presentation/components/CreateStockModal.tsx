@@ -43,6 +43,9 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
   const { data: sucursalesData } = useSucursales(1, 100);
   const { data: productosData } = useProductos(1, 100);
 
+  const activeSucursales = sucursalesData?.items.filter(s => s.suestado === 'activo') || [];
+  const activeProductos = productosData?.items.filter(p => p.prdtoestado === 'activo') || [];
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -123,7 +126,7 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
                           className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="">Seleccione una sucursal</option>
-                          {sucursalesData?.items.map((sucursal) => (
+                          {activeSucursales.map((sucursal) => (
                             <option key={sucursal.suid} value={sucursal.suid}>
                               {sucursal.sunombre} (Identificador: {sucursal.suidentificador})
                             </option>
@@ -148,7 +151,7 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
                           className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="">Seleccione un producto</option>
-                          {productosData?.items.map((producto) => (
+                          {activeProductos.map((producto) => (
                             <option key={producto.prdtoid} value={producto.prdtoid}>
                               {producto.prdtocodigo} - {producto.prdtonombre}
                             </option>
