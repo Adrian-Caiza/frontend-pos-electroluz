@@ -41,7 +41,7 @@ export const columns: ColumnDef<Alert>[] = [
 
       return (
         <div className="flex flex-col py-1">
-          <span className={cn("text-[13px]", !alert.isViewed ? "font-bold text-slate-900" : "font-medium text-slate-700")}>
+          <span className={cn("text-[13px] line-clamp-2 max-w-[450px] whitespace-normal", !alert.isViewed ? "font-bold text-slate-900" : "font-medium text-slate-700")}>
             {displayMessage}
           </span>
           {alert.type === 'stock_bajo' && alert.currentQuantity !== undefined && (

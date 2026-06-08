@@ -12,7 +12,7 @@ export const AlertsPage = () => {
         </div>
       </div>
 
-      <div className="flex-1 bg-white rounded-2xl border border-slate-200/60 shadow-sm overflow-hidden flex flex-col">
+      <div className="flex-1 flex flex-col">
         <AlertTable />
       </div>
     </div>

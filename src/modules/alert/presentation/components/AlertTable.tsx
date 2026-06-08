@@ -58,7 +58,7 @@ export const AlertTable = () => {
       }}
       rowSelection={rowSelection}
       onRowSelectionChange={setRowSelection}
-      getRowId={(row) => row.alid}
+      getRowId={(row) => row.id}
       toolbar={{
         globalFilter,
         onGlobalFilterChange: setGlobalFilter,
