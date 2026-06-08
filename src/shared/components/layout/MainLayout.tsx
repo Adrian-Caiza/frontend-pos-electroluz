@@ -2,6 +2,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../../stores/useAuthStore';
 
 import { Sidebar } from './Sidebar';
+import { AlertBell } from '../../../modules/alert/presentation/components/AlertBell';
 
 export const MainLayout = () => {
   const { user, company, refreshToken, logout } = useAuthStore();
@@ -65,12 +66,21 @@ export const MainLayout = () => {
 
       {/* Main Content Card */}
       <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-3xl shadow-sm border border-slate-200/60">
-        {/* Header */}
-        <header className="h-16 bg-white flex items-center justify-between px-6 shrink-0 rounded-t-3xl border-b border-slate-100 md:hidden">
-          <div className="flex items-center">
+        {/* Subtle Top Bar */}
+        <header className="h-14 bg-white flex items-center justify-between px-6 shrink-0 rounded-t-3xl border-b border-slate-100/60 z-10">
+          {/* Mobile Company Name */}
+          <div className="flex items-center md:hidden">
             <span className="font-bold text-lg text-slate-800">
               {company?.emrznsocial || 'POS App'}
             </span>
+          </div>
+          
+          {/* Desktop Spacer */}
+          <div className="hidden md:flex flex-1" />
+
+          {/* Right Actions */}
+          <div className="flex items-center space-x-2 ml-auto">
+            <AlertBell />
           </div>
         </header>
 

@@ -19,6 +19,7 @@ import MetodosPagoPage from './app/metodos-pago/page';
 import ProformasPage from './app/proformas/page';
 import TerminalPage from './app/terminal/page';
 import UnauthorizedPage from './app/unauthorized/page';
+import { AlertsPage } from './modules/alert/presentation/pages/AlertsPage';
 
 const HomeRedirect = () => {
   const { user } = useAuthStore();
@@ -172,6 +173,14 @@ function App() {
               element={
                 <RoleGuard allowedRoles={['jefe', 'empleado']}>
                   <TerminalPage />
+                </RoleGuard>
+              }
+            />
+            <Route
+              path="/alertas"
+              element={
+                <RoleGuard allowedRoles={['jefe', 'empleado', 'administrador']}>
+                  <AlertsPage />
                 </RoleGuard>
               }
             />
