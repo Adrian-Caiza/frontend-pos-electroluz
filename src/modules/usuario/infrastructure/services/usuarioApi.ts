@@ -57,4 +57,9 @@ export const usuarioApi = {
     const response = await apiClient.patch(`/users/${id}/status`, data);
     return response.data;
   },
+
+  updateUsuarioPassword: async (id: string, uspassword: string): Promise<{ message: string }> => {
+    const response = await apiClient.patch(`/users/${id}/password`, { uspassword });
+    return response.data;
+  },
 };

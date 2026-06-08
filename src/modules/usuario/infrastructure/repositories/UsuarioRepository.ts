@@ -24,4 +24,8 @@ export class UsuarioRepository implements IUsuarioRepository {
   async updateUsuarioStatus(id: string, data: UpdateUsuarioStatusDto): Promise<{ message: string }> {
     return usuarioApi.updateUsuarioStatus(id, data);
   }
+
+  async updateUsuarioPassword(id: string, uspassword: string): Promise<{ message: string }> {
+    return usuarioApi.updateUsuarioPassword(id, uspassword);
+  }
 }

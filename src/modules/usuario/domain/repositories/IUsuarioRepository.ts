@@ -11,4 +11,5 @@ export interface IUsuarioRepository {
   createUsuario(data: CreateUsuarioDto): Promise<Usuario>;
   updateUsuario(id: string, data: UpdateUsuarioDto): Promise<Usuario>;
   updateUsuarioStatus(id: string, data: UpdateUsuarioStatusDto): Promise<{ message: string }>;
+  updateUsuarioPassword(id: string, uspassword: string): Promise<{ message: string }>;
 }

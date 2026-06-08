@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { UserCog, User, Mail, Lock, Shield, UploadCloud, X, Camera } from 'lucide-react';
 import { toast } from 'sonner';
+import { useUpdateUsuarioPassword } from '../hooks/useUpdateUsuarioPassword';
 import {
   BaseModal,
   ModalFooter,
@@ -26,6 +27,24 @@ const formSchema = z.object({
   usnombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
   uscorreo: z.string().email('Debe ser un correo válido').min(1, 'El correo es requerido'),
   usrol: z.enum(['jefe', 'empleado'], { message: 'El rol es requerido' }),
+  uspassword: z.string().optional(),
+  uspasswordConfirm: z.string().optional(),
+}).refine((data) => {
+  if (data.uspassword && data.uspassword.length > 0) {
+    return data.uspassword.length >= 8;
+  }
+  return true;
+}, {
+  message: "La contraseña debe tener al menos 8 caracteres",
+  path: ["uspassword"],
+}).refine((data) => {
+  if (data.uspassword && data.uspassword.length > 0) {
+    return data.uspassword === data.uspasswordConfirm;
+  }
+  return true;
+}, {
+  message: "Las contraseñas no coinciden",
+  path: ["uspasswordConfirm"],
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -38,7 +57,9 @@ interface EditUsuarioModalProps {
 
 export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioModalProps) => {
   const { user: currentUser } = useAuthStore();
-  const { mutate: updateUsuario, isPending } = useUpdateUsuario();
+  const { mutate: updateUsuario, isPending: isUpdatingUser } = useUpdateUsuario();
+  const { mutateAsync: updateUsuarioPassword, isPending: isUpdatingPassword } = useUpdateUsuarioPassword();
+  const isPending = isUpdatingUser || isUpdatingPassword;
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
@@ -84,6 +105,8 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
         usnombre: usuario.usnombre,
         uscorreo: usuario.uscorreo,
         usrol: usuario.usrol === 'administrador' ? 'jefe' : usuario.usrol, // Fallback safely
+        uspassword: '',
+        uspasswordConfirm: '',
       });
       setImagePreview(getImageUrl(usuario.usimagen));
       setSelectedImage(null);
@@ -127,22 +150,38 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
       payload.imagen = selectedImage;
     }
 
-    if (Object.keys(payload).length === 0) {
+    const hasPasswordChange = values.uspassword && values.uspassword.length > 0;
+    const hasInfoChanges = Object.keys(payload).length > 0;
+
+    if (!hasInfoChanges && !hasPasswordChange) {
       onOpenChange(false); // No changes made
       return;
     }
 
-    updateUsuario(
-      { id: usuario.usid, data: payload },
-      {
-        onSuccess: () => {
-          onOpenChange(false);
-          form.reset();
-          setSelectedImage(null);
-          setImagePreview(null);
-        },
-      }
-    );
+    const finalize = () => {
+      onOpenChange(false);
+      form.reset();
+      setSelectedImage(null);
+      setImagePreview(null);
+    };
+
+    if (hasInfoChanges) {
+      updateUsuario(
+        { id: usuario.usid, data: payload },
+        {
+          onSuccess: async () => {
+            if (hasPasswordChange) {
+              await updateUsuarioPassword({ id: usuario.usid, uspassword: values.uspassword! });
+            }
+            finalize();
+          },
+        }
+      );
+    } else if (hasPasswordChange) {
+      updateUsuarioPassword({ id: usuario.usid, uspassword: values.uspassword! })
+        .then(() => finalize())
+        .catch(() => {}); // Error already handled in hook
+    }
   };
 
   const footer = (
@@ -270,6 +309,34 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
                   )}
                 />
               )}
+            </div>
+          </ModalSection>
+
+          <ModalSection title="Cambiar Contraseña (Opcional)">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <FormField
+                control={form.control}
+                name="uspassword"
+                render={({ field, fieldState }) => (
+                  <ModalField label="Nueva Contraseña" error={fieldState.error?.message}>
+                    <FormControl>
+                      <Input icon={Lock} className="h-11 rounded-xl" type="password" placeholder="Mínimo 8 caracteres" {...field} value={field.value || ''} />
+                    </FormControl>
+                  </ModalField>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="uspasswordConfirm"
+                render={({ field, fieldState }) => (
+                  <ModalField label="Repetir Contraseña" error={fieldState.error?.message}>
+                    <FormControl>
+                      <Input icon={Shield} className="h-11 rounded-xl" type="password" placeholder="Mínimo 8 caracteres" {...field} value={field.value || ''} />
+                    </FormControl>
+                  </ModalField>
+                )}
+              />
             </div>
           </ModalSection>
         </form>
