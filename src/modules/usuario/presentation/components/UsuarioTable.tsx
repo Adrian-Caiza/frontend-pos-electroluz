@@ -26,7 +26,7 @@ export const UsuarioTable = () => {
   const [statusFilter, setStatusFilter] = useState('todos');
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  const { data, isLoading } = useUsuarios(page, 1000); // Fetch all for local pagination/filtering if possible
+  const { data, isLoading } = useUsuarios(1, 1000); // Fetch all for local pagination/filtering if possible
   const updateStatusMutation = useUpdateUsuarioStatus();
   const { user: currentUser, company } = useAuthStore();
   const isJefe = currentUser?.usrol === 'jefe';

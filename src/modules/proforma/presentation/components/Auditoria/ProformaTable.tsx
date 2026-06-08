@@ -28,7 +28,7 @@ export const ProformaTable = () => {
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const { data, isLoading } = useProformas(page, 1000); // Fetch all for local filtering
+  const { data, isLoading } = useProformas(1, 1000); // Fetch all for local filtering
   const { mutateAsync: cancelProforma, isPending: isCanceling } = useCancelProforma();
   const { mutateAsync: payProforma, isPending: isPaying } = usePayProforma();
   const { mutate: viewPdf, isPending: isViewingPdf } = useProformaPdf();

@@ -26,7 +26,7 @@ export const MetodoPagoTable = () => {
   const [statusFilter, setStatusFilter] = useState('todos');
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  const { data, isLoading } = useMetodosPago(page, 1000);
+  const { data, isLoading } = useMetodosPago(1, 1000);
   const updateMutation = useUpdateMetodoPago();
   const { mutate: updateMetodo } = updateMutation;
   const { user } = useAuthStore();

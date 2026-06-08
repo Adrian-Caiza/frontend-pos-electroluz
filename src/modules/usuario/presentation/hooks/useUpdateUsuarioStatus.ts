@@ -21,7 +21,7 @@ export const useUpdateUsuarioStatus = () => {
       // If the updated user is the current user, update the global store
       if (currentUser?.usid === variables.id) {
         updateUser({
-          usestado: updatedUsuario.usestado,
+          usestado: variables.data.usestado,
         });
       }
     },

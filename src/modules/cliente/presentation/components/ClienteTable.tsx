@@ -27,7 +27,7 @@ export const ClienteTable = () => {
   
   // Obtenemos un número grande de registros para permitir filtrado local, 
   // idealmente la API debería soportar búsqueda global
-  const { data, isLoading } = useClientes(page, 1000);
+  const { data, isLoading } = useClientes(1, 1000);
   const updateMutation = useUpdateCliente();
   const { mutate: updateCliente } = updateMutation;
 

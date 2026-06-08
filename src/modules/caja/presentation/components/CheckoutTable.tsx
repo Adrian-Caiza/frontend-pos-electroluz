@@ -24,7 +24,7 @@ export const CheckoutTable = () => {
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
   
   // Obtenemos un número grande de registros para permitir filtrado local
-  const { data, isLoading, isError } = useCheckouts(page, 1000);
+  const { data, isLoading, isError } = useCheckouts(1, 1000);
   const updateMutation = useUpdateCheckoutStatus();
   const { mutate: updateStatus } = updateMutation;
   const { user } = useAuthStore();

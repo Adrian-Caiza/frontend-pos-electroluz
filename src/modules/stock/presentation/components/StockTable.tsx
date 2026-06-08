@@ -31,7 +31,7 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
   // Fetch all for local pagination/filtering if possible
-  const { data, isLoading } = useStocks(undefined, sucursalId, page, 1000);
+  const { data, isLoading } = useStocks(undefined, sucursalId, 1, 1000);
   const { mutate: updateStock, mutateAsync: updateStockAsync } = useUpdateStock();
   const { data: productosData } = useProductos(1, 1000);
 

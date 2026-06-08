@@ -26,7 +26,7 @@ export const SucursalTable = () => {
   const [statusFilter, setStatusFilter] = useState('todos');
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  const { data, isLoading } = useSucursales(page, 1000); // Fetch all for local pagination/filtering
+  const { data, isLoading } = useSucursales(1, 1000); // Fetch all for local pagination/filtering
   const updateMutation = useUpdateSucursal();
   const { user } = useAuthStore();
   const isJefe = user?.usrol === 'jefe';
