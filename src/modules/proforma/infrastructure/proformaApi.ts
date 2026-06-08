@@ -1,6 +1,6 @@
 import { apiClient } from '../../../shared/lib/apiClient';
 import type { PaginatedResult } from '../../../shared/types/PaginatedResult';
-import type { Proforma, CreateProformaDTO, UpdateProformaDTO } from '../domain/Proforma';
+import type { Proforma, CreateProformaDTO, UpdateProformaDTO, ProformaPdfResponse } from '../domain/Proforma';
 
 export const fetchProformas = async (page: number, pageSize: number): Promise<PaginatedResult<Proforma>> => {
   const { data } = await apiClient.get<PaginatedResult<Proforma>>('/proformas', {
@@ -38,4 +38,9 @@ export const cancelProforma = async (id: string): Promise<void> => {
 
 export const payProforma = async (id: string): Promise<void> => {
   await apiClient.patch(`/proformas/${id}/pay`);
+};
+
+export const fetchProformaPdf = async (id: string): Promise<ProformaPdfResponse> => {
+  const { data } = await apiClient.get<{proforma: ProformaPdfResponse}>(`/proformas/${id}/pdf`);
+  return data.proforma;
 };

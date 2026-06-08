@@ -44,6 +44,15 @@ export interface Proforma {
   total: ProformaTotal;
 }
 
+export interface ProformaPdfResponse {
+  prfmaid: string;
+  prfmaidentificador: string;
+  documento: {
+    docnombre: string;
+    docurl: string;
+  };
+}
+
 export interface CreateProformaItemDTO {
   dprfmaesinventariable: boolean;
   dprfmacodigo?: string;

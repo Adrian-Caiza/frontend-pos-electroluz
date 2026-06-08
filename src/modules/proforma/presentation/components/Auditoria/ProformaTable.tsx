@@ -4,6 +4,7 @@ import type { RowSelectionState } from '@tanstack/react-table';
 import { useProformas } from '../../hooks/useProformas';
 import { useCancelProforma } from '../../hooks/useCancelProforma';
 import { usePayProforma } from '../../hooks/usePayProforma';
+import { useProformaPdf } from '../../hooks/useProformaPdf';
 import { DataTable } from '../../../../../shared/components/ui/data-table/DataTable';
 import { columns } from '../../table/columns';
 import type { ProformaTableMeta } from '../../table/columns';
@@ -30,6 +31,7 @@ export const ProformaTable = () => {
   const { data, isLoading } = useProformas(page, 1000); // Fetch all for local filtering
   const { mutateAsync: cancelProforma, isPending: isCanceling } = useCancelProforma();
   const { mutateAsync: payProforma, isPending: isPaying } = usePayProforma();
+  const { mutate: viewPdf, isPending: isViewingPdf } = useProformaPdf();
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
@@ -136,6 +138,7 @@ export const ProformaTable = () => {
     onCancel: handleCancel,
     onPay: handlePay,
     onEdit: (id: string) => navigate(`/terminal?edit=${id}`),
+    onViewPdf: (id: string) => viewPdf(id),
     isCanceling,
     isPaying,
   };

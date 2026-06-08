@@ -8,6 +8,7 @@ interface AuthState {
   token: string | null;
   refreshToken: string | null;
   setAuth: (user: User, company: Company, accessToken: string, refreshToken: string) => void;
+  updateUser: (user: Partial<User>) => void;
   logout: () => void;
 }
 
@@ -19,6 +20,7 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       refreshToken: null,
       setAuth: (user, company, token, refreshToken) => set({ user, company, token, refreshToken }),
+      updateUser: (updatedUser) => set((state) => ({ user: state.user ? { ...state.user, ...updatedUser } : null })),
       logout: () => set({ user: null, company: null, token: null, refreshToken: null }),
     }),
     {

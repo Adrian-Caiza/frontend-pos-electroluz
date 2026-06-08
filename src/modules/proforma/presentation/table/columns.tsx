@@ -3,7 +3,7 @@ import type { Proforma } from '../../domain/Proforma';
 import { DataTableColumnHeader } from '../../../../shared/components/ui/data-table/DataTableColumnHeader';
 import { DataTableCheckbox } from '../../../../shared/components/ui/data-table/DataTableCheckbox';
 import { DataTableRowActions, type DataTableRowActionItem } from '../../../../shared/components/ui/data-table/DataTableRowActions';
-import { Receipt, CheckCircle2, XCircle, Pencil } from 'lucide-react';
+import { Receipt, CheckCircle2, XCircle, Pencil, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Badge } from '../../../../shared/components/ui/badge';
@@ -14,6 +14,7 @@ export interface ProformaTableMeta {
   onEdit: (id: string) => void;
   isCanceling: boolean;
   isPaying: boolean;
+  onViewPdf: (id: string) => void;
 }
 
 export const columns: ColumnDef<Proforma>[] = [
@@ -122,33 +123,36 @@ export const columns: ColumnDef<Proforma>[] = [
       const meta = table.options.meta as ProformaTableMeta;
       const proforma = row.original;
 
-      if (proforma.prfmaestado !== 'emitida') {
-        return (
-          <div className="flex justify-center w-full">
-            <span className="text-xs text-slate-400 italic">Sin acciones</span>
-          </div>
-        );
-      }
-
       const actions: DataTableRowActionItem[] = [
         {
-          label: 'Editar Proforma',
-          icon: <Pencil className="h-4 w-4 text-blue-600" />,
-          onClick: () => meta.onEdit(proforma.prfmaid),
-        },
-        {
-          label: 'Registrar Pago',
-          icon: <CheckCircle2 className="h-4 w-4 text-emerald-600" />,
-          onClick: () => meta.onPay(proforma.prfmaid),
-        },
-        {
-          label: 'Cancelar Proforma',
-          icon: <XCircle className="h-4 w-4 text-rose-600" />,
-          onClick: () => meta.onCancel(proforma.prfmaid),
-          variant: 'danger',
-          separatorAbove: true
+          label: 'Ver PDF',
+          icon: <FileText className="h-4 w-4 text-slate-600" />,
+          onClick: () => meta.onViewPdf(proforma.prfmaid),
         }
       ];
+
+      if (proforma.prfmaestado === 'emitida') {
+        actions.push(
+          {
+            label: 'Editar Proforma',
+            icon: <Pencil className="h-4 w-4 text-blue-600" />,
+            onClick: () => meta.onEdit(proforma.prfmaid),
+            separatorAbove: true
+          },
+          {
+            label: 'Registrar Pago',
+            icon: <CheckCircle2 className="h-4 w-4 text-emerald-600" />,
+            onClick: () => meta.onPay(proforma.prfmaid),
+          },
+          {
+            label: 'Cancelar Proforma',
+            icon: <XCircle className="h-4 w-4 text-rose-600" />,
+            onClick: () => meta.onCancel(proforma.prfmaid),
+            variant: 'danger',
+            separatorAbove: true
+          }
+        );
+      }
 
       return (
         <div className="flex justify-center">

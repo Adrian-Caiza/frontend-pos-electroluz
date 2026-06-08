@@ -1,4 +1,4 @@
-import type { Proforma, CreateProformaDTO, UpdateProformaDTO } from './Proforma';
+import type { Proforma, CreateProformaDTO, UpdateProformaDTO, ProformaPdfResponse } from './Proforma';
 import type { PaginatedResult } from '../../../shared/types/PaginatedResult';
 
 export interface IProformaRepository {
@@ -8,4 +8,5 @@ export interface IProformaRepository {
   updateProforma(id: string, data: UpdateProformaDTO): Promise<Proforma>;
   cancelProforma(id: string): Promise<void>;
   payProforma(id: string): Promise<void>;
+  getProformaPdf(id: string): Promise<ProformaPdfResponse>;
 }
