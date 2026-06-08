@@ -4,50 +4,100 @@ import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { toast } from 'sonner';
 
 export const useAlertEvents = () => {
-  const { addAlert } = useAlertStore();
+  const { addAlert, setUnreadAlerts } = useAlertStore();
   const { token, user } = useAuthStore();
 
   useEffect(() => {
     // Only connect if the user is jefe, empleado or admin (roles that can receive alerts)
     if (!token || !user) return;
     
-    const API_URL = import.meta.env.VITE_API_URL || 'http://163.245.192.54:3000';
-    
-    // Instead of raw EventSource (which doesn't support headers well natively in some browsers if you need auth)
-    // we can use standard fetch with a ReadableStream, or rely on the backend accepting token in URL if we modify the backend.
-    // However, a simple approach for EventSource with Auth header is unfortunately not standard.
-    // Assuming backend accepts it via a query param `?token=` if we want to use native EventSource, OR
-    // we use a custom implementation. For now, let's assume we can fetch it manually or the backend allows it via query string.
-    // Actually, typical implementation is using the native EventSource with `withCredentials: true` if using cookies,
-    // but since we use JWT, we have to append it to the URL if the backend supports it.
-    
-    const eventSource = new EventSource(`${API_URL}/alerts/events?token=${token}`);
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const abortController = new AbortController();
 
-    eventSource.onmessage = (event) => {
-      // General messages
-    };
-
-    eventSource.addEventListener('new-alert', (event: any) => {
+    const fetchInitialUnread = async () => {
       try {
-        const alertData = JSON.parse(event.data);
-        addAlert(alertData);
-        toast.warning('Nueva Alerta: ' + alertData.almensaje, {
-          description: `Sucursal: ${alertData.branch?.sunombre}`,
-          duration: 5000,
+        const response = await fetch(`${API_URL}/alerts?page=1&pageSize=50`, {
+          headers: { 'Authorization': `Bearer ${token}` }
         });
+        if (response.ok) {
+          const data = await response.json();
+          const unread = data.items?.filter((item: any) => item.alvisto === false) || [];
+          setUnreadAlerts(unread);
+        }
       } catch (e) {
-        console.error("Error parsing alert event", e);
+        console.error("Error fetching initial alerts:", e);
       }
-    });
-
-    eventSource.onerror = (error) => {
-      console.error("EventSource failed:", error);
-      eventSource.close();
-      // Optionally implement reconnection logic here
     };
+
+    const connectSSE = async () => {
+      try {
+        const response = await fetch(`${API_URL}/alerts/events`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'text/event-stream'
+          },
+          signal: abortController.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`SSE connection failed: ${response.status}`);
+        }
+
+        const reader = response.body?.getReader();
+        if (!reader) return;
+
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          
+          buffer += decoder.decode(value, { stream: true });
+          
+          // Split by either \n\n or \r\n\r\n to ensure instant processing regardless of line endings
+          const messages = buffer.split(/\r?\n\r?\n/);
+          buffer = messages.pop() || ''; // Keep the incomplete chunk
+
+          for (const msg of messages) {
+            if (msg.trim() === ':keepalive' || !msg.trim()) continue;
+
+            if (msg.includes('event: new-alert')) {
+              // Split the message lines by \r?\n to find the data line
+              const dataLine = msg.split(/\r?\n/).find(line => line.startsWith('data: '));
+              if (dataLine) {
+                const jsonStr = dataLine.substring(6); // remove 'data: '
+                try {
+                  const alertData = JSON.parse(jsonStr);
+                  addAlert(alertData);
+                  toast.warning('Nueva Alerta: ' + alertData.almensaje, {
+                    description: `Sucursal: ${alertData.branch?.sunombre}`,
+                    duration: 5000,
+                  });
+                } catch (e) {
+                  console.error("Error parsing alert event JSON", e);
+                }
+              }
+            }
+          }
+        }
+      } catch (error: any) {
+        if (error.name !== 'AbortError') {
+          console.error("EventSource fetch failed:", error);
+          // Simple reconnection logic could go here if needed
+        }
+      }
+    }; // Close connectSSE
+
+    const initialize = async () => {
+      await fetchInitialUnread();
+      connectSSE();
+    };
+
+    initialize();
 
     return () => {
-      eventSource.close();
+      abortController.abort();
     };
-  }, [token, user, addAlert]);
+  }, [token, user, addAlert, setUnreadAlerts]);
 };
