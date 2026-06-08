@@ -15,11 +15,11 @@ export const columns: ColumnDef<Alert>[] = [
     cell: ({ row }) => {
       const alert = row.original;
       return (
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100">
-          {alert.altipo === 'stock_bajo' ? (
-            <PackageSearch className={cn("w-4 h-4", !alert.alvisto ? "text-red-500" : "text-slate-400")} />
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 border border-slate-100">
+          {alert.type === 'stock_bajo' ? (
+            <PackageSearch className={cn("w-4 h-4", !alert.isViewed ? "text-red-500" : "text-slate-400")} />
           ) : (
-            <AlertTriangle className={cn("w-4 h-4", !alert.alvisto ? "text-red-500" : "text-slate-400")} />
+            <AlertTriangle className={cn("w-4 h-4", !alert.isViewed ? "text-red-500" : "text-slate-400")} />
           )}
         </div>
       );
@@ -33,23 +33,24 @@ export const columns: ColumnDef<Alert>[] = [
     cell: ({ row }) => {
       const alert = row.original;
       
-      let displayMessage = alert.almensaje;
-      if (alert.altipo === 'stock_bajo') {
-        displayMessage = 'Nivel de inventario crítico';
+      let displayMessage = alert.message;
+      if (alert.type === 'stock_bajo') {
+        // If the message is long, we can keep it as is, or extract parts if needed.
+        // The endpoint provides 'almensaje' which is already descriptive.
       }
 
       return (
-        <div className="flex flex-col min-w-[180px]">
-          <span className={cn("text-[13px]", !alert.alvisto ? "font-bold text-slate-900" : "font-medium text-slate-700")}>
+        <div className="flex flex-col py-1">
+          <span className={cn("text-[13px]", !alert.isViewed ? "font-bold text-slate-900" : "font-medium text-slate-700")}>
             {displayMessage}
           </span>
-          {alert.altipo === 'stock_bajo' && alert.alcantidadactual !== undefined && (
-            <div className="flex items-center gap-2 mt-1.5">
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                Actual: {alert.alcantidadactual}
+          {alert.type === 'stock_bajo' && alert.currentQuantity !== undefined && (
+            <div className="flex items-center gap-3 mt-1.5">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-red-50 text-red-600 border border-red-100">
+                Actual: {alert.currentQuantity}
               </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
-                Mínimo: {alert.alstockminimo}
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
+                Mínimo: {alert.minStock}
               </span>
             </div>
           )}
@@ -61,21 +62,21 @@ export const columns: ColumnDef<Alert>[] = [
     id: 'sucursal',
     header: 'Sucursal',
     cell: ({ row }) => {
-      return <span className="text-sm font-medium text-slate-600">{row.original.branch?.sunombre || 'N/A'}</span>;
+      return <span className="text-sm font-medium text-slate-600">{row.original.branch?.name || 'N/A'}</span>;
     },
   },
   {
     id: 'producto',
     header: 'Producto',
     cell: ({ row }) => {
-      return <span className="text-sm font-medium text-slate-600">{row.original.product?.prdtonombre || 'N/A'}</span>;
+      return <span className="text-sm font-medium text-slate-600">{row.original.product?.name || 'N/A'}</span>;
     },
   },
   {
-    accessorKey: 'alfchcreacion',
+    accessorKey: 'createdAt',
     header: 'Fecha y Hora',
     cell: ({ row }) => {
-      return <span className="whitespace-nowrap text-sm text-slate-500">{new Date(row.original.alfchcreacion).toLocaleString()}</span>;
+      return <span className="whitespace-nowrap text-sm text-slate-500">{new Date(row.original.createdAt).toLocaleString()}</span>;
     },
   },
   {
@@ -86,17 +87,17 @@ export const columns: ColumnDef<Alert>[] = [
       const alert = row.original;
       const meta = table.options.meta as AlertTableMeta;
       
-      if (alert.alvisto) return null;
+      if (alert.isViewed) return null;
       
       return (
-        <div className="text-right">
+        <div className="flex justify-end">
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => meta.onMarkAsViewed(alert.alid)}
-            className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+            onClick={() => meta.onMarkAsViewed(alert.id)}
+            className="h-8 px-3 text-[11px] font-semibold text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
           >
-            Marcar visto
+            Marcar como leído
           </Button>
         </div>
       );

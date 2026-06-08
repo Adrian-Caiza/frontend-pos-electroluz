@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useAlertStore } from '../store/useAlertStore';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { toast } from 'sonner';
+import { mapToAlert } from '../../infrastructure/services/alertApi';
 
 export const useAlertEvents = () => {
   const { addAlert, setUnreadAlerts } = useAlertStore();
@@ -21,7 +22,7 @@ export const useAlertEvents = () => {
         });
         if (response.ok) {
           const data = await response.json();
-          const unread = data.items?.filter((item: any) => item.alvisto === false) || [];
+          const unread = data.items?.filter((item: any) => item.alvisto === false).map(mapToAlert) || [];
           setUnreadAlerts(unread);
         }
       } catch (e) {
@@ -68,12 +69,22 @@ export const useAlertEvents = () => {
               if (dataLine) {
                 const jsonStr = dataLine.substring(6); // remove 'data: '
                 try {
-                  const alertData = JSON.parse(jsonStr);
-                  addAlert(alertData);
-                  toast.warning('Nueva Alerta: ' + alertData.almensaje, {
-                    description: `Sucursal: ${alertData.branch?.sunombre}`,
-                    duration: 5000,
-                  });
+                  const parsed = JSON.parse(jsonStr);
+                  const alertData = mapToAlert(parsed);
+                  
+                  const state = useAlertStore.getState();
+                  const isDuplicate = state.unreadAlerts.some(a => a.id === alertData.id);
+                  const isViewed = state.viewedAlertIds.includes(alertData.id);
+                  
+                  // If the backend sends an alert we've already marked as read, ignore it.
+                  // If it's already in unreadAlerts, we don't need to show a toast again.
+                  if (!isDuplicate && !isViewed && !alertData.isViewed) {
+                    addAlert(alertData);
+                    toast.warning('Nueva Alerta: ' + alertData.message, {
+                      description: alertData.branch?.name ? `Sucursal: ${alertData.branch.name}` : undefined,
+                      duration: 5000,
+                    });
+                  }
                 } catch (e) {
                   console.error("Error parsing alert event JSON", e);
                 }

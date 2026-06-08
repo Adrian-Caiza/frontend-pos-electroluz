@@ -50,19 +50,19 @@ export const AlertBell = () => {
           ) : (
             <div className="flex flex-col">
               {unreadAlerts.slice(0, 5).map((alert) => (
-                <div key={alert.alid} className="p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors relative group">
+                <div key={alert.id} className="p-4 border-b border-slate-100 hover:bg-slate-50 transition-colors relative group">
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex flex-col space-y-1">
                       <span className="text-[13px] text-slate-800 font-medium leading-snug">
-                        {alert.almensaje}
+                        {alert.message}
                       </span>
                       <span className="text-[11px] text-slate-500">
-                        {new Date(alert.alfchcreacion).toLocaleString()}
+                        {new Date(alert.createdAt).toLocaleString()}
                       </span>
                     </div>
                   </div>
                   <button
-                    onClick={() => handleMarkAsViewed(alert.alid)}
+                    onClick={() => handleMarkAsViewed(alert.id)}
                     className="mt-2 text-xs text-emerald-600 font-medium hover:text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     Marcar como leído

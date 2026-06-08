@@ -1,5 +1,28 @@
 import { apiClient } from '../../../../shared/lib/apiClient';
-import type { PaginatedAlerts } from '../../domain/entities/Alert';
+import type { Alert, PaginatedAlerts } from '../../domain/entities/Alert';
+
+export function mapToAlert(data: any): Alert {
+  return {
+    id: data.alid,
+    type: data.altipo,
+    message: data.almensaje,
+    isViewed: data.alvisto,
+    createdAt: data.alfchcreacion,
+    currentQuantity: data.alcantidadactual,
+    minStock: data.alstockminimo,
+    maxStock: data.alstockmaximo,
+    branch: data.branch ? {
+      id: data.branch.suid,
+      name: data.branch.sunombre,
+      code: data.branch.suidentificador
+    } : undefined,
+    product: data.product ? {
+      id: data.product.prdtoid,
+      code: data.product.prdtocodigo,
+      name: data.product.prdtonombre
+    } : undefined
+  };
+}
 
 export const alertApi = {
   getAlerts: async (page: number, pageSize: number, suid?: string): Promise<PaginatedAlerts> => {
@@ -13,7 +36,10 @@ export const alertApi = {
     }
 
     const response = await apiClient.get(`/alerts?${params.toString()}`);
-    return response.data;
+    return {
+      ...response.data,
+      items: response.data.items.map(mapToAlert)
+    };
   },
 
   markAsViewed: async (id: string): Promise<{ message: string }> => {

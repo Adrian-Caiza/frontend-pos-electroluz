@@ -1,24 +1,22 @@
 export interface Alert {
-  alid: string;
-  alemid: string;
+  id: string;
+  type: string;
+  message: string;
+  isViewed: boolean;
+  createdAt: string;
+  currentQuantity?: number;
+  minStock?: number;
+  maxStock?: number;
   branch?: {
-    suid: string;
-    sunombre: string;
-    suidentificador: string;
+    id: string;
+    name: string;
+    code: string;
   };
   product?: {
-    prdtoid: string;
-    prdtocodigo: string;
-    prdtonombre: string;
+    id: string;
+    code: string;
+    name: string;
   };
-  altipo: 'stock_bajo' | string;
-  almensaje: string;
-  alcantidadactual?: number;
-  alstockminimo?: number;
-  alstockmaximo?: number;
-  alvisible: boolean;
-  alvisto: boolean;
-  alfchcreacion: string;
 }
 
 export interface PaginatedAlerts {
