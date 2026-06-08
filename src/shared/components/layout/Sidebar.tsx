@@ -207,10 +207,13 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
       </div>
 
       {/* User Section */}
-      <div className="p-3 shrink-0 mt-auto flex flex-col space-y-2">
+      <div className={cn(
+        "shrink-0 mt-auto flex flex-col space-y-2 transition-all duration-300",
+        isExpanded ? "p-3" : "p-2"
+      )}>
         <DropdownMenu onOpenChange={setIsDropdownOpen}>
           <DropdownMenuTrigger asChild>
-            <button className="w-full flex items-center justify-between p-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/60 shadow-sm transition-colors outline-none ring-0 group/user">
+            <button className="w-full flex items-center p-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-200/60 shadow-sm transition-colors outline-none ring-0 group/user text-left">
               <div className="flex items-center overflow-hidden">
                 {/* Avatar */}
                 <div className="flex items-center justify-center min-w-[36px] w-[36px] h-[36px] rounded-lg overflow-hidden bg-slate-100 shrink-0 border border-slate-200/50">
@@ -242,7 +245,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
 
               {/* Chevrons */}
               <div className={cn(
-                "transition-all duration-300 delay-75 text-slate-400 overflow-hidden",
+                "ml-auto transition-all duration-300 delay-75 text-slate-400 overflow-hidden shrink-0",
                 isExpanded ? "w-4 px-1 opacity-100" : "w-0 px-0 opacity-0 group-hover:w-4 group-hover:px-1 group-hover:opacity-100"
               )}>
                 <ChevronsUpDown className="w-4 h-4" />
