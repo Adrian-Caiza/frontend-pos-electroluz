@@ -1,31 +1,48 @@
 import { create } from 'zustand';
 import type { Alert } from '../../domain/entities/Alert';
 
+/** Stable key for a product-branch combination (survives backend alert re-creation) */
+export function alertKey(alert: Alert): string {
+  return `${alert.product?.id || ''}_${alert.branch?.id || ''}`;
+}
+
 interface AlertStore {
   unreadAlerts: Alert[];
-  viewedAlertIds: string[]; // To track alerts we've already marked as read
+  /** product_branch keys the user has explicitly dismissed (marked as read) */
+  dismissedKeys: string[];
   addAlert: (alert: Alert) => void;
   setUnreadAlerts: (alerts: Alert[]) => void;
   removeUnreadAlert: (id: string) => void;
-  unmarkViewed: (id: string) => void;
+  /** Remove keys from dismissedKeys (when the product goes back above min stock) */
+  undismissKeys: (keys: string[]) => void;
   clearUnreadAlerts: () => void;
 }
 
 export const useAlertStore = create<AlertStore>((set) => ({
   unreadAlerts: [],
-  viewedAlertIds: [],
+  dismissedKeys: [],
+
   addAlert: (alert) => set((state) => {
-    // Avoid duplicates if we receive the same event
     if (state.unreadAlerts.some(a => a.id === alert.id)) return state;
     return { unreadAlerts: [alert, ...state.unreadAlerts] };
   }),
+
   setUnreadAlerts: (alerts) => set({ unreadAlerts: alerts }),
-  removeUnreadAlert: (id) => set((state) => ({
-    unreadAlerts: state.unreadAlerts.filter(a => a.id !== id),
-    viewedAlertIds: [...state.viewedAlertIds, id] // Remember that we viewed this
+
+  removeUnreadAlert: (id) => set((state) => {
+    const alert = state.unreadAlerts.find(a => a.id === id);
+    const key = alert ? alertKey(alert) : null;
+    return {
+      unreadAlerts: state.unreadAlerts.filter(a => a.id !== id),
+      dismissedKeys: key && !state.dismissedKeys.includes(key)
+        ? [...state.dismissedKeys, key]
+        : state.dismissedKeys,
+    };
+  }),
+
+  undismissKeys: (keys) => set((state) => ({
+    dismissedKeys: state.dismissedKeys.filter(k => !keys.includes(k)),
   })),
-  unmarkViewed: (id) => set((state) => ({
-    viewedAlertIds: state.viewedAlertIds.filter(vid => vid !== id),
-  })),
-  clearUnreadAlerts: () => set({ unreadAlerts: [], viewedAlertIds: [] })
+
+  clearUnreadAlerts: () => set({ unreadAlerts: [], dismissedKeys: [] }),
 }));

@@ -206,7 +206,9 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
               return (
               <div 
                 key={stock.stckid}
-                className="flex flex-col bg-white rounded-2xl border border-slate-100 hover:border-indigo-200 hover:shadow-md transition-all group overflow-hidden"
+                onClick={stockDisponible > 0 ? () => handleAddProduct(stock, productoData, stockDisponible) : undefined}
+                role="button"
+                className={`flex flex-col bg-white rounded-2xl border transition-all group overflow-hidden ${stockDisponible > 0 ? 'border-slate-100 hover:border-indigo-300 hover:shadow-md cursor-pointer active:scale-[0.98]' : 'border-slate-100 opacity-75 cursor-not-allowed'}`}
               >
                 <div className="aspect-square bg-slate-50/50 relative overflow-hidden flex items-center justify-center p-4">
                   {imageUrl ? (
@@ -241,15 +243,6 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
                         Stock: {stockDisponible} {unidad}
                       </div>
                     </div>
-                    <Button
-                      size="icon"
-                      variant={stockDisponible > 0 ? "default" : "secondary"}
-                      disabled={stockDisponible <= 0}
-                      className={stockDisponible > 0 ? "bg-indigo-600 hover:bg-indigo-700 h-9 w-9 rounded-xl shadow-sm shrink-0" : "h-9 w-9 rounded-xl shrink-0"}
-                      onClick={() => handleAddProduct(stock, productoData, stockDisponible)}
-                    >
-                      <Plus className="w-5 h-5" />
-                    </Button>
                   </div>
                 </div>
               </div>
