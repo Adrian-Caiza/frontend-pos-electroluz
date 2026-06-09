@@ -7,6 +7,7 @@ import { mapToAlert } from '../../infrastructure/services/alertApi';
 export const useAlertEvents = () => {
   const addAlert = useAlertStore((s) => s.addAlert);
   const setUnreadAlerts = useAlertStore((s) => s.setUnreadAlerts);
+  const unmarkViewed = useAlertStore((s) => s.unmarkViewed);
   const token = useAuthStore((s) => s.token);
   const userRole = useAuthStore((s) => s.user?.usrol);
 
@@ -98,11 +99,17 @@ export const useAlertEvents = () => {
 
                   const state = useAlertStore.getState();
                   const isDuplicate = state.unreadAlerts.some(a => a.id === alertData.id);
-                  const isViewed = state.viewedAlertIds.includes(alertData.id);
+                  const wasViewed = state.viewedAlertIds.includes(alertData.id);
 
-                  // If the backend sends an alert we've already marked as read, ignore it.
-                  // If it's already in unreadAlerts, we don't need to show a toast again.
-                  if (!isDuplicate && !isViewed && !alertData.isViewed) {
+                  // If the backend resends an alert we previously viewed but now with
+                  // alvisto=false (e.g. stock dropped below minimum again after adjustment),
+                  // clear it from our local viewed cache so it's treated as new.
+                  if (wasViewed && !alertData.isViewed) {
+                    unmarkViewed(alertData.id);
+                  }
+
+                  // Skip if it's already showing in the unread list
+                  if (!isDuplicate && !alertData.isViewed) {
                     addAlert(alertData);
                     toast.warning('Nueva Alerta: ' + alertData.message, {
                       description: alertData.branch?.name ? `Sucursal: ${alertData.branch.name}` : undefined,
@@ -140,5 +147,5 @@ export const useAlertEvents = () => {
     return () => {
       abortController.abort();
     };
-  }, [token, userRole, addAlert, setUnreadAlerts]);
+  }, [token, userRole, addAlert, setUnreadAlerts, unmarkViewed]);
 };

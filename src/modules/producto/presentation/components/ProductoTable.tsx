@@ -7,6 +7,7 @@ import { Button } from '../../../../shared/components/ui/button';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useProductos } from '../hooks/useProductos';
 import { useUpdateProducto } from '../hooks/useUpdateProducto';
+import { useProductoStore } from '../store/useProductoStore';
 import type { Producto } from '../../domain/entities/Producto';
 import { EditProductoModal } from './EditProductoModal';
 import { DataTable } from '../../../../shared/components/ui/data-table/DataTable';
@@ -31,8 +32,9 @@ export const ProductoTable = () => {
   const updateMutation = useUpdateProducto();
   const { user } = useAuthStore();
   const isJefe = user?.usrol === 'jefe';
+  const { openDetail, selectedProduct } = useProductoStore();
 
-  const [selectedProducto, setSelectedProducto] = useState<Producto | null>(null);
+  const [selectedProductoEdit, setSelectedProductoEdit] = useState<Producto | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
@@ -97,7 +99,7 @@ export const ProductoTable = () => {
   const meta: ProductoTableMeta = {
     isJefe,
     onEdit: (producto) => {
-      setSelectedProducto(producto);
+      setSelectedProductoEdit(producto);
       setIsEditOpen(true);
     },
     onStatusChange: handleStatusChange
@@ -120,6 +122,8 @@ export const ProductoTable = () => {
         onRowSelectionChange={setRowSelection}
         getRowId={(row) => row.prdtoid}
         meta={meta}
+        onRowClick={(row) => openDetail(row.original)}
+        selectedRowId={selectedProduct?.prdtoid}
         toolbar={{
           globalFilter,
           onGlobalFilterChange: setGlobalFilter,
@@ -187,7 +191,7 @@ export const ProductoTable = () => {
       />
 
       <EditProductoModal
-        producto={selectedProducto}
+        producto={selectedProductoEdit}
         open={isEditOpen}
         onOpenChange={setIsEditOpen}
       />

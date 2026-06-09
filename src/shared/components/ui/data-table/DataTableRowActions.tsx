@@ -33,6 +33,7 @@ export function DataTableRowActions({ actions, title }: DataTableRowActionsProps
         <Button
           variant="ghost"
           className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+          onClick={(e) => e.stopPropagation()}
         >
           <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
           <span className="sr-only">Abrir menú</span>
@@ -50,7 +51,10 @@ export function DataTableRowActions({ actions, title }: DataTableRowActionsProps
           <div key={index}>
             {action.separatorAbove && <DropdownMenuSeparator className="-mx-2 my-1 bg-slate-100" />}
             <DropdownMenuItem 
-              onClick={action.onClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                action.onClick();
+              }}
               className={cn(
                 "px-3 py-2.5 rounded-lg cursor-pointer transition-colors",
                 action.variant === 'danger' 

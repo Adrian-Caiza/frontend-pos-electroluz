@@ -44,6 +44,8 @@ interface DataTableProps<TData, TValue> {
   toolbar?: DataTableToolbarProps
   disableAnimations?: boolean
   meta?: any
+  onRowClick?: (row: Row<TData>) => void
+  selectedRowId?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -60,6 +62,8 @@ export function DataTable<TData, TValue>({
   toolbar,
   disableAnimations = false,
   meta,
+  onRowClick,
+  selectedRowId,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -161,7 +165,8 @@ export function DataTable<TData, TValue>({
                   <TableRow
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
-                    className="hover:bg-slate-50 transition-colors border-b border-slate-200"
+                    onClick={() => onRowClick?.(row)}
+                    className={`hover:bg-slate-50 transition-colors border-b border-slate-200 ${onRowClick ? "cursor-pointer" : ""} ${selectedRowId === row.id ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-primary" : ""}`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="py-4 px-4">
@@ -212,8 +217,9 @@ export function DataTable<TData, TValue>({
                       layout
                       variants={tableRowVariants}
                       data-state={row.getIsSelected() && "selected"}
+                      onClick={() => onRowClick?.(row)}
                       transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                      className="border-b transition-colors hover:bg-muted/50 has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted hover:bg-slate-50 border-slate-200"
+                      className={`border-b transition-colors has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted hover:bg-slate-50 border-slate-200 ${onRowClick ? "cursor-pointer" : ""} ${selectedRowId === row.id ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-primary" : ""}`}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <td key={cell.id} className="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4">

@@ -1,5 +1,6 @@
 import { ProductoTable } from '../../modules/producto/presentation/components/ProductoTable';
 import { CreateProductoModal } from '../../modules/producto/presentation/components/CreateProductoModal';
+import { ProductDetailPanel } from '../../modules/producto/presentation/components/ProductDetailPanel';
 import { useAuthStore } from '../../shared/stores/useAuthStore';
 import { PackageSearch } from 'lucide-react';
 
@@ -29,6 +30,8 @@ export default function ProductosPage() {
       <div className="w-full bg-white rounded-xl">
         <ProductoTable />
       </div>
+
+      <ProductDetailPanel />
     </div>
   );
 }
