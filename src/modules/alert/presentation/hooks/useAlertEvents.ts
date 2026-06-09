@@ -11,6 +11,8 @@ export const useAlertEvents = () => {
   useEffect(() => {
     // Only connect if the user is jefe, empleado or admin (roles that can receive alerts)
     if (!token || !user) return;
+    const allowedRoles = ['jefe', 'empleado', 'administrador'];
+if (!allowedRoles.includes(user.usrol)) return;
     
     const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
     const abortController = new AbortController();
@@ -64,10 +66,10 @@ export const useAlertEvents = () => {
             if (msg.trim() === ':keepalive' || !msg.trim()) continue;
 
             if (msg.includes('event: new-alert')) {
-              // Split the message lines by \r?\n to find the data line
-              const dataLine = msg.split(/\r?\n/).find(line => line.startsWith('data: '));
-              if (dataLine) {
-                const jsonStr = dataLine.substring(6); // remove 'data: '
+              // Robust data parsing: concatenate all 'data: ' lines
+              const dataLines = msg.split(/\r?\n/).filter(line => line.startsWith('data: '));
+              if (dataLines.length > 0) {
+                const jsonStr = dataLines.map(line => line.substring(6)).join('\n');
                 try {
                   const parsed = JSON.parse(jsonStr);
                   const alertData = mapToAlert(parsed);
@@ -95,7 +97,11 @@ export const useAlertEvents = () => {
       } catch (error: any) {
         if (error.name !== 'AbortError') {
           console.error("EventSource fetch failed:", error);
-          // Simple reconnection logic could go here if needed
+        }
+      } finally {
+        // Automatic Reconnection Logic
+        if (!abortController.signal.aborted) {
+          setTimeout(connectSSE, 5000);
         }
       }
     }; // Close connectSSE

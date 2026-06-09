@@ -16,21 +16,6 @@ export const DashboardHeader = () => {
           Bienvenido de vuelta, {user?.usnombre}. RUC: {company?.emruc || 'N/A'}
         </p>
       </div>
-
-      {company?.emlogo && !imgError ? (
-        <div className="hidden md:block">
-          <img
-            src={company.emlogo}
-            alt={company.emrznsocial}
-            onError={() => setImgError(true)}
-            className="h-12 object-contain bg-white rounded shadow-sm px-2 py-1 border border-slate-100"
-          />
-        </div>
-      ) : (
-        <div className="hidden md:flex items-center justify-center w-12 h-12 bg-slate-100 rounded-lg text-slate-400 shadow-sm border border-slate-100">
-          <Building2 className="w-6 h-6" />
-        </div>
-      )}
     </div>
   );
 };
