@@ -120,45 +120,47 @@ export const CartPanel = ({ config, onSuccess, editId }: CartPanelProps) => {
               {cart.items.map(item => (
                 <div 
                   key={item.id}
-                  className="p-3 bg-white rounded-xl border border-slate-100 shadow-sm flex flex-col gap-2 relative group"
+                  className="p-3 bg-white rounded-2xl border border-slate-100 shadow-sm flex flex-col relative group"
                 >
-                  <div className="flex justify-between items-start pr-6">
+                  <div className="flex justify-between items-start pr-6 mb-2">
                     <div>
-                      <span className="font-semibold text-slate-900 text-sm leading-tight block">
+                      <span className="font-medium text-slate-900 text-[14px] leading-snug block">
                         {item.descripcion}
                       </span>
-                      <span className="text-xs text-slate-500 mt-0.5 block">
+                      <span className="text-[11.5px] text-slate-500 mt-0.5 block">
                         {!item.esInventariable ? 'Servicio Manual' : `Cód: ${item.codigo}`}
                       </span>
                     </div>
                     <button 
                       onClick={() => cart.removeItem(item.id)}
-                      className="absolute right-3 top-3 text-slate-300 hover:text-rose-500 transition-colors opacity-0 group-hover:opacity-100"
+                      className="absolute right-2 top-2 p-1.5 text-slate-300 hover:text-rose-500 transition-colors opacity-0 md:opacity-100 md:group-hover:opacity-100 rounded-md hover:bg-rose-50"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                   
-                  <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-50">
-                    <div className="flex items-center space-x-1 bg-slate-50 p-1 rounded-lg border border-slate-100">
+                  <div className="w-full h-px bg-slate-50 my-1" />
+                  
+                  <div className="flex items-center justify-between mt-1">
+                    <div className="flex items-center bg-slate-50/80 rounded-[10px] border border-slate-100 p-0.5 shadow-sm">
                       <button 
                         onClick={() => cart.updateQuantity(item.id, item.cantidad - 1)}
-                        className="w-7 h-7 rounded-md bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 shadow-sm"
+                        className="w-7 h-7 rounded-[8px] bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-50 shadow-sm transition-colors"
                       >
-                        <Minus className="w-3 h-3" />
+                        <Minus className="w-3.5 h-3.5" />
                       </button>
-                      <span className="text-sm font-bold w-8 text-center text-slate-700">{item.cantidad}</span>
+                      <span className="text-[13px] font-semibold w-8 text-center text-slate-700">{item.cantidad}</span>
                       <button 
                         onClick={() => cart.updateQuantity(item.id, item.cantidad + 1)}
                         disabled={item.stockMaximo !== undefined && item.cantidad >= item.stockMaximo}
-                        className="w-7 h-7 rounded-md bg-white border border-slate-200 flex items-center justify-center text-slate-600 hover:bg-slate-100 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-7 h-7 rounded-[8px] bg-white border border-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-50 shadow-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        <Plus className="w-3 h-3" />
+                        <Plus className="w-3.5 h-3.5" />
                       </button>
                     </div>
                     <div className="text-right">
-                      <div className="text-[11px] text-slate-400 font-medium">${item.precioUnitario.toFixed(2)} c/u</div>
-                      <div className="font-bold text-slate-900 text-base">${item.precioTotal.toFixed(2)}</div>
+                      <div className="text-[11px] text-slate-400 font-medium leading-none mb-1">${item.precioUnitario.toFixed(2)} c/u</div>
+                      <div className="font-black text-slate-900 text-[15px] leading-none">${item.precioTotal.toFixed(2)}</div>
                     </div>
                   </div>
                 </div>
