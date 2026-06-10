@@ -18,7 +18,7 @@ export const DetailPanel: React.FC<DetailPanelProps> = ({
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
-        className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl p-0 flex flex-col h-full bg-slate-50 border-l border-slate-200"
+        className="w-full sm:!max-w-md md:!max-w-xl lg:!max-w-2xl p-0 flex flex-col h-full bg-slate-50 border-l border-slate-200"
       >
         {title && (
           <SheetHeader className="px-6 py-4 border-b border-slate-200 bg-white shrink-0">

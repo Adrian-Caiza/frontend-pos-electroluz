@@ -208,7 +208,7 @@ export const ProformaTable = () => {
                   <SelectItem value="todos">Todos los Estados</SelectItem>
                   <SelectItem value="emitida">Emitida</SelectItem>
                   <SelectItem value="pagada">Pagada</SelectItem>
-                  <SelectItem value="cancelada">Cancelada</SelectItem>
+                  <SelectItem value="anulada">Anulada</SelectItem>
                 </SelectContent>
               </Select>
             )}

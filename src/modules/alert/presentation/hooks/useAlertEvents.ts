@@ -1,25 +1,18 @@
 import { useEffect, useRef } from 'react';
-import { useAlertStore, alertKey } from '../store/useAlertStore';
+import { useAlertStore } from '../store/useAlertStore';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { toast } from 'sonner';
 import { mapToAlert } from '../../infrastructure/services/alertApi';
-import type { Alert } from '../../domain/entities/Alert';
-
-const POLL_INTERVAL_MS = 30_000; // 30 seconds
 
 export const useAlertEvents = () => {
   const addAlert = useAlertStore((s) => s.addAlert);
   const setUnreadAlerts = useAlertStore((s) => s.setUnreadAlerts);
-  const undismissKeys = useAlertStore((s) => s.undismissKeys);
   const token = useAuthStore((s) => s.token);
   const userRole = useAuthStore((s) => s.user?.usrol);
 
+  // Keep token in a ref so SSE reconnection always uses the latest value
   const tokenRef = useRef(token);
   tokenRef.current = token;
-
-  // All product+branch keys we've seen from the backend during this session.
-  // Used to determine if a key is "genuinely new" vs "recreated by the 5-min batch".
-  const knownKeysRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!token || !userRole) return;
@@ -30,103 +23,42 @@ export const useAlertEvents = () => {
     const abortController = new AbortController();
 
     // ──────────────────────────────────────────────────────────────
-    // Fetch ALL visible alerts from the backend (both read & unread)
+    // Initial load: populate the bell with currently unread alerts.
+    // No toasts here — the user just loaded the page.
     // ──────────────────────────────────────────────────────────────
-    const fetchAllAlerts = async (): Promise<Alert[]> => {
-      const currentToken = tokenRef.current;
-      if (!currentToken) return [];
-
-      const response = await fetch(`${API_URL}/alerts?page=1&pageSize=50`, {
-        headers: { 'Authorization': `Bearer ${currentToken}` },
-        signal: abortController.signal,
-      });
-
-      if (!response.ok) return [];
-      const data = await response.json();
-      return data.items?.map(mapToAlert) || [];
-    };
-
-    // ──────────────────────────────────────────────────────────────
-    // Initial load
-    // ──────────────────────────────────────────────────────────────
-    const initialize = async () => {
+    const fetchInitialUnread = async () => {
       try {
-        const allAlerts = await fetchAllAlerts();
-        if (abortController.signal.aborted) return;
-
-        // Register all current product+branch keys as "known" — no toasts on first load
-        for (const alert of allAlerts) {
-          knownKeysRef.current.add(alertKey(alert));
+        const response = await fetch(`${API_URL}/alerts?page=1&pageSize=50`, {
+          headers: { 'Authorization': `Bearer ${token}` },
+          signal: abortController.signal,
+        });
+        if (response.ok) {
+          const data = await response.json();
+          const unread = data.items
+            ?.filter((item: any) => item.alvisto === false)
+            .map(mapToAlert) || [];
+          if (!abortController.signal.aborted) {
+            setUnreadAlerts(unread);
+          }
         }
-
-        // Put only non-dismissed alerts into the bell
-        const { dismissedKeys } = useAlertStore.getState();
-        const unread = allAlerts.filter(a => !dismissedKeys.includes(alertKey(a)));
-        setUnreadAlerts(unread);
       } catch (e: any) {
         if (e.name !== 'AbortError') {
           console.error('Error fetching initial alerts:', e);
         }
       }
-
-      if (!abortController.signal.aborted) {
-        connectSSE();
-      }
     };
 
     // ──────────────────────────────────────────────────────────────
-    // Periodic sync — the core fix for recurring low-stock alerts
+    // SSE: real-time stream for periodic reminders.
     //
-    // The backend destroys & recreates ALL alerts every ~5 min with
-    // new alid values but the same product+branch combinations.
-    // We track by product+branch key, NOT by alid.
-    // ──────────────────────────────────────────────────────────────
-    const syncAlerts = async () => {
-      try {
-        const allAlerts = await fetchAllAlerts();
-        if (abortController.signal.aborted) return;
-
-        const currentKeys = new Set(allAlerts.map(alertKey));
-        const { dismissedKeys } = useAlertStore.getState();
-
-        // 1. Keys that DISAPPEARED from the backend → product went above min stock
-        //    Remove them from dismissedKeys so if they drop again we re-notify
-        const disappeared = dismissedKeys.filter(k => !currentKeys.has(k));
-        if (disappeared.length > 0) {
-          undismissKeys(disappeared);
-        }
-
-        // 2. Keys that are GENUINELY NEW (not previously known, not dismissed)
-        //    → show toast notification
-        const updatedDismissed = useAlertStore.getState().dismissedKeys;
-        for (const alert of allAlerts) {
-          const key = alertKey(alert);
-          if (!knownKeysRef.current.has(key) && !updatedDismissed.includes(key)) {
-            toast.warning('Nueva Alerta: ' + alert.message, {
-              description: alert.branch?.name ? `Sucursal: ${alert.branch.name}` : undefined,
-              duration: 5000,
-            });
-          }
-        }
-
-        // 3. Update known keys (also forgets disappeared keys so they
-        //    trigger toasts if they reappear later)
-        knownKeysRef.current = currentKeys;
-
-        // 4. Sync the store with the latest alerts (fresh alid values),
-        //    filtered by dismissedKeys
-        const finalDismissed = useAlertStore.getState().dismissedKeys;
-        const unread = allAlerts.filter(a => !finalDismissed.includes(alertKey(a)));
-        setUnreadAlerts(unread);
-      } catch (e: any) {
-        if (e.name !== 'AbortError') {
-          console.error('Error syncing alerts:', e);
-        }
-      }
-    };
-
-    // ──────────────────────────────────────────────────────────────
-    // SSE: real-time stream for instant notifications
+    // The backend creates alerts every ~5 min for products below
+    // minimum stock and sends them via SSE. Every event is a
+    // legitimate reminder → show a toast and update the bell.
+    //
+    // Dedup: if the same alid arrives twice (SSE internal re-poll),
+    // the store already has it → isDuplicate → no double toast.
+    // When a new 5-min batch creates new alids, isDuplicate is
+    // false → toast fires → this is the periodic reminder.
     // ──────────────────────────────────────────────────────────────
     const connectSSE = async () => {
       try {
@@ -136,7 +68,7 @@ export const useAlertEvents = () => {
         const response = await fetch(`${API_URL}/alerts/events`, {
           headers: {
             'Authorization': `Bearer ${currentToken}`,
-            'Accept': 'text/event-stream'
+            'Accept': 'text/event-stream',
           },
           signal: abortController.signal,
         });
@@ -175,27 +107,22 @@ export const useAlertEvents = () => {
                 try {
                   const parsed = JSON.parse(jsonStr);
                   const alertData = mapToAlert(parsed);
-                  const key = alertKey(alertData);
 
-                  const { dismissedKeys } = useAlertStore.getState();
-
-                  // Skip alerts the user already dismissed
-                  if (dismissedKeys.includes(key)) continue;
-
-                  const isNewKey = !knownKeysRef.current.has(key);
-                  knownKeysRef.current.add(key);
-
+                  // Check if this exact alid is already in the store
+                  // (prevents double-toasting within the same 5-min cycle)
                   const state = useAlertStore.getState();
                   const isDuplicate = state.unreadAlerts.some(a => a.id === alertData.id);
 
+                  // addAlert replaces by product+branch key (keeps latest alid)
+                  addAlert(alertData);
+
                   if (!isDuplicate) {
-                    addAlert(alertData);
-                    if (isNewKey) {
-                      toast.warning('Nueva Alerta: ' + alertData.message, {
-                        description: alertData.branch?.name ? `Sucursal: ${alertData.branch.name}` : undefined,
-                        duration: 5000,
-                      });
-                    }
+                    toast.warning('Nueva Alerta: ' + alertData.message, {
+                      description: alertData.branch?.name
+                        ? `Sucursal: ${alertData.branch.name}`
+                        : undefined,
+                      duration: 5000,
+                    });
                   }
                 } catch (e) {
                   console.error('Error parsing alert event JSON', e);
@@ -209,19 +136,25 @@ export const useAlertEvents = () => {
           console.error('SSE connection error:', error);
         }
       } finally {
+        // Reconnect after disconnect (unless the component unmounted)
         if (!abortController.signal.aborted) {
           setTimeout(connectSSE, 5000);
         }
       }
     };
 
-    initialize();
+    // Bootstrap: initial fetch → SSE
+    const initialize = async () => {
+      await fetchInitialUnread();
+      if (!abortController.signal.aborted) {
+        connectSSE();
+      }
+    };
 
-    const pollInterval = setInterval(syncAlerts, POLL_INTERVAL_MS);
+    initialize();
 
     return () => {
       abortController.abort();
-      clearInterval(pollInterval);
     };
-  }, [token, userRole, addAlert, setUnreadAlerts, undismissKeys]);
+  }, [token, userRole, addAlert, setUnreadAlerts]);
 };

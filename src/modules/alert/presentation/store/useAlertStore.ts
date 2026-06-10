@@ -8,41 +8,29 @@ export function alertKey(alert: Alert): string {
 
 interface AlertStore {
   unreadAlerts: Alert[];
-  /** product_branch keys the user has explicitly dismissed (marked as read) */
-  dismissedKeys: string[];
   addAlert: (alert: Alert) => void;
   setUnreadAlerts: (alerts: Alert[]) => void;
   removeUnreadAlert: (id: string) => void;
-  /** Remove keys from dismissedKeys (when the product goes back above min stock) */
-  undismissKeys: (keys: string[]) => void;
   clearUnreadAlerts: () => void;
 }
 
 export const useAlertStore = create<AlertStore>((set) => ({
   unreadAlerts: [],
-  dismissedKeys: [],
 
   addAlert: (alert) => set((state) => {
-    if (state.unreadAlerts.some(a => a.id === alert.id)) return state;
-    return { unreadAlerts: [alert, ...state.unreadAlerts] };
+    const key = alertKey(alert);
+    // Replace any existing alert for the same product+branch.
+    // The backend recreates alerts every ~5 min with new alid values,
+    // so we replace by product+branch key to keep the latest alid.
+    const filtered = state.unreadAlerts.filter(a => alertKey(a) !== key);
+    return { unreadAlerts: [alert, ...filtered] };
   }),
 
   setUnreadAlerts: (alerts) => set({ unreadAlerts: alerts }),
 
-  removeUnreadAlert: (id) => set((state) => {
-    const alert = state.unreadAlerts.find(a => a.id === id);
-    const key = alert ? alertKey(alert) : null;
-    return {
-      unreadAlerts: state.unreadAlerts.filter(a => a.id !== id),
-      dismissedKeys: key && !state.dismissedKeys.includes(key)
-        ? [...state.dismissedKeys, key]
-        : state.dismissedKeys,
-    };
-  }),
-
-  undismissKeys: (keys) => set((state) => ({
-    dismissedKeys: state.dismissedKeys.filter(k => !keys.includes(k)),
+  removeUnreadAlert: (id) => set((state) => ({
+    unreadAlerts: state.unreadAlerts.filter(a => a.id !== id),
   })),
 
-  clearUnreadAlerts: () => set({ unreadAlerts: [], dismissedKeys: [] }),
+  clearUnreadAlerts: () => set({ unreadAlerts: [] }),
 }));

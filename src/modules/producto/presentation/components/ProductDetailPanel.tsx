@@ -6,9 +6,16 @@ import { Pencil, Trash2, Package, Tag, Archive, BarChart3, TrendingUp, DollarSig
 import { Badge } from '../../../../shared/components/ui/badge';
 import { cn } from '../../../../shared/lib/utils';
 import { formatCurrency } from '@/shared/utils/formatCurrency';
+import { useState } from 'react';
+import { useUpdateProducto } from '../hooks/useUpdateProducto';
+import { EditProductoModal } from './EditProductoModal';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 
 export const ProductDetailPanel = () => {
   const { selectedProduct, isDetailOpen, closeDetail } = useProductoStore();
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const updateMutation = useUpdateProducto();
 
   if (!selectedProduct) return null;
 
@@ -49,60 +56,46 @@ export const ProductDetailPanel = () => {
       <div className="flex flex-col h-full bg-slate-50/50">
         
         {/* Header Section */}
-        <div className="bg-white p-6 border-b border-slate-200">
-          <div className="flex justify-between items-start mb-6">
-            <div className="w-24 h-24 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+        <div className="bg-white p-5 border-b border-slate-200 shrink-0">
+          <div className="flex items-center gap-5">
+            <div className="w-20 h-20 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
               {imageUrl !== '/placeholder-image.png' ? (
-                <img src={imageUrl} alt={selectedProduct.prdtonombre} className="w-full h-full object-contain p-2" />
+                <img src={imageUrl} alt={selectedProduct.prdtonombre} className="w-full h-full object-contain p-1.5" />
               ) : (
                 <Package className="w-8 h-8 text-slate-300" />
               )}
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" className="h-8 gap-1.5 text-slate-600">
-                <Pencil className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Editar</span>
-              </Button>
-              <Button variant="outline" size="sm" className="h-8 gap-1.5 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200">
-                <Trash2 className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">Eliminar</span>
-              </Button>
-            </div>
-          </div>
-          
-          <div className="space-y-3">
-            <div>
-              <h2 className="text-xl font-bold text-slate-900 leading-tight">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-xl font-bold text-slate-900 leading-tight line-clamp-2 text-wrap break-words" title={selectedProduct.prdtonombre}>
                 {selectedProduct.prdtonombre}
               </h2>
-              <p className="text-sm font-mono text-slate-500 mt-1.5">
+              <p className="text-sm font-mono text-slate-500 mt-1">
                 {selectedProduct.prdtocodigo}
               </p>
-            </div>
-            
-            <div className="flex flex-wrap gap-2 pt-2">
-              <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 border-indigo-100 shadow-none">
-                {selectedProduct.categoria?.ctgnombre || 'Sin Categoría'}
-              </Badge>
-              <Badge variant="outline" className="text-slate-600 bg-white">
-                {selectedProduct.marca?.mrcnombre || 'Sin Marca'}
-              </Badge>
-              <Badge 
-                variant="outline" 
-                className={cn("bg-white", 
-                  selectedProduct.prdtoestado === 'activo' && "text-emerald-700 border-emerald-200 bg-emerald-50",
-                  selectedProduct.prdtoestado === 'inactivo' && "text-amber-700 border-amber-200 bg-amber-50",
-                  selectedProduct.prdtoestado === 'eliminado' && "text-red-700 border-red-200 bg-red-50"
-                )}
-              >
-                {selectedProduct.prdtoestado.charAt(0).toUpperCase() + selectedProduct.prdtoestado.slice(1)}
-              </Badge>
+              <div className="flex flex-wrap gap-2 mt-3">
+                <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 border-indigo-100 shadow-none">
+                  {selectedProduct.categoria?.ctgnombre || 'Sin Categoría'}
+                </Badge>
+                <Badge variant="outline" className="text-slate-600 bg-white">
+                  {selectedProduct.marca?.mrcnombre || 'Sin Marca'}
+                </Badge>
+                <Badge 
+                  variant="outline" 
+                  className={cn("bg-white", 
+                    selectedProduct.prdtoestado === 'activo' && "text-emerald-700 border-emerald-200 bg-emerald-50",
+                    selectedProduct.prdtoestado === 'inactivo' && "text-amber-700 border-amber-200 bg-amber-50",
+                    selectedProduct.prdtoestado === 'eliminado' && "text-red-700 border-red-200 bg-red-50"
+                  )}
+                >
+                  {selectedProduct.prdtoestado.charAt(0).toUpperCase() + selectedProduct.prdtoestado.slice(1)}
+                </Badge>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-6 flex-1 overflow-y-auto">
           
           {/* General Info */}
           <section className="space-y-3">
@@ -208,7 +201,43 @@ export const ProductDetailPanel = () => {
           </section>
 
         </div>
+
+        {/* Footer Actions */}
+        <div className="p-4 bg-white border-t border-slate-200 flex justify-end gap-3 shrink-0">
+          <Button variant="outline" className="gap-2 text-slate-600" onClick={() => setIsEditOpen(true)}>
+            <Pencil className="w-4 h-4" /> Editar
+          </Button>
+          <Button variant="outline" className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => setIsConfirmOpen(true)}>
+            <Trash2 className="w-4 h-4" /> Eliminar
+          </Button>
+        </div>
       </div>
+
+      {selectedProduct && (
+        <EditProductoModal
+          producto={selectedProduct}
+          open={isEditOpen}
+          onOpenChange={setIsEditOpen}
+        />
+      )}
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        title="¿Eliminar Producto?"
+        description={`¿Estás seguro de que deseas eliminar el producto "${selectedProduct?.prdtonombre}"? Esta acción no se puede deshacer.`}
+        variant="destructive"
+        isLoading={updateMutation.isPending}
+        onConfirm={async () => {
+          if (!selectedProduct) return;
+          await updateMutation.mutateAsync({
+            id: selectedProduct.prdtoid,
+            data: { prdtoestado: 'eliminado' }
+          });
+          setIsConfirmOpen(false);
+          closeDetail();
+        }}
+      />
     </DetailPanel>
   );
 };

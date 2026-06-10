@@ -12,11 +12,13 @@ export function DataTableCheckbox({
   ariaLabel,
 }: DataTableCheckboxProps) {
   return (
-    <Checkbox
-      checked={checked}
-      onCheckedChange={onCheckedChange}
-      aria-label={ariaLabel}
-      className="translate-y-[2px] border-slate-300 shadow-sm data-[state=checked]:border-primary"
-    />
+    <div onClick={(e) => e.stopPropagation()} className="flex items-center justify-center">
+      <Checkbox
+        checked={checked}
+        onCheckedChange={onCheckedChange}
+        aria-label={ariaLabel}
+        className="translate-y-[2px] border-slate-300 shadow-sm data-[state=checked]:border-primary"
+      />
+    </div>
   )
 }

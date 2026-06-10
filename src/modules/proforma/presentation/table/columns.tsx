@@ -6,7 +6,7 @@ import { DataTableRowActions, type DataTableRowActionItem } from '../../../../sh
 import { Receipt, CheckCircle2, XCircle, Pencil, FileText } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Badge } from '../../../../shared/components/ui/badge';
+import { DataTableStatusBadge } from '../../../../shared/components/ui/data-table/DataTableStatusBadge';
 
 export interface ProformaTableMeta {
   onCancel: (id: string) => void;
@@ -100,18 +100,31 @@ export const columns: ColumnDef<Proforma>[] = [
       const estado = row.getValue('prfmaestado') as string;
       return (
         <div className="flex w-full justify-center">
-          <Badge
-            variant="outline"
-            className={
-              estado === 'pagada'
-                ? 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                : estado === 'cancelada'
-                ? 'bg-rose-100 text-rose-800 border-rose-200'
-                : 'bg-amber-100 text-amber-800 border-amber-200'
-            }
-          >
-            {estado.charAt(0).toUpperCase() + estado.slice(1)}
-          </Badge>
+          <DataTableStatusBadge
+            status={estado}
+            colorMap={{
+              pagada: {
+                bg: 'bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20',
+                text: 'text-emerald-700 dark:text-emerald-400',
+                dot: 'bg-emerald-500'
+              },
+              anulada: {
+                bg: 'bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20',
+                text: 'text-rose-700 dark:text-rose-400',
+                dot: 'bg-rose-500'
+              },
+              cancelada: {
+                bg: 'bg-rose-50 hover:bg-rose-100 dark:bg-rose-500/10 dark:hover:bg-rose-500/20',
+                text: 'text-rose-700 dark:text-rose-400',
+                dot: 'bg-rose-500'
+              },
+              emitida: {
+                bg: 'bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20',
+                text: 'text-amber-700 dark:text-amber-400',
+                dot: 'bg-amber-500'
+              }
+            }}
+          />
         </div>
       );
     },
