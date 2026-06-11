@@ -18,11 +18,11 @@ export const DetailPanel: React.FC<DetailPanelProps> = ({
     <Sheet open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <SheetContent
         side="right"
-        className="w-full sm:!max-w-md md:!max-w-xl lg:!max-w-2xl p-0 flex flex-col h-full bg-slate-50 border-l border-slate-200"
+        className="w-full sm:!max-w-md md:!max-w-xl lg:!max-w-2xl p-0 flex flex-col h-full bg-card border-l border-border"
       >
         {title && (
-          <SheetHeader className="px-6 py-4 border-b border-slate-200 bg-white shrink-0">
-            <SheetTitle className="text-lg font-semibold text-slate-800">{title}</SheetTitle>
+          <SheetHeader className="px-6 py-4 border-b border-border bg-card shrink-0">
+            <SheetTitle className="text-lg font-semibold text-foreground">{title}</SheetTitle>
           </SheetHeader>
         )}
         

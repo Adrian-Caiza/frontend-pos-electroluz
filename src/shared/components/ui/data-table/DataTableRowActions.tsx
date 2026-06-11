@@ -39,17 +39,17 @@ export function DataTableRowActions({ actions, title }: DataTableRowActionsProps
           <span className="sr-only">Abrir menú</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-[240px] p-2 rounded-xl border border-slate-200 shadow-lg">
+      <DropdownMenuContent align="end" className="w-[240px] p-2 rounded-xl border border-border shadow-lg">
         {title && (
           <>
-            <DropdownMenuLabel className="px-3 py-2.5 text-[15px] font-semibold text-slate-400/80">
+            <DropdownMenuLabel className="px-3 py-2.5 text-[15px] font-semibold text-muted-foreground/80">
               {title}
             </DropdownMenuLabel>
           </>
         )}
         {actions.map((action, index) => (
           <div key={index}>
-            {action.separatorAbove && <DropdownMenuSeparator className="-mx-2 my-1 bg-slate-100" />}
+            {action.separatorAbove && <DropdownMenuSeparator className="-mx-2 my-1 bg-border" />}
             <DropdownMenuItem 
               onClick={(e) => {
                 e.stopPropagation();
@@ -59,13 +59,13 @@ export function DataTableRowActions({ actions, title }: DataTableRowActionsProps
                 "px-3 py-2.5 rounded-lg cursor-pointer transition-colors",
                 action.variant === 'danger' 
                   ? "text-rose-600 focus:text-rose-700 focus:bg-rose-50" 
-                  : "text-slate-700 focus:bg-slate-100"
+                  : "text-foreground focus:bg-muted"
               )}
             >
               {action.icon && (
                 <span className={cn(
                   "mr-3 flex items-center justify-center",
-                  action.variant === 'danger' ? "text-rose-500" : "text-slate-400",
+                  action.variant === 'danger' ? "text-rose-500" : "text-muted-foreground",
                   "[&>svg]:h-5 [&>svg]:w-5"
                 )}>
                   {action.icon}

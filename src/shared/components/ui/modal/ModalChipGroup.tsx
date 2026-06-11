@@ -22,7 +22,7 @@ export function ModalChipGroup<T extends string | number>({ options, value, onCh
             className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${
               isSelected
                 ? 'bg-[#00e676] text-[#0d1b2a] shadow-sm ring-1 ring-[#00e676]/50'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-transparent'
+                : 'bg-muted text-muted-foreground hover:bg-muted/80 border border-transparent dark:text-foreground'
             }`}
           >
             {opt.label}

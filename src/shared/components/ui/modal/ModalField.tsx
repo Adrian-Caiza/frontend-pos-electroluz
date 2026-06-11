@@ -5,7 +5,7 @@ import { cn } from '../../../lib/utils';
 export function ModalField({ label, children, error, required }: { label: string; children: ReactNode; error?: string; required?: boolean }) {
   return (
     <div className="flex flex-col space-y-1.5 w-full">
-      <label className={cn("text-xs font-semibold", error ? "text-red-500" : "text-slate-600")}>
+      <label className={cn("text-xs font-semibold", error ? "text-red-500" : "text-muted-foreground")}>
         {label} {required && <span className="text-red-500">*</span>}
       </label>
       <div className="relative">

@@ -23,11 +23,11 @@ import {
 } from "../table"
 import { DataTablePagination } from "./DataTablePagination"
 import { DataTableToolbar, type DataTableToolbarProps } from "./DataTableToolbar"
-import { 
-  tableBodyVariants, 
-  tableRowVariants, 
-  tableHeaderVariants, 
-  tableHeadVariants 
+import {
+  tableBodyVariants,
+  tableRowVariants,
+  tableHeaderVariants,
+  tableHeadVariants
 } from "./table-animations"
 
 interface DataTableProps<TData, TValue> {
@@ -91,7 +91,7 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4 font-geist">
       {toolbar && <DataTableToolbar {...toolbar} />}
-      
+
       <div className="w-full @container overflow-x-auto pb-2">
         <Table className="border-0 border-collapse">
           {disableAnimations ? (
@@ -101,13 +101,13 @@ export function DataTable<TData, TValue>({
                   {headerGroup.headers.map((header) => {
                     return (
                       <TableHead key={header.id} className={`h-12 px-1 py-2 align-middle ${(header.column.columnDef.meta as any)?.className || ''}`}>
-                        <div className="h-full w-full bg-slate-100 rounded-lg flex items-center px-3">
+                        <div className="h-full w-full bg-muted rounded-lg flex items-center px-3">
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                         </div>
                       </TableHead>
                     )
@@ -116,7 +116,7 @@ export function DataTable<TData, TValue>({
               ))}
             </TableHeader>
           ) : (
-            <motion.thead 
+            <motion.thead
               className="[&_tr]:border-b border-0"
               variants={tableHeaderVariants}
               initial="hidden"
@@ -126,18 +126,18 @@ export function DataTable<TData, TValue>({
                 <tr key={headerGroup.id} className="border-b transition-colors hover:bg-transparent border-0">
                   {headerGroup.headers.map((header) => {
                     return (
-                      <motion.th 
-                        key={header.id} 
+                      <motion.th
+                        key={header.id}
                         variants={tableHeadVariants}
                         className={`h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 h-12 py-2 ${(header.column.columnDef.meta as any)?.className || ''}`}
                       >
-                        <div className="h-full w-full bg-slate-100 rounded-lg flex items-center px-3">
+                        <div className="h-full w-full bg-muted rounded-lg flex items-center px-3">
                           {header.isPlaceholder
                             ? null
                             : flexRender(
-                                header.column.columnDef.header,
-                                header.getContext()
-                              )}
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
                         </div>
                       </motion.th>
                     )
@@ -152,10 +152,10 @@ export function DataTable<TData, TValue>({
               {isLoading ? (
                 // Skeleton Rows
                 Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
-                  <TableRow key={`skeleton-${i}`} className="border-b border-slate-200 hover:bg-transparent">
+                  <TableRow key={`skeleton-${i}`} className="border-b border-border hover:bg-transparent">
                     {columns.map((_, j) => (
                       <TableCell key={`skeleton-cell-${i}-${j}`} className={`py-4 px-4 ${(columns[j].meta as any)?.className || ''}`}>
-                        <div className="h-5 bg-slate-100 rounded animate-pulse w-3/4"></div>
+                        <div className="h-5 bg-muted rounded animate-pulse w-3/4"></div>
                       </TableCell>
                     ))}
                   </TableRow>
@@ -166,7 +166,7 @@ export function DataTable<TData, TValue>({
                     key={row.id}
                     data-state={row.getIsSelected() && "selected"}
                     onClick={() => onRowClick?.(row)}
-                    className={`hover:bg-slate-50 transition-colors border-b border-slate-200 ${onRowClick ? "cursor-pointer" : ""} ${selectedRowId === row.id ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-primary" : ""}`}
+                    className={`hover:bg-muted/50 transition-colors border-b border-border ${onRowClick ? "cursor-pointer" : ""} ${selectedRowId === row.id ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-primary" : ""}`}
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className={`py-4 px-4 ${(cell.column.columnDef.meta as any)?.className || ''}`}>
@@ -187,7 +187,7 @@ export function DataTable<TData, TValue>({
             </TableBody>
           ) : (
             <AnimatePresence mode="popLayout">
-              <motion.tbody 
+              <motion.tbody
                 className="[&_tr:last-child]:border-0 border-0"
                 key={`page-${table.getState().pagination.pageIndex}`}
                 variants={tableBodyVariants}
@@ -198,14 +198,14 @@ export function DataTable<TData, TValue>({
                 {isLoading ? (
                   // Skeleton Rows
                   Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
-                    <motion.tr 
-                      key={`skeleton-${i}`} 
+                    <motion.tr
+                      key={`skeleton-${i}`}
                       variants={tableRowVariants}
-                      className="border-b transition-colors hover:bg-transparent border-slate-200"
+                      className="border-b transition-colors hover:bg-transparent border-border"
                     >
                       {columns.map((_, j) => (
                         <td key={`skeleton-cell-${i}-${j}`} className={`p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4 ${(columns[j].meta as any)?.className || ''}`}>
-                          <div className="h-5 bg-slate-100 rounded animate-pulse w-3/4"></div>
+                          <div className="h-5 bg-muted rounded animate-pulse w-3/4"></div>
                         </td>
                       ))}
                     </motion.tr>
@@ -219,7 +219,7 @@ export function DataTable<TData, TValue>({
                       data-state={row.getIsSelected() && "selected"}
                       onClick={() => onRowClick?.(row)}
                       transition={{ type: "spring", stiffness: 500, damping: 35 }}
-                      className={`border-b transition-colors has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted hover:bg-slate-50 border-slate-200 ${onRowClick ? "cursor-pointer" : ""} ${selectedRowId === row.id ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-primary" : ""}`}
+                      className={`border-b transition-colors has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted hover:bg-muted/50 border-border ${onRowClick ? "cursor-pointer" : ""} ${selectedRowId === row.id ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-primary" : ""}`}
                     >
                       {row.getVisibleCells().map((cell) => (
                         <td key={cell.id} className={`p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4 ${(cell.column.columnDef.meta as any)?.className || ''}`}>
@@ -229,10 +229,10 @@ export function DataTable<TData, TValue>({
                     </motion.tr>
                   ))
                 ) : (
-                  <motion.tr 
+                  <motion.tr
                     key="empty-state"
                     variants={tableRowVariants}
-                    className="border-b transition-colors hover:bg-transparent border-slate-200"
+                    className="border-b transition-colors hover:bg-transparent border-border"
                   >
                     <td colSpan={columns.length} className="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 h-32 text-center">
                       <div className="flex flex-col items-center justify-center text-muted-foreground">

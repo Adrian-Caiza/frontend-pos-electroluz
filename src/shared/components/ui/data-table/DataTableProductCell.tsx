@@ -28,7 +28,7 @@ export function DataTableProductCell({ name, sku, imageUrl }: DataTableProductCe
 
   return (
     <div className="flex items-center gap-3">
-      <div className="relative h-11 w-11 rounded-lg border border-slate-200 overflow-hidden shrink-0 shadow-sm bg-slate-50">
+      <div className="relative h-11 w-11 rounded-lg border border-border overflow-hidden shrink-0 shadow-sm bg-muted">
         {imageUrl ? (
           <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
         ) : (

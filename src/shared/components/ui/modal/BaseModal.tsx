@@ -61,20 +61,20 @@ export function BaseModal({
       <div 
         ref={modalRef} 
         className={cn(
-          "bg-white rounded-[20px] shadow-2xl flex flex-col w-full max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] overflow-hidden animate-in zoom-in-95 duration-200",
+          "bg-card rounded-[20px] shadow-2xl flex flex-col w-full max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] overflow-hidden animate-in zoom-in-95 duration-200",
           sizeClasses[size]
         )}
       >
         {/* Header */}
-        <div className="flex justify-between items-start p-6 border-b border-slate-100 shrink-0">
+        <div className="flex justify-between items-start p-6 border-b border-border shrink-0">
           <div>
-            <h2 className="text-xl font-bold text-slate-800">{title}</h2>
-            {subtitle && <p className="text-sm text-slate-500 mt-1">{subtitle}</p>}
+            <h2 className="text-xl font-bold text-foreground">{title}</h2>
+            {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
           </div>
           {!hideCloseButton && (
             <button 
               onClick={onClose}
-              className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-full transition-colors"
+              className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
             >
               <X className="w-5 h-5" />
             </button>
@@ -90,7 +90,7 @@ export function BaseModal({
 
         {/* Footer */}
         {footer && (
-          <div className="p-6 border-t border-slate-100 bg-slate-50/50 rounded-b-[20px] shrink-0">
+          <div className="p-6 border-t border-border bg-muted/50 rounded-b-[20px] shrink-0">
             {footer}
           </div>
         )}

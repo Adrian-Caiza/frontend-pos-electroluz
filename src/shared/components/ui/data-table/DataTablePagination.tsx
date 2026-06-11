@@ -35,14 +35,14 @@ export function DataTablePagination({
   onPageChange,
   onPageSizeChange,
 }: DataTablePaginationProps) {
-  
+
   const renderPageNumbers = () => {
     const pages = [];
     const maxVisiblePages = 5;
-    
+
     let startPage = Math.max(1, pageIndex - 2);
     let endPage = Math.min(pageCount || 1, startPage + maxVisiblePages - 1);
-    
+
     if (endPage - startPage + 1 < maxVisiblePages) {
       startPage = Math.max(1, endPage - maxVisiblePages + 1);
     }
@@ -55,8 +55,8 @@ export function DataTablePagination({
           variant={isActive ? "default" : "outline"}
           className={cn(
             "h-9 w-9 p-0 rounded-lg transition-colors font-semibold",
-            isActive 
-              ? "bg-primary text-primary-foreground hover:bg-primary/90 border-transparent shadow-sm" 
+            isActive
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 border-transparent shadow-sm"
               : "text-muted-foreground border-border hover:bg-muted bg-background"
           )}
           onClick={() => onPageChange(i)}
@@ -69,7 +69,7 @@ export function DataTablePagination({
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 mt-2 border-t border-slate-100 gap-4">
+    <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 mt-2 border-t border-border gap-4">
       {/* Left side */}
       <div className="flex items-center space-x-3 text-sm text-muted-foreground">
         <p>Mostrar</p>
@@ -92,7 +92,7 @@ export function DataTablePagination({
         </Select>
         <p>por página</p>
       </div>
-      
+
       {/* Center */}
       <div className="text-sm text-muted-foreground font-medium hidden md:block">
         Mostrando {currentRows} de {rowCount} registros
@@ -108,7 +108,7 @@ export function DataTablePagination({
         >
           Anterior
         </Button>
-        
+
         {renderPageNumbers()}
 
         <Button

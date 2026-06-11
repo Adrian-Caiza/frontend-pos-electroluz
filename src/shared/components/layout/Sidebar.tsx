@@ -96,7 +96,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
       {/* Header section (Company Logo) */}
       <div className="h-16 flex items-center px-4 overflow-hidden shrink-0 relative">
         {companyLogo ? (
-          <div className="flex items-center justify-center min-w-[40px] w-10 h-10 rounded-lg overflow-hidden border border-slate-200 shadow-sm bg-white shrink-0 p-1">
+          <div className="flex items-center justify-center min-w-[40px] w-10 h-10 rounded-lg overflow-hidden border border-sidebar-border shadow-sm bg-sidebar shrink-0 p-1">
             <img src={companyLogo} alt={companyName || 'Logo'} className="w-full h-full object-contain" />
           </div>
         ) : (
@@ -253,7 +253,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="right" sideOffset={16} className="w-56 rounded-xl">
-            <DropdownMenuItem className="cursor-pointer rounded-lg text-slate-600">
+            <DropdownMenuItem className="cursor-pointer rounded-lg text-muted-foreground hover:text-foreground focus:text-foreground">
               <span>Configuración de Perfil</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

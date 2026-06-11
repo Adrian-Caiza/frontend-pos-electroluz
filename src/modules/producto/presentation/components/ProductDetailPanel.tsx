@@ -53,35 +53,35 @@ export const ProductDetailPanel = () => {
 
   return (
     <DetailPanel isOpen={isDetailOpen} onClose={closeDetail}>
-      <div className="flex flex-col h-full bg-slate-50/50">
+      <div className="flex flex-col h-full bg-muted/50">
         
         {/* Header Section */}
-        <div className="bg-white p-5 border-b border-slate-200 shrink-0">
+        <div className="bg-card p-5 border-b border-border shrink-0">
           <div className="flex items-center gap-5">
-            <div className="w-20 h-20 rounded-xl border border-slate-100 bg-slate-50 flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
+            <div className="w-20 h-20 rounded-xl border border-border bg-muted flex items-center justify-center overflow-hidden shrink-0 shadow-sm">
               {imageUrl !== '/placeholder-image.png' ? (
                 <img src={imageUrl} alt={selectedProduct.prdtonombre} className="w-full h-full object-contain p-1.5" />
               ) : (
-                <Package className="w-8 h-8 text-slate-300" />
+                <Package className="w-8 h-8 text-muted" />
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-bold text-slate-900 leading-tight line-clamp-2 text-wrap break-words" title={selectedProduct.prdtonombre}>
+              <h2 className="text-xl font-bold text-foreground leading-tight line-clamp-2 text-wrap break-words" title={selectedProduct.prdtonombre}>
                 {selectedProduct.prdtonombre}
               </h2>
-              <p className="text-sm font-mono text-slate-500 mt-1">
+              <p className="text-sm font-mono text-muted-foreground mt-1">
                 {selectedProduct.prdtocodigo}
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
-                <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 border-indigo-100 shadow-none">
+                <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 border-indigo-100 shadow-none dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-800">
                   {selectedProduct.categoria?.ctgnombre || 'Sin Categoría'}
                 </Badge>
-                <Badge variant="outline" className="text-slate-600 bg-white">
+                <Badge variant="outline" className="text-muted-foreground bg-card">
                   {selectedProduct.marca?.mrcnombre || 'Sin Marca'}
                 </Badge>
                 <Badge 
                   variant="outline" 
-                  className={cn("bg-white", 
+                  className={cn("bg-card", 
                     selectedProduct.prdtoestado === 'activo' && "text-emerald-700 border-emerald-200 bg-emerald-50",
                     selectedProduct.prdtoestado === 'inactivo' && "text-amber-700 border-amber-200 bg-amber-50",
                     selectedProduct.prdtoestado === 'eliminado' && "text-red-700 border-red-200 bg-red-50"
@@ -99,26 +99,26 @@ export const ProductDetailPanel = () => {
           
           {/* General Info */}
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-              <Tag className="w-4 h-4 text-slate-400" />
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Tag className="w-4 h-4 text-muted-foreground" />
               Información General
             </h3>
-            <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-white border border-slate-100 shadow-sm">
+            <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-card border border-border shadow-sm">
               <div className="space-y-1">
-                <p className="text-xs text-slate-500">Categoría</p>
-                <p className="text-sm font-medium text-slate-800">{selectedProduct.categoria?.ctgnombre || 'N/A'}</p>
+                <p className="text-xs text-muted-foreground">Categoría</p>
+                <p className="text-sm font-medium text-foreground">{selectedProduct.categoria?.ctgnombre || 'N/A'}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500">Marca</p>
-                <p className="text-sm font-medium text-slate-800">{selectedProduct.marca?.mrcnombre || 'N/A'}</p>
+                <p className="text-xs text-muted-foreground">Marca</p>
+                <p className="text-sm font-medium text-foreground">{selectedProduct.marca?.mrcnombre || 'N/A'}</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500">Unidad de Medida</p>
-                <p className="text-sm font-medium text-slate-800">{selectedProduct.medida?.mdianombre || 'N/A'} ({selectedProduct.medida?.mdiaabreviatura || '-'})</p>
+                <p className="text-xs text-muted-foreground">Unidad de Medida</p>
+                <p className="text-sm font-medium text-foreground">{selectedProduct.medida?.mdianombre || 'N/A'} ({selectedProduct.medida?.mdiaabreviatura || '-'})</p>
               </div>
               <div className="space-y-1">
-                <p className="text-xs text-slate-500">Proveedor</p>
-                <p className="text-sm font-medium text-slate-800 truncate" title={selectedProduct.proveedor?.provnombre || 'N/A'}>
+                <p className="text-xs text-muted-foreground">Proveedor</p>
+                <p className="text-sm font-medium text-foreground truncate" title={selectedProduct.proveedor?.provnombre || 'N/A'}>
                   {selectedProduct.proveedor?.provnombre || 'N/A'}
                 </p>
               </div>
@@ -127,23 +127,23 @@ export const ProductDetailPanel = () => {
 
           {/* Pricing */}
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-              <DollarSign className="w-4 h-4 text-slate-400" />
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <DollarSign className="w-4 h-4 text-muted-foreground" />
               Estructura de Precios
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm flex flex-col justify-between">
-                <p className="text-xs text-slate-500 mb-1">Costo (Compra)</p>
-                <p className="text-lg font-semibold text-slate-700">{formatCurrency(costPrice)}</p>
+              <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex flex-col justify-between">
+                <p className="text-xs text-muted-foreground mb-1">Costo (Compra)</p>
+                <p className="text-lg font-semibold text-foreground">{formatCurrency(costPrice)}</p>
               </div>
               
-              <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-100 shadow-sm flex flex-col justify-between ring-1 ring-indigo-500/10">
+              <div className="p-4 rounded-xl bg-indigo-50 border border-indigo-100 shadow-sm flex flex-col justify-between ring-1 ring-indigo-500/10 dark:bg-indigo-900/20 dark:border-indigo-800">
                 <p className="text-xs text-indigo-600 mb-1 font-medium">Precio de Venta</p>
                 <p className="text-xl font-bold text-indigo-700">{formatCurrency(sellPrice)}</p>
               </div>
               
-              <div className="p-4 rounded-xl bg-white border border-slate-100 shadow-sm flex flex-col justify-between">
-                <p className="text-xs text-slate-500 mb-1 flex items-center gap-1">
+              <div className="p-4 rounded-xl bg-card border border-border shadow-sm flex flex-col justify-between">
+                <p className="text-xs text-muted-foreground mb-1 flex items-center gap-1">
                   Margen
                   <TrendingUp className={cn("w-3 h-3", isGoodMargin ? "text-emerald-500" : "text-red-500")} />
                 </p>
@@ -156,18 +156,18 @@ export const ProductDetailPanel = () => {
 
           {/* Stock Info */}
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold text-slate-900 flex items-center gap-2">
-              <Archive className="w-4 h-4 text-slate-400" />
+            <h3 className="text-sm font-semibold text-foreground flex items-center gap-2">
+              <Archive className="w-4 h-4 text-muted-foreground" />
               Disponibilidad e Inventario
             </h3>
             
-            <div className="p-5 rounded-xl bg-white border border-slate-100 shadow-sm space-y-5">
+            <div className="p-5 rounded-xl bg-card border border-border shadow-sm space-y-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-500">Stock Actual</p>
+                  <p className="text-sm text-muted-foreground">Stock Actual</p>
                   <div className="flex items-baseline gap-2 mt-1">
-                    <span className="text-2xl font-bold text-slate-900">{currentStock}</span>
-                    <span className="text-sm font-medium text-slate-500">{selectedProduct.medida?.mdiaabreviatura}</span>
+                    <span className="text-2xl font-bold text-foreground">{currentStock}</span>
+                    <span className="text-sm font-medium text-muted-foreground">{selectedProduct.medida?.mdiaabreviatura}</span>
                   </div>
                 </div>
                 <div className={cn("px-3 py-1 rounded-full border text-xs font-semibold", getStockColor())}>
@@ -177,7 +177,7 @@ export const ProductDetailPanel = () => {
 
               {/* Progress Bar Container */}
               <div className="space-y-2">
-                <div className="relative h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+                <div className="relative h-3 w-full bg-muted rounded-full overflow-hidden">
                   <div 
                     className={cn("absolute top-0 left-0 h-full rounded-full transition-all duration-500", getProgressBarColor())}
                     style={{ width: `${stockPercentage}%` }}
@@ -188,7 +188,7 @@ export const ProductDetailPanel = () => {
                     style={{ left: `${minStockPercentage}%` }}
                   />
                 </div>
-                <div className="flex justify-between text-xs text-slate-400">
+                <div className="flex justify-between text-xs text-muted-foreground">
                   <span>0</span>
                   <span className="flex flex-col items-center relative -left-3">
                     <span className="text-red-500 font-medium">Mín {minStock}</span>
@@ -203,8 +203,8 @@ export const ProductDetailPanel = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-white border-t border-slate-200 flex justify-end gap-3 shrink-0">
-          <Button variant="outline" className="gap-2 text-slate-600" onClick={() => setIsEditOpen(true)}>
+        <div className="p-4 bg-card border-t border-border flex justify-end gap-3 shrink-0">
+          <Button variant="outline" className="gap-2 text-muted-foreground hover:text-foreground hover:bg-muted" onClick={() => setIsEditOpen(true)}>
             <Pencil className="w-4 h-4" /> Editar
           </Button>
           <Button variant="outline" className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => setIsConfirmOpen(true)}>

@@ -38,17 +38,17 @@ export function DataTableToolbar({
           </div>
         )}
       </div>
-      
+
       <div className="flex items-center gap-2 self-end sm:self-auto w-full sm:w-auto">
         {children}
-        
+
         {onAdvancedFilterClick && (
-          <Button variant="outline" onClick={onAdvancedFilterClick} className="font-medium text-slate-700 bg-card shadow-sm hover:bg-slate-50">
+          <Button variant="outline" onClick={onAdvancedFilterClick} className="font-medium text-foreground bg-card shadow-sm hover:bg-muted">
             <Filter className="mr-2 h-4 w-4" />
             Filtros
           </Button>
         )}
-        
+
         {primaryAction && (
           <Button onClick={primaryAction.onClick} className="font-medium shadow-sm">
             {primaryAction.icon || <Plus className="mr-2 h-4 w-4" />}

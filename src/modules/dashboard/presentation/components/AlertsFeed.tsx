@@ -19,38 +19,38 @@ export const AlertsFeed = () => {
 
   return (
     <Card className="h-full flex flex-col">
-      <CardHeader className="pb-3 border-b border-slate-100">
-        <CardTitle className="text-lg font-semibold text-slate-800">Centro de Alertas</CardTitle>
+      <CardHeader className="pb-3 border-b border-border">
+        <CardTitle className="text-lg font-semibold text-foreground">Centro de Alertas</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 p-0 overflow-y-auto max-h-[400px]">
         {unreadAlerts.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-center px-4">
             <CheckCircle2 className="w-10 h-10 text-emerald-400 mb-3" />
-            <p className="text-sm font-medium text-slate-700">Todo está en orden</p>
-            <p className="text-xs text-slate-500 mt-1">No tienes alertas pendientes por revisar.</p>
+            <p className="text-sm font-medium text-foreground">Todo está en orden</p>
+            <p className="text-xs text-muted-foreground mt-1">No tienes alertas pendientes por revisar.</p>
           </div>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-border">
             {unreadAlerts.map((alert) => (
-              <li key={alert.id} className="p-4 hover:bg-slate-50 transition-colors group">
+              <li key={alert.id} className="p-4 hover:bg-muted transition-colors group">
                 <div className="flex gap-3">
                   <div className="mt-0.5">
                     {alert.type === 'stock_bajo' ? (
-                      <div className="p-1.5 bg-red-100 rounded-full">
+                      <div className="p-1.5 bg-red-100 dark:bg-red-900/50 rounded-full">
                         <PackageSearch className="w-4 h-4 text-red-600" />
                       </div>
                     ) : (
-                      <div className="p-1.5 bg-amber-100 rounded-full">
+                      <div className="p-1.5 bg-amber-100 dark:bg-amber-900/50 rounded-full">
                         <AlertTriangle className="w-4 h-4 text-amber-600" />
                       </div>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-slate-900 line-clamp-2">
+                    <p className="text-sm font-medium text-foreground line-clamp-2">
                       {alert.message}
                     </p>
                     <div className="flex items-center justify-between mt-2">
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-muted-foreground">
                         {new Date(alert.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <Button

@@ -31,7 +31,7 @@ export function ModalFooter({
         variant="outline" 
         onClick={onCancel}
         disabled={isLoading}
-        className="rounded-xl px-6 font-medium text-slate-600 border-slate-200 hover:bg-slate-50"
+        className="rounded-xl px-6 font-medium text-foreground border-border hover:bg-muted"
       >
         {cancelLabel}
       </Button>
@@ -41,7 +41,7 @@ export function ModalFooter({
         disabled={isDisabled || isLoading}
         className={`rounded-xl px-6 font-medium text-white shadow-md transition-all
           ${confirmVariant === 'primary' 
-            ? 'bg-[#0d1b2a] hover:bg-[#1a2f4c] shadow-[#0d1b2a]/20' 
+            ? 'bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-primary dark:hover:bg-primary/90 shadow-primary/20' 
             : 'bg-red-600 hover:bg-red-700 shadow-red-600/20'}`}
       >
         {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
