@@ -39,8 +39,8 @@ export const columns: ColumnDef<Cliente>[] = [
       const cliente = row.original;
       return (
         <div className="flex flex-col">
-          <span className="font-medium text-slate-900">{cliente.clntenombre}</span>
-          <span className="text-xs text-slate-500 mt-1 flex items-center">
+          <span className="font-medium text-foreground">{cliente.clntenombre}</span>
+          <span className="text-xs text-muted-foreground mt-1 flex items-center">
             <MapPin className="w-3 h-3 mr-1" />
             {cliente.clntedireccion}
           </span>
@@ -55,8 +55,8 @@ export const columns: ColumnDef<Cliente>[] = [
       const cliente = row.original;
       return (
         <div className="flex flex-col">
-          <span className="text-sm text-slate-700">{cliente.clnteidentificacion}</span>
-          <span className="text-xs text-slate-500 uppercase">{cliente.clntetipoidentificacion}</span>
+          <span className="text-sm text-foreground">{cliente.clnteidentificacion}</span>
+          <span className="text-xs text-muted-foreground uppercase">{cliente.clntetipoidentificacion}</span>
         </div>
       );
     },
@@ -68,11 +68,11 @@ export const columns: ColumnDef<Cliente>[] = [
       const cliente = row.original;
       return (
         <div className="flex flex-col space-y-1">
-          <div className="flex items-center text-sm text-slate-600">
+          <div className="flex items-center text-sm text-muted-foreground">
             <Mail className="w-3 h-3 mr-2" />
             {cliente.clntecorreo}
           </div>
-          <div className="flex items-center text-sm text-slate-600">
+          <div className="flex items-center text-sm text-muted-foreground">
             <Phone className="w-3 h-3 mr-2" />
             {cliente.clntetelefono}
           </div>

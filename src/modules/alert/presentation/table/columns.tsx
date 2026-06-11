@@ -15,11 +15,11 @@ export const columns: ColumnDef<Alert>[] = [
     cell: ({ row }) => {
       const alert = row.original;
       return (
-        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-50 border border-slate-100">
+        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted border border-border">
           {alert.type === 'stock_bajo' ? (
-            <PackageSearch className={cn("w-4 h-4", !alert.isViewed ? "text-red-500" : "text-slate-400")} />
+            <PackageSearch className={cn("w-4 h-4", !alert.isViewed ? "text-red-500" : "text-muted-foreground")} />
           ) : (
-            <AlertTriangle className={cn("w-4 h-4", !alert.isViewed ? "text-red-500" : "text-slate-400")} />
+            <AlertTriangle className={cn("w-4 h-4", !alert.isViewed ? "text-red-500" : "text-muted-foreground")} />
           )}
         </div>
       );
@@ -41,7 +41,7 @@ export const columns: ColumnDef<Alert>[] = [
 
       return (
         <div className="flex flex-col py-1">
-          <span className={cn("text-[13px] line-clamp-2 max-w-[450px] whitespace-normal", !alert.isViewed ? "font-bold text-slate-900" : "font-medium text-slate-700")}>
+          <span className={cn("text-[13px] line-clamp-2 max-w-[450px] whitespace-normal", !alert.isViewed ? "font-bold text-foreground" : "font-medium text-muted-foreground")}>
             {displayMessage}
           </span>
           {alert.type === 'stock_bajo' && alert.currentQuantity !== undefined && (
@@ -49,7 +49,7 @@ export const columns: ColumnDef<Alert>[] = [
               <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-red-50 text-red-600 border border-red-100">
                 Actual: {alert.currentQuantity}
               </span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-muted text-muted-foreground">
                 Mínimo: {alert.minStock}
               </span>
             </div>
@@ -62,21 +62,21 @@ export const columns: ColumnDef<Alert>[] = [
     id: 'sucursal',
     header: 'Sucursal',
     cell: ({ row }) => {
-      return <span className="text-sm font-medium text-slate-600">{row.original.branch?.name || 'N/A'}</span>;
+      return <span className="text-sm font-medium text-muted-foreground">{row.original.branch?.name || 'N/A'}</span>;
     },
   },
   {
     id: 'producto',
     header: 'Producto',
     cell: ({ row }) => {
-      return <span className="text-sm font-medium text-slate-600">{row.original.product?.name || 'N/A'}</span>;
+      return <span className="text-sm font-medium text-muted-foreground">{row.original.product?.name || 'N/A'}</span>;
     },
   },
   {
     accessorKey: 'createdAt',
     header: 'Fecha y Hora',
     cell: ({ row }) => {
-      return <span className="whitespace-nowrap text-sm text-slate-500">{new Date(row.original.createdAt).toLocaleString()}</span>;
+      return <span className="whitespace-nowrap text-sm text-muted-foreground">{new Date(row.original.createdAt).toLocaleString()}</span>;
     },
   },
   {

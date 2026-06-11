@@ -38,7 +38,7 @@ export const StockPage = () => {
           <select
             value={selectedSucursalId}
             onChange={(e) => setSelectedSucursalId(e.target.value)}
-            className="flex h-10 w-full sm:max-w-md rounded-md border border-input bg-transparent px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="flex h-10 w-full sm:max-w-md rounded-md border border-input bg-transparent dark:bg-slate-900 text-foreground px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           >
             <option value="">-- Seleccione una sucursal para ver su stock --</option>
             {sucursalesData?.items.map((sucursal) => (

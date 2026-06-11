@@ -81,16 +81,16 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-full overflow-hidden min-h-0">
+    <div className="bg-card rounded-2xl shadow-sm border border-border flex flex-col h-full overflow-hidden min-h-0">
       
       {/* Settings Bar integrated directly */}
-      <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+      <div className="p-3 border-b border-border bg-muted/30">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           {/* Sucursal */}
           <div className="relative">
             <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             <select
-              className="w-full h-10 pl-9 pr-8 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm transition-colors hover:border-slate-300 cursor-pointer"
+              className="w-full h-10 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm transition-colors hover:border-border cursor-pointer"
               value={config.sucursalId || ''}
               onChange={(e) => {
                 onChangeConfig('sucursalId', e.target.value || null);
@@ -108,7 +108,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
           <div className="relative">
             <ShoppingCart className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             <select
-              className="w-full h-10 pl-9 pr-8 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm transition-colors hover:border-slate-300 cursor-pointer"
+              className="w-full h-10 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm transition-colors hover:border-border cursor-pointer"
               value={config.cajaId || ''}
               onChange={(e) => onChangeConfig('cajaId', e.target.value || null)}
               disabled={!config.sucursalId}
@@ -125,7 +125,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
             <div className="relative flex-1">
               <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               <select
-                className="w-full h-10 pl-9 pr-8 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm transition-colors hover:border-slate-300 cursor-pointer"
+                className="w-full h-10 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm transition-colors hover:border-border cursor-pointer"
                 value={config.clienteId || ''}
                 onChange={(e) => onChangeConfig('clienteId', e.target.value || null)}
               >
@@ -138,7 +138,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
             <button
               type="button"
               onClick={() => setClienteModalOpen(true)}
-              className="h-10 px-3 flex items-center justify-center bg-white border border-slate-200 rounded-lg text-indigo-600 hover:bg-indigo-50 transition-colors shrink-0 shadow-sm"
+              className="h-10 px-3 flex items-center justify-center bg-background border border-border rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors shrink-0 shadow-sm"
               title="Nuevo Cliente"
             >
               <UserPlus className="w-4 h-4" />
@@ -149,7 +149,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
           <div className="relative">
             <WalletCards className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
             <select
-              className="w-full h-10 pl-9 pr-8 rounded-lg border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 appearance-none shadow-sm transition-colors hover:border-slate-300 cursor-pointer"
+              className="w-full h-10 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm transition-colors hover:border-border cursor-pointer"
               value={config.metodoPagoId || ''}
               onChange={(e) => onChangeConfig('metodoPagoId', e.target.value || null)}
             >
@@ -162,12 +162,12 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
         </div>
       </div>
 
-      <div className="p-4 border-b border-slate-100 flex items-center gap-3">
+      <div className="p-4 border-b border-border flex items-center gap-3">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             placeholder={config.sucursalId ? "Buscar producto por código o nombre..." : "Selecciona una sucursal primero..."}
-            className="pl-11 h-12 text-lg bg-slate-50 border-slate-200 focus-visible:ring-indigo-500 rounded-xl transition-all"
+            className="pl-11 h-12 text-lg bg-background border-border focus-visible:ring-primary rounded-xl transition-all"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             disabled={!config.sucursalId}
@@ -178,9 +178,9 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
 
       <div className="flex-1 overflow-y-auto p-3">
         {!config.sucursalId ? (
-          <div className="h-full flex flex-col justify-center items-center text-slate-400 p-6 text-center">
-            <PackagePlus className="w-16 h-16 mb-4 text-slate-200" />
-            <p className="text-base font-medium text-slate-500">Sin sucursal seleccionada</p>
+          <div className="h-full flex flex-col justify-center items-center text-muted-foreground p-6 text-center">
+            <PackagePlus className="w-16 h-16 mb-4 text-muted/50" />
+            <p className="text-base font-medium text-foreground">Sin sucursal seleccionada</p>
             <p className="text-sm mt-1">Por favor, selecciona una sucursal arriba para ver su inventario.</p>
           </div>
         ) : isLoading ? (
@@ -188,7 +188,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
           </div>
         ) : filteredItems.length === 0 ? (
-          <div className="h-full flex flex-col justify-center items-center text-slate-400 p-6 text-center">
+          <div className="h-full flex flex-col justify-center items-center text-muted-foreground p-6 text-center">
             <p className="text-sm">No se encontraron productos en stock que coincidan con la búsqueda.</p>
           </div>
         ) : (
@@ -208,28 +208,28 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
                 key={stock.stckid}
                 onClick={stockDisponible > 0 ? () => handleAddProduct(stock, productoData, stockDisponible) : undefined}
                 role="button"
-                className={`flex flex-col bg-white rounded-2xl border transition-all group overflow-hidden ${stockDisponible > 0 ? 'border-slate-100 hover:border-indigo-300 hover:shadow-md cursor-pointer active:scale-[0.98]' : 'border-slate-100 opacity-75 cursor-not-allowed'}`}
+                className={`flex flex-col bg-card rounded-2xl border transition-all group overflow-hidden ${stockDisponible > 0 ? 'border-border hover:border-primary/50 hover:shadow-md cursor-pointer active:scale-[0.98]' : 'border-border opacity-75 cursor-not-allowed'}`}
               >
-                <div className="aspect-square bg-slate-50/50 relative overflow-hidden flex items-center justify-center p-4">
+                <div className="aspect-square bg-muted/30 relative overflow-hidden flex items-center justify-center p-4">
                   {imageUrl ? (
                     <img 
                       src={imageUrl} 
                       alt={stock.producto.prdtonombre} 
-                      className="object-contain w-full h-full mix-blend-multiply group-hover:scale-105 transition-transform duration-500" 
+                      className="object-contain w-full h-full mix-blend-multiply dark:mix-blend-normal group-hover:scale-105 transition-transform duration-500" 
                     />
                   ) : (
-                    <PackagePlus className="w-12 h-12 text-slate-300" />
+                    <PackagePlus className="w-12 h-12 text-muted-foreground/30" />
                   )}
                 </div>
                 
-                <div className="p-3 flex flex-col flex-1 border-t border-slate-50">
+                <div className="p-3 flex flex-col flex-1 border-t border-border/50">
                   <div className="flex-1">
                     <div className="mb-1">
-                      <span className="font-semibold text-slate-800 text-sm leading-tight line-clamp-2" title={stock.producto.prdtonombre}>
+                      <span className="font-semibold text-foreground text-sm leading-tight line-clamp-2" title={stock.producto.prdtonombre}>
                         {stock.producto.prdtonombre}
                       </span>
                     </div>
-                    <span className="text-[11px] font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200">
+                    <span className="text-[11px] font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded border border-border">
                       {stock.producto.prdtocodigo}
                     </span>
                   </div>

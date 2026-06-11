@@ -84,7 +84,7 @@ export const columns: ColumnDef<Producto>[] = [
       return (
         <div className="flex items-center gap-3">
           <DataTableRowIndicator status={producto.prdtoestado} />
-          <span className="text-sm font-medium text-slate-600 dark:text-slate-300">
+          <span className="text-sm font-medium text-muted-foreground">
             {producto.prdtocodigo}
           </span>
         </div>
@@ -117,7 +117,7 @@ export const columns: ColumnDef<Producto>[] = [
       const producto = row.original;
       return (
         <div className="flex flex-col">
-          <span className="text-sm text-slate-700 dark:text-slate-300">{producto.categoria?.ctgnombre || 'S/C'}</span>
+          <span className="text-sm text-foreground">{producto.categoria?.ctgnombre || 'S/C'}</span>
           <span className="text-xs text-muted-foreground">{producto.marca?.mrcnombre || 'S/M'}</span>
         </div>
       )

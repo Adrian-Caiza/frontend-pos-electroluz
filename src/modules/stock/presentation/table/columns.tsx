@@ -47,7 +47,7 @@ export const columns: ColumnDef<Stock>[] = [
       return (
         <div className="flex items-center gap-3">
           <DataTableRowIndicator status={stock.stckestado} />
-          <span className="text-sm font-medium text-slate-600">
+          <span className="text-sm font-medium text-muted-foreground">
             {stock.producto.prdtocodigo}
           </span>
         </div>
@@ -80,7 +80,7 @@ export const columns: ColumnDef<Stock>[] = [
       const minStock = fullProduct?.prdtostockminimo ? Number(fullProduct.prdtostockminimo) : null;
 
       return (
-        <div className="text-center text-slate-500 w-full font-medium">
+        <div className="text-center text-muted-foreground w-full font-medium">
           {minStock !== null ? minStock : 'N/A'}
         </div>
       );
@@ -99,7 +99,7 @@ export const columns: ColumnDef<Stock>[] = [
 
       return (
         <div className="text-right w-full">
-          <span className={`text-lg font-bold ${isLowStock ? 'text-rose-600' : 'text-slate-700'}`}>
+          <span className={`text-lg font-bold ${isLowStock ? 'text-rose-600 dark:text-rose-400' : 'text-foreground'}`}>
             {Number(stock.stckcantidad)}
           </span>
         </div>
@@ -111,7 +111,7 @@ export const columns: ColumnDef<Stock>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Fecha Registro" />,
     cell: ({ row }) => {
       const dateStr = row.getValue('stckfchregistro') as string;
-      return <span className="text-slate-500">{format(new Date(dateStr), "d 'de' MMMM, yyyy", { locale: es })}</span>;
+      return <span className="text-muted-foreground">{format(new Date(dateStr), "d 'de' MMMM, yyyy", { locale: es })}</span>;
     },
   },
   {

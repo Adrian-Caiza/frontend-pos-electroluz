@@ -21,7 +21,7 @@ const getRoleBadge = (role: string) => {
     case 'jefe':
       return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Jefe</Badge>;
     case 'empleado':
-      return <Badge className="bg-slate-100 text-slate-800 hover:bg-slate-100">Empleado</Badge>;
+      return <Badge className="bg-muted text-foreground hover:bg-muted/80">Empleado</Badge>;
     default:
       return <Badge variant="outline">{role}</Badge>;
   }
@@ -91,7 +91,7 @@ export const columns: ColumnDef<Usuario>[] = [
     accessorKey: 'uscorreo',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Contacto" />,
     cell: ({ row }) => (
-      <span className="text-slate-600">{row.getValue('uscorreo')}</span>
+      <span className="text-muted-foreground">{row.getValue('uscorreo')}</span>
     ),
   },
   {

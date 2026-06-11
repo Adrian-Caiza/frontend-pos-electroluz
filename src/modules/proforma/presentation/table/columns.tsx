@@ -44,12 +44,12 @@ export const columns: ColumnDef<Proforma>[] = [
       const proforma = row.original;
       return (
         <div className="flex items-center">
-          <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center mr-3 text-slate-600">
+          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center mr-3 text-muted-foreground">
             <Receipt className="w-4 h-4" />
           </div>
           <div className="flex flex-col">
-            <span className="font-medium text-slate-900">{proforma.prfmaidentificador}</span>
-            <span className="text-xs text-slate-500">
+            <span className="font-medium text-foreground">{proforma.prfmaidentificador}</span>
+            <span className="text-xs text-muted-foreground">
               {format(new Date(proforma.prfmafchregistro), "d MMM yyyy, HH:mm", { locale: es })}
             </span>
           </div>
@@ -65,8 +65,8 @@ export const columns: ColumnDef<Proforma>[] = [
       const receptor = row.original.receptor;
       return (
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-900">{receptor.clntenombre || (receptor as any).cliente?.clntenombre}</span>
-          <span className="text-xs text-slate-500">CI/RUC: {receptor.clnteidentificacion || (receptor as any).cliente?.clnteidentificacion || (receptor as any).identificacion || (receptor as any).clntedocumento || 'N/A'}</span>
+          <span className="text-sm font-medium text-foreground">{receptor.clntenombre || (receptor as any).cliente?.clntenombre}</span>
+          <span className="text-xs text-muted-foreground">CI/RUC: {receptor.clnteidentificacion || (receptor as any).cliente?.clnteidentificacion || (receptor as any).identificacion || (receptor as any).clntedocumento || 'N/A'}</span>
         </div>
       );
     },
@@ -76,7 +76,7 @@ export const columns: ColumnDef<Proforma>[] = [
     accessorFn: (row) => row.metodoPago.mpnombre,
     header: ({ column }) => <DataTableColumnHeader column={column} title="Método de Pago" />,
     cell: ({ row }) => (
-      <span className="text-slate-600 text-sm">
+      <span className="text-muted-foreground text-sm">
         {row.original.metodoPago.mpnombre}
       </span>
     ),
@@ -87,7 +87,7 @@ export const columns: ColumnDef<Proforma>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Total" className="justify-end" />,
     cell: ({ row }) => (
       <div className="text-right w-full">
-        <span className="font-bold text-slate-900">
+        <span className="font-bold text-foreground">
           ${row.original.total.prfmatotal.toFixed(2)}
         </span>
       </div>
@@ -139,7 +139,7 @@ export const columns: ColumnDef<Proforma>[] = [
       const actions: DataTableRowActionItem[] = [
         {
           label: 'Ver PDF',
-          icon: <FileText className="h-4 w-4 text-slate-600" />,
+          icon: <FileText className="h-4 w-4 text-muted-foreground" />,
           onClick: () => meta.onViewPdf(proforma.prfmaid),
         }
       ];

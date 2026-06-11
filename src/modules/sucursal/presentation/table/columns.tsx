@@ -36,7 +36,7 @@ export const columns: ColumnDef<Sucursal>[] = [
     accessorKey: 'suidentificador',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Identificador" />,
     cell: ({ row }) => (
-      <span className="font-medium text-slate-900">
+      <span className="font-medium text-foreground">
         ID: {row.getValue('suidentificador')}
       </span>
     ),
@@ -45,7 +45,7 @@ export const columns: ColumnDef<Sucursal>[] = [
     accessorKey: 'sunombre',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Nombre" />,
     cell: ({ row }) => (
-      <span className="text-slate-900 font-semibold">
+      <span className="text-foreground font-semibold">
         {row.getValue('sunombre')}
       </span>
     ),
@@ -57,10 +57,10 @@ export const columns: ColumnDef<Sucursal>[] = [
     cell: ({ row }) => {
       const sucursal = row.original;
       return (
-        <div className="text-slate-500 text-sm">
+        <div className="text-muted-foreground text-sm">
           {sucursal.sudireccion ? <div>{sucursal.sudireccion}</div> : null}
-          {sucursal.sucorreo ? <div className="text-slate-400">{sucursal.sucorreo}</div> : null}
-          {!sucursal.sudireccion && !sucursal.sucorreo && <span className="text-slate-300">N/A</span>}
+          {sucursal.sucorreo ? <div className="text-muted-foreground">{sucursal.sucorreo}</div> : null}
+          {!sucursal.sudireccion && !sucursal.sucorreo && <span className="text-muted-foreground">N/A</span>}
         </div>
       );
     },

@@ -46,7 +46,7 @@ export const columns: ColumnDef<MetodoPago>[] = [
           <div className="w-8 h-8 rounded-full bg-indigo-50 flex items-center justify-center mr-3 text-indigo-600">
             <Wallet className="w-4 h-4" />
           </div>
-          <span className="font-medium text-slate-900">{nombre}</span>
+          <span className="font-medium text-foreground">{nombre}</span>
         </div>
       );
     },
@@ -59,7 +59,7 @@ export const columns: ColumnDef<MetodoPago>[] = [
     cell: ({ row }) => {
       const fecha = row.getValue('mpfchregistro') as string;
       return (
-        <div className="text-slate-500 text-sm">
+        <div className="text-muted-foreground text-sm">
           {format(new Date(fecha), "d 'de' MMMM, yyyy", { locale: es })}
         </div>
       );

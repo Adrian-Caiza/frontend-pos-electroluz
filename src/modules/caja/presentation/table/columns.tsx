@@ -38,7 +38,7 @@ export const columns: ColumnDef<Checkout>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Identificador" />,
     cell: ({ row }) => {
       return (
-        <span className="font-medium text-slate-900">
+        <span className="font-medium text-foreground">
           Caja {row.getValue('cjidentificador')}
         </span>
       );
@@ -49,7 +49,7 @@ export const columns: ColumnDef<Checkout>[] = [
     id: 'sucursal',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Sucursal" />,
     cell: ({ row }) => {
-      return <span className="text-slate-600">{row.getValue('sucursal')}</span>;
+      return <span className="text-muted-foreground">{row.getValue('sucursal')}</span>;
     },
   },
   {
@@ -57,7 +57,7 @@ export const columns: ColumnDef<Checkout>[] = [
     header: ({ column }) => <DataTableColumnHeader column={column} title="Fecha Registro" />,
     cell: ({ row }) => {
       const dateStr = row.getValue('cjfchregistro') as string;
-      return <span className="text-slate-500">{new Date(dateStr).toLocaleDateString()}</span>;
+      return <span className="text-muted-foreground">{new Date(dateStr).toLocaleDateString()}</span>;
     },
   },
   {
