@@ -22,7 +22,7 @@ export const TopProductsChart = ({ data, isLoading }: TopProductsChartProps) => 
           layout="vertical" 
           margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
         >
-          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--color-slate-100)" />
+          <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} stroke="var(--color-border)" />
           <XAxis type="number" hide />
           <YAxis 
             dataKey="name" 
@@ -30,17 +30,18 @@ export const TopProductsChart = ({ data, isLoading }: TopProductsChartProps) => 
             axisLine={false} 
             tickLine={false} 
             width={120}
-            tick={{ fontSize: 11, fill: 'var(--color-slate-600)' }}
+            tick={{ fontSize: 11, fill: 'currentColor' }}
+            className="text-muted-foreground"
           />
           <Tooltip 
             formatter={(value: number) => [`${value} unid.`, 'Vendidos']}
-            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-            cursor={{ fill: 'var(--color-slate-50)' }}
+            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', background: 'var(--color-card)', color: 'var(--color-foreground)' }}
+            cursor={{ fill: 'var(--color-muted)' }}
           />
           <Bar 
             dataKey="count" 
             name="Vendidos"
-            fill="var(--color-chart-2)" 
+            fill="var(--color-primary)" 
             radius={[0, 4, 4, 0]} 
             barSize={20}
           />

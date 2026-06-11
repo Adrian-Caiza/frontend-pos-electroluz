@@ -1,53 +1,87 @@
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartCardWrapper } from '../../../../../shared/components/ui/charts/ChartCardWrapper';
+import { ChevronDown } from 'lucide-react';
 
 interface SalesTrendChartProps {
   data: Array<{ date: string; total: number; rawDate: string }>;
   isLoading?: boolean;
 }
 
+const CustomTooltip = ({ active, payload, label }: any) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-primary text-primary-foreground p-3 rounded-xl shadow-lg border-none min-w-[120px] relative">
+        <p className="text-xs font-medium opacity-80 mb-2">{label}</p>
+        <div className="flex items-center gap-1.5 mb-1">
+          <div className="w-1.5 h-1.5 rounded-full bg-primary-foreground"></div>
+          <span className="text-xs font-medium opacity-90">Ingresos</span>
+        </div>
+        <p className="text-lg font-bold">${payload[0].value.toFixed(2)}</p>
+        {/* Triangle pointer */}
+        <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-4 h-4 bg-primary rotate-45"></div>
+      </div>
+    );
+  }
+  return null;
+};
+
 export const SalesTrendChart = ({ data, isLoading }: SalesTrendChartProps) => {
+  const headerRight = (
+    <div className="flex items-center text-sm text-muted-foreground font-medium cursor-pointer hover:text-foreground transition-colors">
+      Mensual
+      <ChevronDown className="w-4 h-4 ml-1" />
+    </div>
+  );
+
   return (
     <ChartCardWrapper 
-      title="Tendencia de Ventas" 
-      description="Ingresos diarios basados en proformas emitidas y pagadas"
+      title="Reporte de Ventas" 
+      headerRight={headerRight}
     >
       {isLoading ? (
-        <div className="flex h-full items-center justify-center text-slate-400 animate-pulse">Cargando datos...</div>
+        <div className="flex h-full items-center justify-center text-muted-foreground animate-pulse">Cargando datos...</div>
       ) : data.length === 0 ? (
-        <div className="flex h-full items-center justify-center text-slate-400">No hay suficientes datos</div>
+        <div className="flex h-full items-center justify-center text-muted-foreground">No hay suficientes datos</div>
       ) : (
-        <LineChart data={data} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-slate-200)" />
+        <AreaChart data={data} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="colorTotal" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
+              <stop offset="95%" stopColor="var(--color-primary)" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="currentColor" className="text-border opacity-50" />
           <XAxis 
             dataKey="date" 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fontSize: 12, fill: 'var(--color-slate-500)' }} 
+            tick={{ fontSize: 12, fill: 'currentColor' }} 
+            className="text-muted-foreground"
             dy={10}
           />
           <YAxis 
             axisLine={false} 
             tickLine={false} 
-            tick={{ fontSize: 12, fill: 'var(--color-slate-500)' }}
-            tickFormatter={(value) => `$${value}`}
+            tick={{ fontSize: 12, fill: 'currentColor' }}
+            className="text-muted-foreground"
+            tickFormatter={(value) => value >= 1000 ? `${value / 1000}k` : value}
             dx={-10}
           />
           <Tooltip 
-            formatter={(value: number) => [`$${value.toFixed(2)}`, 'Ventas']}
-            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+            content={<CustomTooltip />} 
+            cursor={{ stroke: 'currentColor', className: 'text-border opacity-50', strokeWidth: 1, strokeDasharray: '3 3' }} 
           />
-          <Legend wrapperStyle={{ paddingTop: '20px' }} />
-          <Line 
+          <Area 
             type="monotone" 
             name="Ingresos"
             dataKey="total" 
             stroke="var(--color-primary)" 
+            fillOpacity={1} 
+            fill="url(#colorTotal)"
             strokeWidth={3}
-            dot={{ r: 4, fill: 'var(--color-primary)', strokeWidth: 0 }}
-            activeDot={{ r: 6, stroke: 'var(--color-primary)', strokeWidth: 2, fill: '#fff' }}
+            activeDot={{ r: 6, strokeWidth: 4, stroke: 'var(--color-background)', fill: 'var(--color-primary)' }}
           />
-        </LineChart>
+        </AreaChart>
       )}
     </ChartCardWrapper>
   );
