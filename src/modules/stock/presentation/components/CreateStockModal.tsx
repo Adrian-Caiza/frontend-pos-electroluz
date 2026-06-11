@@ -24,10 +24,15 @@ import { useProductos } from '../../../producto/presentation/hooks/useProductos'
 const formSchema = z.object({
   stcksuid: z.string().min(1, 'Seleccione una sucursal'),
   stckprdtoid: z.string().min(1, 'Seleccione un producto'),
-  stckcantidad: z.number().min(0, 'La cantidad no puede ser negativa'),
+  stckcantidad: z.union([z.number(), z.string(), z.undefined()])
+    .refine((val) => val !== '' && val !== undefined, { message: 'Ingrese una cantidad' })
+    .transform((val) => Number(val))
+    .refine((val) => !isNaN(val) && val >= 0, { message: 'La cantidad no puede ser negativa' })
+    .refine((val) => Number.isInteger(val), { message: 'La cantidad debe ser un número entero' }),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormInput = z.input<typeof formSchema>;
+type FormOutput = z.infer<typeof formSchema>;
 
 interface CreateStockModalProps {
   open: boolean;
@@ -46,13 +51,13 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
   const activeSucursales = sucursalesData?.items.filter(s => s.suestado === 'activo') || [];
   const activeProductos = productosData?.items.filter(p => p.prdtoestado === 'activo') || [];
 
-  const form = useForm<FormValues>({
+  const form = useForm<FormInput, any, FormOutput>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: {
       stcksuid: defaultSucursalId || '',
       stckprdtoid: '',
-      stckcantidad: 0,
+      stckcantidad: '',
     },
   });
 
@@ -61,12 +66,12 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
       form.reset({
         stcksuid: defaultSucursalId || '',
         stckprdtoid: '',
-        stckcantidad: 0,
+        stckcantidad: '',
       });
     }
   }, [open, form.reset, defaultSucursalId]);
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = (values: FormOutput) => {
     if (!company?.emid) return;
 
     createStock(
@@ -173,10 +178,15 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
                         icon={Hash}
                         type="number" 
                         {...field} 
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          field.onChange(val === '' ? '' : Number(val));
+                        }}
                         className="h-11 rounded-xl"
-                        placeholder="0" 
+                        placeholder="Ingrese la cantidad" 
                         min="0"
+                        step="1"
                       />
                     </FormControl>
                   </ModalField>

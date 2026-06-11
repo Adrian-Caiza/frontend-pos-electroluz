@@ -75,6 +75,7 @@ export const columns: ColumnDef<Producto>[] = [
   },
   {
     accessorKey: "prdtocodigo",
+    meta: { className: "hidden @4xl:table-cell" },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Código" />
     ),
@@ -108,6 +109,7 @@ export const columns: ColumnDef<Producto>[] = [
   {
     id: "categoria",
     accessorFn: (row) => `${row.categoria?.ctgnombre || ''} ${row.marca?.mrcnombre || ''}`,
+    meta: { className: "hidden @6xl:table-cell" },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Categoría / Marca" />
     ),
@@ -154,6 +156,7 @@ export const columns: ColumnDef<Producto>[] = [
   },
   {
     accessorKey: "prdtoestado",
+    meta: { className: "hidden @5xl:table-cell" },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Estado" className="justify-center" />
     ),

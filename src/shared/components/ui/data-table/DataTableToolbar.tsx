@@ -27,7 +27,7 @@ export function DataTableToolbar({
     <div className="flex flex-col sm:flex-row items-center gap-2 p-2 bg-background border border-border rounded-xl shadow-sm">
       <div className="flex flex-1 items-center w-full">
         {onGlobalFilterChange !== undefined && (
-          <div className="relative w-full">
+          <div className="relative w-full bg-card rounded-lg shadow-sm border border-border focus-within:ring-1 focus-within:ring-ring transition-shadow">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder={searchPlaceholder}
@@ -43,7 +43,7 @@ export function DataTableToolbar({
         {children}
         
         {onAdvancedFilterClick && (
-          <Button variant="outline" onClick={onAdvancedFilterClick} className="font-medium text-slate-600">
+          <Button variant="outline" onClick={onAdvancedFilterClick} className="font-medium text-slate-700 bg-card shadow-sm hover:bg-slate-50">
             <Filter className="mr-2 h-4 w-4" />
             Filtros
           </Button>

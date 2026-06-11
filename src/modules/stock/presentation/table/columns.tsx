@@ -73,18 +73,33 @@ export const columns: ColumnDef<Stock>[] = [
   {
     id: 'cantidadMinima',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Cantidad Mínima" className="justify-center" />,
-    cell: () => (
-      <div className="text-center text-slate-500 w-full">N/A</div>
-    ),
+    cell: ({ row, table }) => {
+      const stock = row.original;
+      const meta = table.options.meta as StockTableMeta;
+      const fullProduct = meta.productos?.find(p => p.prdtoid === stock.producto.prdtoid);
+      const minStock = fullProduct?.prdtostockminimo ? Number(fullProduct.prdtostockminimo) : null;
+
+      return (
+        <div className="text-center text-slate-500 w-full font-medium">
+          {minStock !== null ? minStock : 'N/A'}
+        </div>
+      );
+    },
   },
   {
     accessorKey: 'stckcantidad',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Stock" className="justify-end" />,
-    cell: ({ row }) => {
+    cell: ({ row, table }) => {
       const stock = row.original;
+      const meta = table.options.meta as StockTableMeta;
+      const fullProduct = meta.productos?.find(p => p.prdtoid === stock.producto.prdtoid);
+      const minStock = fullProduct?.prdtostockminimo ? Number(fullProduct.prdtostockminimo) : null;
+      
+      const isLowStock = minStock !== null ? Number(stock.stckcantidad) <= minStock : Number(stock.stckcantidad) <= 10;
+
       return (
         <div className="text-right w-full">
-          <span className={`text-lg font-bold ${Number(stock.stckcantidad) <= 10 ? 'text-rose-600' : 'text-slate-700'}`}>
+          <span className={`text-lg font-bold ${isLowStock ? 'text-rose-600' : 'text-slate-700'}`}>
             {Number(stock.stckcantidad)}
           </span>
         </div>

@@ -192,7 +192,7 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
                 </>
               ) : (
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-[180px] bg-background">
+                  <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>
                   <SelectContent>

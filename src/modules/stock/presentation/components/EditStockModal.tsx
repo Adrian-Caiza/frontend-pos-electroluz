@@ -21,11 +21,16 @@ import { useUpdateStock } from '../hooks/useUpdateStock';
 import type { Stock } from '../../domain/entities/Stock';
 
 const formSchema = z.object({
-  stckcantidad: z.number().min(0, 'La cantidad no puede ser negativa'),
+  stckcantidad: z.union([z.number(), z.string(), z.undefined()])
+    .refine((val) => val !== '' && val !== undefined, { message: 'Ingrese una cantidad' })
+    .transform((val) => Number(val))
+    .refine((val) => !isNaN(val) && val >= 0, { message: 'La cantidad no puede ser negativa' })
+    .refine((val) => Number.isInteger(val), { message: 'La cantidad debe ser un número entero' }),
   stckestado: z.enum(['activo', 'inactivo', 'eliminado']),
 });
 
-type FormValues = z.infer<typeof formSchema>;
+type FormInput = z.input<typeof formSchema>;
+type FormOutput = z.infer<typeof formSchema>;
 
 interface EditStockModalProps {
   stock: Stock;
@@ -36,7 +41,7 @@ interface EditStockModalProps {
 export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProps) => {
   const { mutate: updateStock, isPending } = useUpdateStock();
 
-  const form = useForm<FormValues>({
+  const form = useForm<FormInput, any, FormOutput>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: {
@@ -54,7 +59,7 @@ export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProp
     }
   }, [open, form.reset, stock]);
 
-  const onSubmit = (values: FormValues) => {
+  const onSubmit = (values: FormOutput) => {
     const payload: any = { stcksuid: stock.sucursal.suid }; // Obligatorio para API
 
     // Solo enviamos lo que cambió para evitar conflictos
@@ -120,10 +125,14 @@ export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProp
                         icon={Hash}
                         type="number" 
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        value={field.value ?? ''}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          field.onChange(val === '' ? '' : Number(val));
+                        }}
                         className="h-11 rounded-xl"
                         min="0"
-                        step="0.01"
+                        step="1"
                       />
                     </FormControl>
                   </ModalField>

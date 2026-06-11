@@ -67,7 +67,7 @@ export const AlertTable = () => {
         children: (
           <div className="flex gap-2">
             <Select value={suidFilter} onValueChange={(val) => { setSuidFilter(val); setPage(1); }}>
-              <SelectTrigger className="w-[200px] bg-background">
+              <SelectTrigger className="w-[200px] bg-card shadow-sm border-border">
                 <SelectValue placeholder="Sucursal" />
               </SelectTrigger>
               <SelectContent>

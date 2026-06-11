@@ -92,7 +92,7 @@ export function DataTable<TData, TValue>({
     <div className="space-y-4 font-geist">
       {toolbar && <DataTableToolbar {...toolbar} />}
       
-      <div className="w-full">
+      <div className="w-full @container overflow-x-auto pb-2">
         <Table className="border-0 border-collapse">
           {disableAnimations ? (
             <TableHeader className="border-0">
@@ -100,7 +100,7 @@ export function DataTable<TData, TValue>({
                 <TableRow key={headerGroup.id} className="border-0 hover:bg-transparent">
                   {headerGroup.headers.map((header) => {
                     return (
-                      <TableHead key={header.id} className="h-12 px-1 py-2 align-middle">
+                      <TableHead key={header.id} className={`h-12 px-1 py-2 align-middle ${(header.column.columnDef.meta as any)?.className || ''}`}>
                         <div className="h-full w-full bg-slate-100 rounded-lg flex items-center px-3">
                           {header.isPlaceholder
                             ? null
@@ -129,7 +129,7 @@ export function DataTable<TData, TValue>({
                       <motion.th 
                         key={header.id} 
                         variants={tableHeadVariants}
-                        className="h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 h-12 py-2"
+                        className={`h-10 px-2 text-left align-middle font-medium whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0 h-12 py-2 ${(header.column.columnDef.meta as any)?.className || ''}`}
                       >
                         <div className="h-full w-full bg-slate-100 rounded-lg flex items-center px-3">
                           {header.isPlaceholder
@@ -154,7 +154,7 @@ export function DataTable<TData, TValue>({
                 Array.from({ length: table.getState().pagination.pageSize }).map((_, i) => (
                   <TableRow key={`skeleton-${i}`} className="border-b border-slate-200 hover:bg-transparent">
                     {columns.map((_, j) => (
-                      <TableCell key={`skeleton-cell-${i}-${j}`} className="py-4 px-4">
+                      <TableCell key={`skeleton-cell-${i}-${j}`} className={`py-4 px-4 ${(columns[j].meta as any)?.className || ''}`}>
                         <div className="h-5 bg-slate-100 rounded animate-pulse w-3/4"></div>
                       </TableCell>
                     ))}
@@ -169,7 +169,7 @@ export function DataTable<TData, TValue>({
                     className={`hover:bg-slate-50 transition-colors border-b border-slate-200 ${onRowClick ? "cursor-pointer" : ""} ${selectedRowId === row.id ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-primary" : ""}`}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-4 px-4">
+                      <TableCell key={cell.id} className={`py-4 px-4 ${(cell.column.columnDef.meta as any)?.className || ''}`}>
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
@@ -204,7 +204,7 @@ export function DataTable<TData, TValue>({
                       className="border-b transition-colors hover:bg-transparent border-slate-200"
                     >
                       {columns.map((_, j) => (
-                        <td key={`skeleton-cell-${i}-${j}`} className="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4">
+                        <td key={`skeleton-cell-${i}-${j}`} className={`p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4 ${(columns[j].meta as any)?.className || ''}`}>
                           <div className="h-5 bg-slate-100 rounded animate-pulse w-3/4"></div>
                         </td>
                       ))}
@@ -222,7 +222,7 @@ export function DataTable<TData, TValue>({
                       className={`border-b transition-colors has-aria-expanded:bg-muted/50 data-[state=selected]:bg-muted hover:bg-slate-50 border-slate-200 ${onRowClick ? "cursor-pointer" : ""} ${selectedRowId === row.id ? "bg-primary/5 hover:bg-primary/10 border-l-4 border-l-primary" : ""}`}
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className="p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4">
+                        <td key={cell.id} className={`p-2 align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 py-4 px-4 ${(cell.column.columnDef.meta as any)?.className || ''}`}>
                           {flexRender(cell.column.columnDef.cell, cell.getContext())}
                         </td>
                       ))}
