@@ -131,3 +131,69 @@
     @apply font-sans;
   }
 }
+
+/* ── Login background blob animations ── */
+@keyframes blob-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -50px) scale(1.05); }
+  50% { transform: translate(-20px, 20px) scale(0.95); }
+  75% { transform: translate(15px, 40px) scale(1.02); }
+}
+
+@keyframes blob-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(-40px, 30px) scale(0.97); }
+  50% { transform: translate(25px, -35px) scale(1.06); }
+  75% { transform: translate(-15px, -20px) scale(1); }
+}
+
+@keyframes blob-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1.02); }
+  33% { transform: translate(50px, 20px) scale(0.96); }
+  66% { transform: translate(-30px, -40px) scale(1.04); }
+}
+
+@keyframes subtle-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.9; }
+}
+
+.login-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.login-blob-1 {
+  width: clamp(300px, 50vw, 700px);
+  height: clamp(300px, 50vw, 700px);
+  animation: blob-drift-1 20s ease-in-out infinite;
+}
+
+.login-blob-2 {
+  width: clamp(250px, 40vw, 600px);
+  height: clamp(250px, 40vw, 600px);
+  animation: blob-drift-2 25s ease-in-out infinite;
+}
+
+.login-blob-3 {
+  width: clamp(200px, 35vw, 500px);
+  height: clamp(200px, 35vw, 500px);
+  animation: blob-drift-3 18s ease-in-out infinite;
+}
+
+.login-noise-overlay {
+  position: absolute;
+  inset: 0;
+  opacity: 0.03;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 128px 128px;
+}
+
+.dark .login-noise-overlay {
+  opacity: 0.06;
+}

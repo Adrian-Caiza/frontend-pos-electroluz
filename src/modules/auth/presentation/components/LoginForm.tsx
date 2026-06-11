@@ -15,11 +15,15 @@ export const LoginForm = () => {
   const { form, onSubmit, isPending } = useLoginForm();
 
   return (
-    <div className="w-full max-w-sm mx-auto space-y-8">
-      <div className="space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
-          Login
+    <div className="w-full space-y-6">
+      {/* Heading */}
+      <div className="space-y-1.5">
+        <h2 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
+          ¡Bienvenido!
         </h2>
+        <p className="text-sm text-muted-foreground">
+          Ingresa tus credenciales para acceder al sistema.
+        </p>
       </div>
 
       <Form {...form}>
@@ -105,7 +109,7 @@ export const LoginForm = () => {
           <div className="pt-4">
             <Button 
               type="submit" 
-              className="w-full h-12 text-base font-semibold bg-[#4f46e5] hover:bg-[#4338ca] text-white rounded-xl shadow-md transition-all"
+              className="w-full h-12 text-base font-semibold bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl shadow-md transition-all"
               disabled={isPending}
             >
               {isPending ? "Ingresando..." : "Ingresar"}
