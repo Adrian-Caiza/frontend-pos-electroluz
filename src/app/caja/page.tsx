@@ -11,11 +11,11 @@ export default function CajaPage() {
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center">
-            <Store className="w-6 h-6 mr-2 text-indigo-600" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center">
+            <Store className="w-6 h-6 mr-2 text-primary" />
             Gestión de Cajas
           </h1>
-          <p className="text-slate-500 text-sm mt-1">
+          <p className="text-muted-foreground text-sm mt-1">
             Administra las cajas registradoras de tus sucursales
           </p>
         </div>
@@ -26,7 +26,7 @@ export default function CajaPage() {
         )}
       </div>
 
-      <div className="w-full bg-white rounded-xl">
+      <div className="w-full bg-transparent rounded-xl">
         <CheckoutTable />
       </div>
     </div>

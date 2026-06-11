@@ -10,18 +10,18 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-blue-600 text-white shadow-sm hover:bg-blue-500 hover:shadow-md focus-visible:ring-4 focus-visible:ring-blue-500/40 active:bg-blue-700",
+          "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:shadow-md focus-visible:ring-4 focus-visible:ring-primary/40 active:bg-primary/80",
         secondary:
-          "bg-slate-800 text-white shadow-sm hover:bg-slate-700 hover:shadow-md focus-visible:ring-4 focus-visible:ring-slate-500/40 active:bg-slate-900",
+          "bg-secondary text-secondary-foreground shadow-sm hover:bg-secondary/80 hover:shadow-md focus-visible:ring-4 focus-visible:ring-secondary/40 active:bg-secondary/60",
         outline:
-          "border border-slate-200 bg-transparent text-slate-700 shadow-sm hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-4 focus-visible:ring-slate-500/30 active:bg-slate-200",
+          "border border-border bg-background text-foreground shadow-sm hover:bg-accent hover:text-accent-foreground focus-visible:ring-4 focus-visible:ring-ring/30 active:bg-accent/80",
         destructive:
-          "bg-red-600 text-white shadow-sm hover:bg-red-500 hover:shadow-md focus-visible:ring-4 focus-visible:ring-red-500/40 active:bg-red-700",
-        danger: // Alias para destructive
-          "bg-red-600 text-white shadow-sm hover:bg-red-500 hover:shadow-md focus-visible:ring-4 focus-visible:ring-red-500/40 active:bg-red-700",
+          "bg-destructive text-white shadow-sm hover:bg-destructive/90 hover:shadow-md focus-visible:ring-4 focus-visible:ring-destructive/40 active:bg-destructive/80",
+        danger:
+          "bg-destructive text-white shadow-sm hover:bg-destructive/90 hover:shadow-md focus-visible:ring-4 focus-visible:ring-destructive/40 active:bg-destructive/80",
         ghost:
-          "bg-transparent text-slate-700 hover:bg-slate-100 hover:text-slate-900 focus-visible:ring-4 focus-visible:ring-slate-500/30 active:bg-slate-200",
-        link: "text-blue-600 underline-offset-4 hover:underline",
+          "bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground focus-visible:ring-4 focus-visible:ring-ring/30 active:bg-accent/80",
+        link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
         default: "h-10 px-4 py-2 [&_svg:not([class*='size-'])]:size-4",

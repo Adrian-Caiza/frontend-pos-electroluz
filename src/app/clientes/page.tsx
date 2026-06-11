@@ -18,7 +18,6 @@ export const ClientesPage = () => {
         </div>
         <Button
           onClick={() => setIsCreateModalOpen(true)}
-          className="bg-indigo-600 hover:bg-indigo-700"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Registrar Cliente

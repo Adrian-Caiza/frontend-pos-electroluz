@@ -132,7 +132,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
   return (
     <>
       {!isControlled && (
-        <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+        <Button onClick={() => setOpen(true)}>
           <PackagePlus className="w-4 h-4 mr-2" />
           Nuevo Producto
         </Button>

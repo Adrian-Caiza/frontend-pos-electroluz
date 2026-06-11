@@ -56,8 +56,8 @@ export function DataTablePagination({
           className={cn(
             "h-9 w-9 p-0 rounded-lg transition-colors font-semibold",
             isActive 
-              ? "bg-indigo-600 text-white hover:bg-indigo-700 border-transparent shadow-sm" 
-              : "text-slate-600 border-slate-200 hover:bg-slate-50 bg-white"
+              ? "bg-primary text-primary-foreground hover:bg-primary/90 border-transparent shadow-sm" 
+              : "text-muted-foreground border-border hover:bg-muted bg-background"
           )}
           onClick={() => onPageChange(i)}
         >
@@ -71,7 +71,7 @@ export function DataTablePagination({
   return (
     <div className="flex flex-col sm:flex-row items-center justify-between px-2 py-4 mt-2 border-t border-slate-100 gap-4">
       {/* Left side */}
-      <div className="flex items-center space-x-3 text-sm text-slate-600">
+      <div className="flex items-center space-x-3 text-sm text-muted-foreground">
         <p>Mostrar</p>
         <Select
           value={`${pageSize}`}
@@ -79,7 +79,7 @@ export function DataTablePagination({
             onPageSizeChange(Number(value))
           }}
         >
-          <SelectTrigger className="h-9 w-[70px] bg-white border-slate-200 rounded-lg">
+          <SelectTrigger className="h-9 w-[70px] bg-background border-border rounded-lg">
             <SelectValue placeholder={pageSize} />
           </SelectTrigger>
           <SelectContent side="top">
@@ -94,7 +94,7 @@ export function DataTablePagination({
       </div>
       
       {/* Center */}
-      <div className="text-sm text-slate-600 font-medium hidden md:block">
+      <div className="text-sm text-muted-foreground font-medium hidden md:block">
         Mostrando {currentRows} de {rowCount} registros
       </div>
 
@@ -102,7 +102,7 @@ export function DataTablePagination({
       <div className="flex items-center space-x-1.5">
         <Button
           variant="outline"
-          className="h-9 px-4 text-sm font-semibold text-slate-600 border-slate-200 rounded-lg bg-white hover:bg-slate-50"
+          className="h-9 px-4 text-sm font-semibold text-muted-foreground border-border rounded-lg bg-background hover:bg-muted"
           onClick={() => onPageChange(pageIndex - 1)}
           disabled={pageIndex <= 1}
         >
@@ -113,7 +113,7 @@ export function DataTablePagination({
 
         <Button
           variant="outline"
-          className="h-9 px-4 text-sm font-semibold text-slate-600 border-slate-200 rounded-lg bg-white hover:bg-slate-50"
+          className="h-9 px-4 text-sm font-semibold text-muted-foreground border-border rounded-lg bg-background hover:bg-muted"
           onClick={() => onPageChange(pageIndex + 1)}
           disabled={pageIndex >= pageCount}
         >

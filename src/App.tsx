@@ -20,6 +20,7 @@ import ProformasPage from './app/proformas/page';
 import TerminalPage from './app/terminal/page';
 import UnauthorizedPage from './app/unauthorized/page';
 import { AlertsPage } from './modules/alert/presentation/pages/AlertsPage';
+import { ThemeProvider } from './shared/components/theme-provider';
 
 const HomeRedirect = () => {
   const { user } = useAuthStore();
@@ -71,7 +72,7 @@ function App() {
   }, [company]);
 
   return (
-    <>
+    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
           {/* Public Routes */}
@@ -191,7 +192,7 @@ function App() {
         </Routes>
       </BrowserRouter>
       <Toaster position="top-center" richColors />
-    </>
+    </ThemeProvider>
   );
 }
 

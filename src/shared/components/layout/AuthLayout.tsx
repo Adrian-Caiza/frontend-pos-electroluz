@@ -1,8 +1,9 @@
 import { Outlet } from 'react-router-dom';
+import { ThemeToggle } from '../ui/theme-toggle';
 
 export const AuthLayout = () => {
   return (
-    <div className="flex min-h-screen w-full bg-[#F1F5F9] dark:bg-gray-900">
+    <div className="flex min-h-screen w-full bg-background">
       {/* Left Panel - Branding */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-[#7e22ce] to-[#581c87] overflow-hidden flex-col justify-between p-12">
         {/* Decorative elements / image could go here as absolute background */}
@@ -31,8 +32,11 @@ export const AuthLayout = () => {
       </div>
 
       {/* Right Panel - Content */}
-      <div className="flex flex-1 items-center justify-center p-8 lg:p-16">
-        <div className="w-full max-w-[480px] bg-white dark:bg-gray-800 rounded-[2rem] p-10 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-gray-100 dark:border-gray-800">
+      <div className="flex flex-1 flex-col items-center justify-center p-8 lg:p-16 relative">
+        <div className="absolute top-4 right-4 md:top-8 md:right-8">
+          <ThemeToggle />
+        </div>
+        <div className="w-full max-w-[480px] bg-card text-card-foreground rounded-[2rem] p-10 sm:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-none border border-border">
           <Outlet />
         </div>
       </div>

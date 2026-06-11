@@ -3,6 +3,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 
 import { Sidebar } from './Sidebar';
 import { AlertBell } from '../../../modules/alert/presentation/components/AlertBell';
+import { ThemeToggle } from '../ui/theme-toggle';
 
 export const MainLayout = () => {
   const { user, company, refreshToken, logout } = useAuthStore();
@@ -56,7 +57,7 @@ export const MainLayout = () => {
   const companyLogo = getImageUrl(company?.emlogo as string | undefined);
 
   return (
-    <div className="h-screen w-full bg-slate-100 flex overflow-hidden p-2 md:p-4 gap-4">
+    <div className="h-screen w-full bg-background flex overflow-hidden p-2 md:p-4 gap-4">
       <Sidebar 
         onLogout={handleLogout} 
         userImage={userImage} 
@@ -65,12 +66,12 @@ export const MainLayout = () => {
       />
 
       {/* Main Content Card */}
-      <div className="flex-1 flex flex-col overflow-hidden bg-white rounded-3xl shadow-sm border border-slate-200/60">
+      <div className="flex-1 flex flex-col overflow-hidden bg-card text-card-foreground rounded-3xl shadow-sm border border-border/60">
         {/* Subtle Top Bar */}
-        <header className="h-14 bg-white flex items-center justify-between px-6 shrink-0 rounded-t-3xl border-b border-slate-100/60 z-10">
+        <header className="h-14 bg-card flex items-center justify-between px-6 shrink-0 rounded-t-3xl border-b border-border/60 z-10">
           {/* Mobile Company Name */}
           <div className="flex items-center md:hidden">
-            <span className="font-bold text-lg text-slate-800">
+            <span className="font-bold text-lg text-card-foreground">
               {company?.emrznsocial || 'POS App'}
             </span>
           </div>
@@ -80,11 +81,12 @@ export const MainLayout = () => {
 
           {/* Right Actions */}
           <div className="flex items-center space-x-2 ml-auto">
+            <ThemeToggle />
             <AlertBell />
           </div>
         </header>
 
-        <main className="flex-1 overflow-auto bg-white p-6 rounded-b-3xl">
+        <main className="flex-1 overflow-auto bg-card p-6 rounded-b-3xl">
           <div className="w-full max-w-[1600px] mx-auto min-h-full flex flex-col pb-8">
             <Outlet />
           </div>

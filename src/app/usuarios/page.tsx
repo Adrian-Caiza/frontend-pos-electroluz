@@ -11,19 +11,19 @@ export default function UsuariosPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Personal</h1>
-          <p className="text-slate-500">Gestiona los usuarios y roles operativos de tu empresa</p>
+          <h1 className="text-3xl font-bold tracking-tight text-foreground">Personal</h1>
+          <p className="text-muted-foreground">Gestiona los usuarios y roles operativos de tu empresa</p>
         </div>
         <Button 
           onClick={() => setIsCreateOpen(true)}
-          className="bg-slate-900 hover:bg-slate-800"
+          className="bg-primary hover:bg-primary/90"
         >
           <UserPlus className="w-4 h-4 mr-2" />
           Registrar Usuario
         </Button>
       </div>
 
-      <div className="w-full bg-white rounded-xl">
+      <div className="w-full bg-transparent rounded-xl">
         <UsuarioTable />
       </div>
       <CreateUsuarioModal 

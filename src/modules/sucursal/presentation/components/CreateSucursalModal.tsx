@@ -79,7 +79,7 @@ export const CreateSucursalModal = () => {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700">
+      <Button onClick={() => setOpen(true)}>
         <Store className="w-4 h-4 mr-2" /> Nueva Sucursal
       </Button>
 

@@ -69,7 +69,7 @@ export const CreateMetodoPagoModal = () => {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 text-white shadow-md">
+      <Button onClick={() => setOpen(true)}>
         <WalletCards className="w-4 h-4 mr-2" />
         Nuevo Método de Pago
       </Button>

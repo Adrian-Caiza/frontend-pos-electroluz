@@ -1,15 +1,65 @@
-import { Card, CardContent, CardHeader, CardTitle } from '../../../../shared/components/ui/card';
+import { Card } from '../../../../shared/components/ui/card';
 import { useProformas } from '../../../proforma/presentation/hooks/useProformas';
 import { useProductos } from '../../../producto/presentation/hooks/useProductos';
 import { useClientes } from '../../../cliente/presentation/hooks/useClientes';
 import { useAlertStore } from '../../../alert/presentation/store/useAlertStore';
-import { Loader2, DollarSign, Package, Users, BellRing } from 'lucide-react';
+import { Loader2, DollarSign, Package, Users, BellRing, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '../../../../shared/lib/utils';
 
+interface KpiCardProps {
+  title: string;
+  value: string | number;
+  caption: string;
+  icon: React.ElementType;
+  iconBgColor: string;
+  loading?: boolean;
+  trend?: 'up' | 'down' | 'neutral';
+  trendValue?: string;
+  containerClassName?: string;
+}
+
+const KpiCard = ({ title, value, caption, icon: Icon, iconBgColor, loading, trend, trendValue, containerClassName }: KpiCardProps) => {
+  return (
+    <Card className={cn("p-5 flex flex-col justify-between border-border shadow-sm transition-all duration-300 hover:shadow-md", containerClassName)}>
+      <div className="flex items-start gap-4 mb-3">
+        <div className={cn("w-14 h-14 rounded-[14px] flex items-center justify-center shrink-0 text-white shadow-sm", iconBgColor)}>
+          <Icon className="w-7 h-7" />
+        </div>
+        <div className="flex flex-col mt-0.5">
+          <span className="text-[13px] font-medium text-muted-foreground mb-1 tracking-wide">{title}</span>
+          <div className="flex items-center gap-2">
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+            ) : (
+              <span className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">{value}</span>
+            )}
+            {!loading && trend && (
+              <div className={cn(
+                "flex items-center justify-center p-0.5 rounded-full",
+                trend === 'up' ? "text-emerald-500" : trend === 'down' ? "text-orange-500" : "text-slate-400"
+              )}>
+                {trend === 'up' && <TrendingUp className="w-5 h-5" strokeWidth={2.5} />}
+                {trend === 'down' && <TrendingDown className="w-5 h-5" strokeWidth={2.5} />}
+                {trend === 'neutral' && <Minus className="w-5 h-5" strokeWidth={2.5} />}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-1.5 mt-2">
+        <span className="text-[13px] text-muted-foreground font-medium">
+          {trendValue && <span className={cn(
+            "font-semibold mr-1",
+            trend === 'up' ? "text-emerald-600 dark:text-emerald-400" : trend === 'down' ? "text-orange-600 dark:text-orange-400" : "text-slate-500"
+          )}>{trendValue}</span>}
+          {caption}
+        </span>
+      </div>
+    </Card>
+  );
+};
+
 export const DashboardKpis = () => {
-  // For Productos and Clientes, we need to fetch all and filter out "eliminado" 
-  // since the backend doesn't filter them and tables do local filtering.
-  // Using the same parameters as their respective tables to leverage React Query cache.
   const { data: proformasData, isLoading: loadingProformas } = useProformas(1, 1);
   const { data: productosData, isLoading: loadingProductos } = useProductos(1, 10000);
   const { data: clientesData, isLoading: loadingClientes } = useClientes(1, 1000);
@@ -17,72 +67,52 @@ export const DashboardKpis = () => {
   const activeProductosCount = productosData?.items?.filter(p => p.prdtoestado !== 'eliminado').length || 0;
   const activeClientesCount = clientesData?.items?.filter(c => c.clnteestado !== 'eliminado').length || 0;
   
-  // Real-time unread alerts from store
   const unreadAlertsCount = useAlertStore((state) => state.unreadAlerts.length);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-slate-600">Ventas Totales</CardTitle>
-          <DollarSign className="w-4 h-4 text-slate-400" />
-        </CardHeader>
-        <CardContent>
-          {loadingProformas ? (
-            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-          ) : (
-            <div className="text-2xl font-bold text-slate-900">{proformasData?.totalItems || 0}</div>
-          )}
-          <p className="text-xs text-slate-500 mt-1">Proformas emitidas</p>
-        </CardContent>
-      </Card>
+    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <KpiCard
+        title="Ventas Totales"
+        value={proformasData?.totalItems || 0}
+        caption="Incremento respecto al mes anterior"
+        icon={DollarSign}
+        iconBgColor="bg-[#A17E45] dark:bg-[#B89252]"
+        loading={loadingProformas}
+        trend="up"
+        trendValue="+12%"
+      />
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-slate-600">Catálogo</CardTitle>
-          <Package className="w-4 h-4 text-slate-400" />
-        </CardHeader>
-        <CardContent>
-          {loadingProductos ? (
-            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-          ) : (
-            <div className="text-2xl font-bold text-slate-900">{activeProductosCount}</div>
-          )}
-          <p className="text-xs text-slate-500 mt-1">Productos registrados</p>
-        </CardContent>
-      </Card>
+      <KpiCard
+        title="Catálogo"
+        value={activeProductosCount}
+        caption="Actualización del inventario"
+        icon={Package}
+        iconBgColor="bg-[#2B5A8F] dark:bg-[#3B70AD]"
+        loading={loadingProductos}
+        trend="down"
+        trendValue="-2%"
+      />
 
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium text-slate-600">Cartera de Clientes</CardTitle>
-          <Users className="w-4 h-4 text-slate-400" />
-        </CardHeader>
-        <CardContent>
-          {loadingClientes ? (
-            <Loader2 className="w-5 h-5 animate-spin text-slate-400" />
-          ) : (
-            <div className="text-2xl font-bold text-slate-900">{activeClientesCount}</div>
-          )}
-          <p className="text-xs text-slate-500 mt-1">Clientes activos</p>
-        </CardContent>
-      </Card>
+      <KpiCard
+        title="Cartera de Clientes"
+        value={activeClientesCount}
+        caption="Nuevos registros este mes"
+        icon={Users}
+        iconBgColor="bg-[#8E44AD] dark:bg-[#9B59B6]"
+        loading={loadingClientes}
+        trend="up"
+        trendValue="+5%"
+      />
 
-      <Card className={cn(unreadAlertsCount > 0 && "border-red-200 bg-red-50/30")}>
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className={cn("text-sm font-medium", unreadAlertsCount > 0 ? "text-red-700" : "text-slate-600")}>
-            Alertas Pendientes
-          </CardTitle>
-          <BellRing className={cn("w-4 h-4", unreadAlertsCount > 0 ? "text-red-500" : "text-slate-400")} />
-        </CardHeader>
-        <CardContent>
-          <div className={cn("text-2xl font-bold", unreadAlertsCount > 0 ? "text-red-600" : "text-slate-900")}>
-            {unreadAlertsCount}
-          </div>
-          <p className={cn("text-xs mt-1", unreadAlertsCount > 0 ? "text-red-500/80" : "text-slate-500")}>
-            Notificaciones no leídas
-          </p>
-        </CardContent>
-      </Card>
+      <KpiCard
+        title="Alertas Pendientes"
+        value={unreadAlertsCount}
+        caption={unreadAlertsCount > 0 ? "Requieren tu atención" : "Todo está al día"}
+        icon={BellRing}
+        iconBgColor={unreadAlertsCount > 0 ? "bg-red-600 dark:bg-red-500" : "bg-[#4834D4] dark:bg-[#686DE0]"}
+        trend={unreadAlertsCount > 0 ? "up" : "neutral"}
+        containerClassName={unreadAlertsCount > 0 ? "border-red-200 dark:border-red-900/50 bg-red-50/30 dark:bg-red-900/10" : ""}
+      />
     </div>
   );
 };

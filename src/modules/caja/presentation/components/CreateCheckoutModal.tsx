@@ -89,7 +89,7 @@ export const CreateCheckoutModal = () => {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 shadow-md text-white">
+      <Button onClick={() => setOpen(true)}>
         <Store className="w-4 h-4 mr-2" /> Nueva Caja
       </Button>
 
