@@ -13,8 +13,8 @@ import {
   Monitor,
   Package,
   Receipt,
-  Pin,
-  PinOff,
+  PanelLeftClose,
+  PanelLeftOpen,
   ChevronsUpDown
 } from 'lucide-react';
 import {
@@ -123,12 +123,12 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
           <button
             onClick={togglePin}
             title={isPinned ? "Desfijar sidebar" : "Fijar sidebar"}
-            className="text-sidebar-foreground/60 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-colors p-1 rounded-md"
+            className="text-sidebar-foreground/60 hover:text-sidebar-accent-foreground hover:bg-sidebar-accent transition-colors p-1.5 rounded-md"
           >
             {isPinned ? (
-              <PinOff className="w-4 h-4" />
+              <PanelLeftClose className="w-4 h-4" />
             ) : (
-              <Pin className="w-4 h-4 -rotate-45" />
+              <PanelLeftOpen className="w-4 h-4" />
             )}
           </button>
         </div>
