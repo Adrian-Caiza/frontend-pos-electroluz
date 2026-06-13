@@ -24,7 +24,7 @@ import type { Proveedor } from '../../domain/entities/Proveedor';
 
 const formSchema = z.object({
   provnombre: z.string().min(3, 'Mínimo 3 caracteres').max(100, 'El nombre es muy largo'),
-  provtelefono: z.string().regex(/^\d{10}$/, 'Debe tener exactamente 10 dígitos numéricos').nullable().optional(),
+  provtelefono: z.string().regex(/^\d{10}$/, 'Debe tener exactamente 10 dígitos numéricos'),
   provcorreo: z.string().email('Formato de correo inválido').or(z.literal('')).nullable().optional(),
   provctgriaid: z.string().optional().nullable(),
   provmrcid: z.string().optional().nullable(),
@@ -75,10 +75,10 @@ export const EditProveedorModal = ({ proveedor, open, onOpenChange }: EditProvee
       id: proveedor.provid,
       data: {
         provnombre: values.provnombre,
-        provtelefono: values.provtelefono || null,
-        provcorreo: values.provcorreo || null,
-        provctgriaid: values.provctgriaid || null,
-        provmrcid: values.provmrcid || null,
+        provtelefono: values.provtelefono ? values.provtelefono : undefined,
+        provcorreo: values.provcorreo ? values.provcorreo : undefined,
+        provctgriaid: values.provctgriaid ? values.provctgriaid : undefined,
+        provmrcid: values.provmrcid ? values.provmrcid : undefined,
       },
     }, {
       onSuccess: () => {
