@@ -30,7 +30,7 @@ export const CategoriaTable = () => {
   const updateMutation = useUpdateCategoria();
   const { mutate: updateCategoria } = updateMutation;
   const { user } = useAuthStore();
-  const isJefe = user?.usrol === 'jefe';
+  const isAuthorized = user?.usrol === 'jefe' || user?.usrol === 'empleado';
 
   const [selectedCategoria, setSelectedCategoria] = useState<Categoria | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -125,7 +125,7 @@ export const CategoriaTable = () => {
   const pageCount = Math.ceil(totalFilteredItems / pageSize);
 
   const meta: CategoriaTableMeta = {
-    isJefe,
+    isJefe: isAuthorized,
     onEdit: handleEdit,
     onStatusChange: handleStatusChange,
   };

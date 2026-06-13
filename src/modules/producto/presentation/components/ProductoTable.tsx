@@ -31,7 +31,7 @@ export const ProductoTable = () => {
   const { data, isLoading } = useProductos(1, 10000);
   const updateMutation = useUpdateProducto();
   const { user } = useAuthStore();
-  const isJefe = user?.usrol === 'jefe';
+  const isAuthorized = user?.usrol === 'jefe' || user?.usrol === 'empleado';
   const { openDetail, selectedProduct } = useProductoStore();
 
   const [selectedProductoEdit, setSelectedProductoEdit] = useState<Producto | null>(null);
@@ -97,7 +97,7 @@ export const ProductoTable = () => {
   };
 
   const meta: ProductoTableMeta = {
-    isJefe,
+    isJefe: isAuthorized,
     onEdit: (producto) => {
       setSelectedProductoEdit(producto);
       setIsEditOpen(true);

@@ -1,8 +1,12 @@
 import { Tag } from 'lucide-react';
 import { MarcaTable } from '../../modules/marca/presentation/components/MarcaTable';
 import { CreateMarcaModal } from '../../modules/marca/presentation/components/CreateMarcaModal';
+import { useAuthStore } from '../../shared/stores/useAuthStore';
 
 export default function MarcasPage() {
+  const { user } = useAuthStore();
+  const isAuthorized = user?.usrol === 'jefe' || user?.usrol === 'empleado';
+
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -15,9 +19,11 @@ export default function MarcasPage() {
             Administra las marcas de tus productos
           </p>
         </div>
-        <div className="flex-shrink-0">
-          <CreateMarcaModal />
-        </div>
+        {isAuthorized && (
+          <div className="flex-shrink-0">
+            <CreateMarcaModal />
+          </div>
+        )}
       </div>
       
       <div className="w-full bg-transparent rounded-xl">

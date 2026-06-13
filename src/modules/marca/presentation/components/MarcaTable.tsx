@@ -30,7 +30,7 @@ export const MarcaTable = () => {
   const updateMutation = useUpdateMarca();
   const { mutate: updateMarca } = updateMutation;
   const { user } = useAuthStore();
-  const isJefe = user?.usrol === 'jefe';
+  const isAuthorized = user?.usrol === 'jefe' || user?.usrol === 'empleado';
 
   const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -124,7 +124,7 @@ export const MarcaTable = () => {
   const pageCount = Math.ceil(totalFilteredItems / pageSize);
 
   const meta: MarcaTableMeta = {
-    isJefe,
+    isJefe: isAuthorized,
     onEdit: handleEdit,
     onStatusChange: handleStatusChange,
   };

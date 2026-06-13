@@ -72,9 +72,9 @@ export const Sidebar = ({ companyName, companyLogo }: SidebarProps) => {
     {
       group: 'Catálogo e Inventario',
       items: [
-        { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe'] },
-        { name: 'Categorías', path: '/categorias', icon: FolderTree, roles: ['jefe'] },
-        { name: 'Marcas', path: '/marcas', icon: Tag, roles: ['jefe'] },
+        { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe', 'empleado'] },
+        { name: 'Categorías', path: '/categorias', icon: FolderTree, roles: ['jefe', 'empleado'] },
+        { name: 'Marcas', path: '/marcas', icon: Tag, roles: ['jefe', 'empleado'] },
         { name: 'Medidas', path: '/medidas', icon: Scale, roles: ['jefe', 'empleado'] },
         { name: 'Proveedores', path: '/proveedores', icon: Truck, roles: ['jefe', 'empleado'] },
         { name: 'Inventario', path: '/stock', icon: Archive, roles: ['jefe', 'empleado'] },

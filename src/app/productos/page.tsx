@@ -6,7 +6,7 @@ import { PackageSearch } from 'lucide-react';
 
 export default function ProductosPage() {
   const { user } = useAuthStore();
-  const isJefe = user?.usrol === 'jefe';
+  const isAuthorized = user?.usrol === 'jefe' || user?.usrol === 'empleado';
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -20,7 +20,7 @@ export default function ProductosPage() {
             Gestiona los productos, precios y niveles de stock
           </p>
         </div>
-        {isJefe && (
+        {isAuthorized && (
           <div className="flex-shrink-0">
             <CreateProductoModal />
           </div>

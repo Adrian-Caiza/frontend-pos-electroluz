@@ -120,31 +120,31 @@ function App() {
               }
             />
 
-            {/* Productos for 'jefe' */}
+            {/* Productos for 'jefe' and 'empleado' */}
             <Route
               path="productos"
               element={
-                <RoleGuard allowedRoles={['jefe']}>
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
                   <ProductosPage />
                 </RoleGuard>
               }
             />
 
-            {/* Categorías for 'jefe' */}
+            {/* Categorías for 'jefe' and 'empleado' */}
             <Route
               path="/categorias"
               element={
-                <RoleGuard allowedRoles={['jefe']}>
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
                   <CategoriasPage />
                 </RoleGuard>
               }
             />
 
-            {/* Marcas for 'jefe' */}
+            {/* Marcas for 'jefe' and 'empleado' */}
             <Route
               path="/marcas"
               element={
-                <RoleGuard allowedRoles={['jefe']}>
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
                   <MarcasPage />
                 </RoleGuard>
               }
