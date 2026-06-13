@@ -187,8 +187,6 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
                         }}
                         className="h-11 rounded-xl"
                         placeholder="Ingrese la cantidad" 
-                        min="0"
-                        step="1"
                       />
                     </FormControl>
                   </ModalField>

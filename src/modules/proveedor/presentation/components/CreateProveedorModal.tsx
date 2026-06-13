@@ -75,10 +75,10 @@ export const CreateProveedorModal = ({ open: controlledOpen, onOpenChange: setCo
     createMutation.mutate({
       provemid: company.emid,
       provnombre: values.provnombre,
-      provtelefono: values.provtelefono ? values.provtelefono : undefined,
-      provcorreo: values.provcorreo ? values.provcorreo : undefined,
-      provctgriaid: values.provctgriaid ? values.provctgriaid : undefined,
-      provmrcid: values.provmrcid ? values.provmrcid : undefined,
+      provtelefono: values.provtelefono ? values.provtelefono : null,
+      provcorreo: values.provcorreo ? values.provcorreo : null,
+      provctgriaid: values.provctgriaid ? values.provctgriaid : null,
+      provmrcid: values.provmrcid ? values.provmrcid : null,
     }, {
       onSuccess: () => {
         setOpen(false);

@@ -196,7 +196,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
             {filteredItems.map((stock) => {
               const productoData = productosData?.items.find(p => p.prdtoid === stock.producto.prdtoid);
               const precio = productoData ? Number(productoData.prdtoprecioventa) : 0;
-              const unidad = productoData?.medida.mdiaabreviatura || 'UND';
+              const unidad = productoData?.medida?.mdiaabreviatura || 'UND';
               const imageUrl = getImageUrl(productoData?.prdtoimagen || null);
               
               const stockTotal = Number(stock.stckcantidad);

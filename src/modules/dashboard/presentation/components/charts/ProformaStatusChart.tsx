@@ -35,7 +35,7 @@ export const ProformaStatusChart = ({ data, isLoading }: ProformaStatusChartProp
             tick={{ fontSize: 12, fill: 'var(--color-slate-500)' }} 
           />
           <Tooltip 
-            formatter={(value: number) => [`${value} proformas`, 'Cantidad']}
+            formatter={(value: any) => [`${value} proformas`, 'Cantidad']}
             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
             cursor={{ fill: 'var(--color-slate-50)' }}
           />

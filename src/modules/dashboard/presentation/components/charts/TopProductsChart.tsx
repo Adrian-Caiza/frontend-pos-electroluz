@@ -34,7 +34,7 @@ export const TopProductsChart = ({ data, isLoading }: TopProductsChartProps) => 
             className="text-muted-foreground"
           />
           <Tooltip 
-            formatter={(value: number) => [`${value} unid.`, 'Vendidos']}
+            formatter={(value: any) => [`${value} unid.`, 'Vendidos']}
             contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', background: 'var(--color-card)', color: 'var(--color-foreground)' }}
             cursor={{ fill: 'var(--color-muted)' }}
           />
