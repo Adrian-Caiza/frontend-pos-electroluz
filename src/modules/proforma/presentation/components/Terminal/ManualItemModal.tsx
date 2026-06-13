@@ -22,8 +22,8 @@ import { useState } from 'react';
 
 const manualItemSchema = z.object({
   descripcion: z.string().min(2, 'La descripción debe tener al menos 2 caracteres'),
-  cantidad: z.number().min(1, 'La cantidad mínima es 1'),
-  precioUnitario: z.number().min(0.01, 'El precio debe ser mayor a 0'),
+  cantidad: z.number().int('Debe ser un número entero').min(1, 'La cantidad mínima es 1'),
+  precioUnitario: z.number().min(0.01, 'El precio debe ser mayor a 0').refine(val => /^\d+(\.\d{1,2})?$/.test(val.toString()), 'Máximo 2 decimales'),
 });
 
 type ManualItemFormData = z.infer<typeof manualItemSchema>;
@@ -116,6 +116,8 @@ export const ManualItemModal = () => {
                           <Input 
                             icon={Hash} 
                             type="number" 
+                            min="1"
+                            step="1"
                             className="h-11 rounded-xl" 
                             {...field} 
                             onChange={(e) => field.onChange(e.target.valueAsNumber || 0)}
@@ -134,6 +136,7 @@ export const ManualItemModal = () => {
                           <Input 
                             icon={DollarSign} 
                             type="number" 
+                            min="0"
                             step="0.01" 
                             className="h-11 rounded-xl" 
                             {...field} 

@@ -15,7 +15,7 @@ export interface DataTableRowActionItem {
   label: string
   icon?: React.ReactNode
   onClick: () => void
-  variant?: 'default' | 'danger'
+  variant?: 'default' | 'danger' | 'warning'
   separatorAbove?: boolean
 }
 
@@ -58,14 +58,18 @@ export function DataTableRowActions({ actions, title }: DataTableRowActionsProps
               className={cn(
                 "px-3 py-2.5 rounded-lg cursor-pointer transition-colors",
                 action.variant === 'danger' 
-                  ? "text-rose-600 focus:text-rose-700 focus:bg-rose-50" 
+                  ? "text-rose-600 dark:text-rose-500 focus:text-rose-700 dark:focus:text-rose-400 focus:bg-rose-50 dark:focus:bg-rose-500/10" 
+                  : action.variant === 'warning'
+                  ? "text-amber-600 dark:text-amber-500 focus:text-amber-700 dark:focus:text-amber-400 focus:bg-amber-50 dark:focus:bg-amber-500/10"
                   : "text-foreground focus:bg-muted"
               )}
             >
               {action.icon && (
                 <span className={cn(
                   "mr-3 flex items-center justify-center",
-                  action.variant === 'danger' ? "text-rose-500" : "text-muted-foreground",
+                  action.variant === 'danger' ? "text-rose-500 dark:text-rose-400" :
+                  action.variant === 'warning' ? "text-amber-500 dark:text-amber-400" :
+                  "text-muted-foreground",
                   "[&>svg]:h-5 [&>svg]:w-5"
                 )}>
                   {action.icon}

@@ -19,6 +19,7 @@ import MetodosPagoPage from './app/metodos-pago/page';
 import ProformasPage from './app/proformas/page';
 import TerminalPage from './app/terminal/page';
 import UnauthorizedPage from './app/unauthorized/page';
+import CategoriasPage from './app/categorias/page';
 import { AlertsPage } from './modules/alert/presentation/pages/AlertsPage';
 import { ThemeProvider } from './shared/components/theme-provider';
 
@@ -126,7 +127,15 @@ function App() {
               }
             />
 
-
+            {/* Categorías for 'jefe' */}
+            <Route
+              path="/categorias"
+              element={
+                <RoleGuard allowedRoles={['jefe']}>
+                  <CategoriasPage />
+                </RoleGuard>
+              }
+            />
 
             {/* Usuarios for 'jefe' */}
             <Route

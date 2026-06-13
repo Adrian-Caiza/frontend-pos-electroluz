@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -70,6 +70,14 @@ export const CreateUsuarioModal = ({ open, onOpenChange }: CreateUsuarioModalPro
     setSelectedImage(null);
     setImagePreview(null);
   };
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+      setSelectedImage(null);
+      setImagePreview(null);
+    }
+  }, [open, form]);
 
   const onSubmit = (values: FormValues) => {
     if (!company) return;

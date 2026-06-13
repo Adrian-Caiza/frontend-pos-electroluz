@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -46,10 +46,10 @@ const formSchema = z.object({
   prdtomdiaid: z.string().min(1, 'La medida es requerida'),
   prdtocodigo: z.string().min(3, 'Mínimo 3 caracteres'),
   prdtonombre: z.string().min(3, 'Mínimo 3 caracteres'),
-  prdtopreciocompra: z.string().min(1, 'Requerido'),
-  prdtoprecioventa: z.string().min(1, 'Requerido'),
-  prdtostockminimo: z.string().min(1, 'Requerido'),
-  prdtostockmaximo: z.string().min(1, 'Requerido'),
+  prdtopreciocompra: z.string().min(1, 'Requerido').regex(/^\d+(\.\d{1,2})?$/, 'Máximo 2 decimales (ej: 10.50)'),
+  prdtoprecioventa: z.string().min(1, 'Requerido').regex(/^\d+(\.\d{1,2})?$/, 'Máximo 2 decimales (ej: 10.50)'),
+  prdtostockminimo: z.string().min(1, 'Requerido').regex(/^\d+$/, 'Debe ser un número entero'),
+  prdtostockmaximo: z.string().min(1, 'Requerido').regex(/^\d+$/, 'Debe ser un número entero'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -102,6 +102,14 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
       setImagePreview(URL.createObjectURL(file));
     }
   };
+
+  useEffect(() => {
+    if (!open) {
+      form.reset();
+      setImageFile(null);
+      setImagePreview(null);
+    }
+  }, [open, form]);
 
   const onSubmit = (values: FormValues) => {
     if (!company) return;
@@ -164,14 +172,14 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                     <ModalField label="Categoría" required error={fieldState.error?.message}>
                       <FormControl>
                         <div className="relative">
-                          <FolderTree className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                          <FolderTree className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                           <select
                             {...field}
                             disabled={loadingCat}
-                            className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-11 w-full rounded-xl border border-border bg-transparent dark:bg-slate-900 text-foreground pl-10 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <option value="">Seleccione una categoría</option>
-                            {categoriasData?.items.map(cat => (
+                            {categoriasData?.items.filter(cat => cat.ctgriaestado === 'activo').map(cat => (
                               <option key={cat.ctgriaid} value={cat.ctgriaid}>{cat.ctgnombre}</option>
                             ))}
                           </select>
@@ -188,11 +196,11 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                     <ModalField label="Marca" required error={fieldState.error?.message}>
                       <FormControl>
                         <div className="relative">
-                          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                          <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                           <select
                             {...field}
                             disabled={loadingMarcas}
-                            className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-11 w-full rounded-xl border border-border bg-transparent dark:bg-slate-900 text-foreground pl-10 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <option value="">Seleccione una marca</option>
                             {marcasData?.items.map(mrc => (
@@ -212,11 +220,11 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                     <ModalField label="Proveedor" required error={fieldState.error?.message}>
                       <FormControl>
                         <div className="relative">
-                          <Truck className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                          <Truck className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                           <select
                             {...field}
                             disabled={loadingProv}
-                            className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-11 w-full rounded-xl border border-border bg-transparent dark:bg-slate-900 text-foreground pl-10 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <option value="">Seleccione un proveedor</option>
                             {proveedoresData?.items.map(prov => (
@@ -236,11 +244,11 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                     <ModalField label="Medida" required error={fieldState.error?.message}>
                       <FormControl>
                         <div className="relative">
-                          <Scale className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                          <Scale className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                           <select
                             {...field}
                             disabled={loadingMedidas}
-                            className="flex h-11 w-full rounded-xl border border-slate-300 bg-transparent pl-10 pr-3 py-2 text-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
+                            className="flex h-11 w-full rounded-xl border border-border bg-transparent dark:bg-slate-900 text-foreground pl-10 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <option value="">Seleccione una medida</option>
                             {medidasData?.items.map(mdia => (
@@ -287,7 +295,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                   render={({ field, fieldState }) => (
                     <ModalField label="Precio Compra ($)" required error={fieldState.error?.message}>
                       <FormControl>
-                        <Input icon={DollarSign} type="number" step="0.01" className="h-11 rounded-xl" placeholder="0.00" {...field} />
+                        <Input icon={DollarSign} type="number" step="0.01" min="0" className="h-11 rounded-xl" placeholder="0.00" {...field} />
                       </FormControl>
                     </ModalField>
                   )}
@@ -299,7 +307,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                   render={({ field, fieldState }) => (
                     <ModalField label="Precio Venta ($)" required error={fieldState.error?.message}>
                       <FormControl>
-                        <Input icon={DollarSign} type="number" step="0.01" className="h-11 rounded-xl" placeholder="0.00" {...field} />
+                        <Input icon={DollarSign} type="number" step="0.01" min="0" className="h-11 rounded-xl" placeholder="0.00" {...field} />
                       </FormControl>
                     </ModalField>
                   )}
@@ -311,7 +319,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                   render={({ field, fieldState }) => (
                     <ModalField label="Stock Mínimo" required error={fieldState.error?.message}>
                       <FormControl>
-                        <Input icon={ArrowDownToLine} type="number" className="h-11 rounded-xl" placeholder="5" {...field} />
+                        <Input icon={ArrowDownToLine} type="number" min="0" className="h-11 rounded-xl" placeholder="5" {...field} />
                       </FormControl>
                     </ModalField>
                   )}
@@ -323,7 +331,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                   render={({ field, fieldState }) => (
                     <ModalField label="Stock Máximo" required error={fieldState.error?.message}>
                       <FormControl>
-                        <Input icon={ArrowUpToLine} type="number" className="h-11 rounded-xl" placeholder="50" {...field} />
+                        <Input icon={ArrowUpToLine} type="number" min="0" className="h-11 rounded-xl" placeholder="50" {...field} />
                       </FormControl>
                     </ModalField>
                   )}

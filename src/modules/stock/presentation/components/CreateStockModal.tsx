@@ -176,7 +176,9 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
                     <FormControl>
                       <Input 
                         icon={Hash}
-                        type="number" 
+                        type="number"
+                        min="0"
+                        step="1" 
                         {...field} 
                         value={field.value ?? ''}
                         onChange={(e) => {

@@ -15,7 +15,8 @@ import {
   Receipt,
   PanelLeftClose,
   PanelLeftOpen,
-  ChevronsUpDown
+  ChevronsUpDown,
+  FolderTree
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -70,6 +71,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
       group: 'Catálogo e Inventario',
       items: [
         { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe'] },
+        { name: 'Categorías', path: '/categorias', icon: FolderTree, roles: ['jefe'] },
         { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
       ]
     },
