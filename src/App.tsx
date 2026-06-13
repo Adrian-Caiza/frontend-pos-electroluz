@@ -17,6 +17,7 @@ import { ClientesPage } from './app/clientes/page';
 import { StockPage } from './app/stock/page';
 import MetodosPagoPage from './app/metodos-pago/page';
 import ProformasPage from './app/proformas/page';
+import MarcasPage from './app/marcas/page';
 import TerminalPage from './app/terminal/page';
 import UnauthorizedPage from './app/unauthorized/page';
 import CategoriasPage from './app/categorias/page';
@@ -133,6 +134,16 @@ function App() {
               element={
                 <RoleGuard allowedRoles={['jefe']}>
                   <CategoriasPage />
+                </RoleGuard>
+              }
+            />
+
+            {/* Marcas for 'jefe' */}
+            <Route
+              path="/marcas"
+              element={
+                <RoleGuard allowedRoles={['jefe']}>
+                  <MarcasPage />
                 </RoleGuard>
               }
             />

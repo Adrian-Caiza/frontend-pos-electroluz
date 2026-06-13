@@ -5,3 +5,13 @@ export interface Marca {
   mrcfchregistro: string;
   mrcestado: 'activo' | 'inactivo' | 'eliminado';
 }
+
+export interface CreateMarcaDto {
+  mrcemid: string;
+  mrcnombre: string;
+}
+
+export interface UpdateMarcaDto {
+  mrcnombre?: string;
+  mrcestado?: 'activo' | 'inactivo' | 'eliminado';
+}

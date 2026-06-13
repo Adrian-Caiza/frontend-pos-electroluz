@@ -4,6 +4,7 @@ import { useAuthStore } from '../../stores/useAuthStore';
 import { Sidebar } from './Sidebar';
 import { AlertBell } from '../../../modules/alert/presentation/components/AlertBell';
 import { ThemeToggle } from '../ui/theme-toggle';
+import { UserProfileMenu } from './UserProfileMenu';
 
 export const MainLayout = () => {
   const { user, company, refreshToken, logout } = useAuthStore();
@@ -59,8 +60,6 @@ export const MainLayout = () => {
   return (
     <div className="h-screen w-full bg-background flex overflow-hidden p-2 md:p-4 gap-4">
       <Sidebar 
-        onLogout={handleLogout} 
-        userImage={userImage} 
         companyName={company?.emrznsocial}
         companyLogo={companyLogo}
       />
@@ -83,6 +82,7 @@ export const MainLayout = () => {
           <div className="flex items-center space-x-2 ml-auto">
             <ThemeToggle />
             <AlertBell />
+            <UserProfileMenu onLogout={handleLogout} userImage={userImage} />
           </div>
         </header>
 

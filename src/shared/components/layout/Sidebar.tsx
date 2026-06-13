@@ -16,7 +16,9 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   ChevronsUpDown,
-  FolderTree
+  FolderTree,
+  Tag,
+  Archive
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -27,13 +29,11 @@ import {
 import { cn } from '../../lib/utils';
 
 export interface SidebarProps {
-  onLogout: () => void;
-  userImage?: string | null;
   companyName?: string;
   companyLogo?: string | null;
 }
 
-export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: SidebarProps) => {
+export const Sidebar = ({ companyName, companyLogo }: SidebarProps) => {
   const location = useLocation();
   const { user } = useAuthStore();
 
@@ -72,7 +72,8 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
       items: [
         { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe'] },
         { name: 'Categorías', path: '/categorias', icon: FolderTree, roles: ['jefe'] },
-        { name: 'Inventario', path: '/stock', icon: PackageSearch, roles: ['jefe', 'empleado'] },
+        { name: 'Marcas', path: '/marcas', icon: Tag, roles: ['jefe'] },
+        { name: 'Inventario', path: '/stock', icon: Archive, roles: ['jefe', 'empleado'] },
       ]
     },
     {
@@ -203,81 +204,7 @@ export const Sidebar = ({ onLogout, userImage, companyName, companyLogo }: Sideb
         ))}
       </nav>
 
-      {/* Bottom Separator */}
-      <div className="px-4 shrink-0">
-        <div className="h-px w-full bg-sidebar-border rounded-full" />
-      </div>
 
-      {/* User Section */}
-      <div className={cn(
-        "shrink-0 mt-auto flex flex-col space-y-2 transition-all duration-300",
-        isExpanded ? "p-3" : "p-2"
-      )}>
-        <DropdownMenu onOpenChange={setIsDropdownOpen}>
-          <DropdownMenuTrigger asChild>
-            <button className="w-full flex items-center p-2 rounded-2xl bg-transparent hover:bg-sidebar-accent border border-sidebar-border/50 shadow-sm transition-colors outline-none ring-0 group/user text-left">
-              <div className="flex items-center overflow-hidden">
-                {/* Avatar */}
-                <div className="flex items-center justify-center min-w-[36px] w-[36px] h-[36px] rounded-lg overflow-hidden bg-sidebar-primary/20 shrink-0 border border-sidebar-border/50">
-                  {userImage ? (
-                    <img src={userImage} alt={user?.usnombre || 'User'} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-sidebar-primary font-bold text-sm uppercase">
-                      {user?.usnombre?.charAt(0) || 'U'}
-                    </span>
-                  )}
-                </div>
-                
-                {/* User Details */}
-                <div className={cn(
-                  "flex flex-col text-left transition-all duration-300 delay-75 overflow-hidden",
-                  isExpanded ? "w-[100px] ml-2.5 opacity-100" : "w-0 ml-0 opacity-0 group-hover:w-[100px] group-hover:ml-2.5 group-hover:opacity-100"
-                )}>
-                  <span className="text-[13px] text-sidebar-foreground font-semibold truncate leading-tight">
-                    {user?.usnombre || 'Usuario'}
-                  </span>
-                  <span className="text-[11px] text-sidebar-foreground/70 truncate leading-tight mt-0.5">
-                    {user?.uscorreo || 'correo@empresa.com'}
-                  </span>
-                  <span className="text-[10px] text-sidebar-primary-foreground font-bold tracking-wider uppercase mt-1.5 bg-sidebar-primary w-max px-2 py-0.5 rounded-md">
-                    {user?.usrol || 'Rol'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Chevrons */}
-              <div className={cn(
-                "ml-auto transition-all duration-300 delay-75 text-sidebar-foreground/60 overflow-hidden shrink-0",
-                isExpanded ? "w-4 px-1 opacity-100" : "w-0 px-0 opacity-0 group-hover:w-4 group-hover:px-1 group-hover:opacity-100"
-              )}>
-                <ChevronsUpDown className="w-4 h-4" />
-              </div>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" side="right" sideOffset={16} className="w-56 rounded-xl">
-            <DropdownMenuItem className="cursor-pointer rounded-lg text-muted-foreground hover:text-foreground focus:text-foreground">
-              <span>Configuración de Perfil</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-
-        {/* Log Out */}
-        <button
-          onClick={onLogout}
-          title="Cerrar Sesión"
-          className="w-full flex items-center px-3 py-3 rounded-xl text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-destructive transition-colors duration-200 overflow-hidden whitespace-nowrap group/logout shadow-sm border border-transparent hover:border-sidebar-border"
-        >
-          <div className="flex items-center justify-center min-w-[32px]">
-            <LogOut className="flex-shrink-0 h-[22px] w-[22px] transition-transform duration-200 group-hover/logout:-translate-x-1" />
-          </div>
-          <span className={cn(
-            "ml-3 text-[15px] font-medium transition-opacity duration-300 delay-75",
-            isExpanded ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-          )}>
-            Cerrar Sesión
-          </span>
-        </button>
-      </div>
 
       {/* Custom Scrollbar CSS for light mode */}
       <style>{`
