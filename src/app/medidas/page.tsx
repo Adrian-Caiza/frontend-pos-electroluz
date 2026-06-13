@@ -1,27 +1,27 @@
-import { Tag } from 'lucide-react';
-import { MarcaTable } from '../../modules/marca/presentation/components/MarcaTable';
-import { CreateMarcaModal } from '../../modules/marca/presentation/components/CreateMarcaModal';
+import { Scale } from 'lucide-react';
+import { MedidaTable } from '../../modules/medida/presentation/components/MedidaTable';
+import { CreateMedidaModal } from '../../modules/medida/presentation/components/CreateMedidaModal';
 
-export default function MarcasPage() {
+export default function MedidasPage() {
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-foreground flex items-center">
-            <Tag className="w-6 h-6 mr-2 text-primary" />
-            Gestión de Marcas
+            <Scale className="w-6 h-6 mr-2 text-primary" />
+            Gestión de Medidas
           </h1>
           <p className="text-muted-foreground text-sm mt-1">
-            Administra las marcas de tus productos
+            Administra las unidades de medida de tus productos
           </p>
         </div>
         <div className="flex-shrink-0">
-          <CreateMarcaModal />
+          <CreateMedidaModal />
         </div>
       </div>
       
       <div className="w-full bg-transparent rounded-xl">
-        <MarcaTable />
+        <MedidaTable />
       </div>
     </div>
   );

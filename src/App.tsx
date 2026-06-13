@@ -18,6 +18,7 @@ import { StockPage } from './app/stock/page';
 import MetodosPagoPage from './app/metodos-pago/page';
 import ProformasPage from './app/proformas/page';
 import MarcasPage from './app/marcas/page';
+import MedidasPage from './app/medidas/page';
 import TerminalPage from './app/terminal/page';
 import UnauthorizedPage from './app/unauthorized/page';
 import CategoriasPage from './app/categorias/page';
@@ -144,6 +145,16 @@ function App() {
               element={
                 <RoleGuard allowedRoles={['jefe']}>
                   <MarcasPage />
+                </RoleGuard>
+              }
+            />
+
+            {/* Medidas for 'jefe' and 'empleado' */}
+            <Route
+              path="/medidas"
+              element={
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
+                  <MedidasPage />
                 </RoleGuard>
               }
             />

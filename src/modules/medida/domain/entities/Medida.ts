@@ -6,3 +6,6 @@ export interface Medida {
   mdiafchregistro: string;
   mdiaestado: 'activo' | 'inactivo' | 'eliminado';
 }
+
+export type CreateMedidaDto = Omit<Medida, 'mdiaid' | 'mdiafchregistro' | 'mdiaestado'>;
+export type UpdateMedidaDto = Partial<Omit<Medida, 'mdiaid' | 'mdiaemid' | 'mdiafchregistro'>>;

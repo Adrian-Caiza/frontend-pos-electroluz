@@ -1,14 +1,14 @@
 import { useState, useMemo } from 'react';
 import type { RowSelectionState } from '@tanstack/react-table';
-import { useMarcas } from '../hooks/useMarcas';
-import { useUpdateMarca } from '../hooks/useUpdateMarca';
+import { useMedidas } from '../hooks/useMedidas';
+import { useUpdateMedida } from '../hooks/useUpdateMedida';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
-import { EditMarcaModal } from './EditMarcaModal';
-import type { Marca } from '../../domain/entities/Marca';
+import { EditMedidaModal } from './EditMedidaModal';
+import type { Medida } from '../../domain/entities/Medida';
 import { DataTable } from '../../../../shared/components/ui/data-table/DataTable';
 import { columns } from '../table/columns';
-import type { MarcaTableMeta } from '../table/columns';
-import { CheckCircle, XCircle, Tag } from 'lucide-react';
+import type { MedidaTableMeta } from '../table/columns';
+import { CheckCircle, XCircle, Scale } from 'lucide-react';
 import { Button } from '../../../../shared/components/ui/button';
 import {
   Select,
@@ -19,20 +19,20 @@ import {
 } from '../../../../shared/components/ui/select';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 
-export const MarcaTable = () => {
+export const MedidaTable = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [globalFilter, setGlobalFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('todos');
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  const { data, isLoading, error } = useMarcas(1, 1000);
-  const updateMutation = useUpdateMarca();
-  const { mutate: updateMarca } = updateMutation;
+  const { data, isLoading, error } = useMedidas(1, 1000);
+  const updateMutation = useUpdateMedida();
+  const { mutate: updateMedida } = updateMutation;
   const { user } = useAuthStore();
-  const isJefe = user?.usrol === 'jefe';
+  const isJefeOrEmpleado = user?.usrol === 'jefe' || user?.usrol === 'empleado';
 
-  const [selectedMarca, setSelectedMarca] = useState<Marca | null>(null);
+  const [selectedMedida, setSelectedMedida] = useState<Medida | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
@@ -50,18 +50,18 @@ export const MarcaTable = () => {
     action: () => {},
   });
 
-  const handleEdit = (marca: Marca) => {
-    setSelectedMarca(marca);
+  const handleEdit = (medida: Medida) => {
+    setSelectedMedida(medida);
     setIsEditModalOpen(true);
   };
 
-  const handleStatusChange = (marca: Marca, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
+  const handleStatusChange = (medida: Medida, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
     let title = `¿Cambiar estado?`;
-    let description = `¿Estás seguro de cambiar el estado de ${marca.mrcnombre} a ${newStatus}?`;
+    let description = `¿Estás seguro de cambiar el estado de ${medida.mdianombre} a ${newStatus}?`;
     
     if (newStatus === 'eliminado') {
-      title = `¿Eliminar marca?`;
-      description = `¿Estás seguro de eliminar la marca ${marca.mrcnombre}? Esta acción no se puede deshacer.`;
+      title = `¿Eliminar medida?`;
+      description = `¿Estás seguro de eliminar la medida ${medida.mdianombre}? Esta acción no se puede deshacer.`;
     }
 
     setConfirmDialog({
@@ -70,7 +70,7 @@ export const MarcaTable = () => {
       description,
       variant: newStatus === 'inactivo' ? 'warning' : newStatus === 'eliminado' ? 'destructive' : 'info',
       action: () => {
-        updateMarca({ id: marca.mrcid, data: { mrcestado: newStatus } }, {
+        updateMedida({ id: medida.mdiaid, data: { mdiaestado: newStatus } }, {
           onSuccess: () => {
             setConfirmDialog(prev => ({ ...prev, isOpen: false }));
           }
@@ -86,7 +86,7 @@ export const MarcaTable = () => {
     setIsProcessingBulk(true);
     try {
       await Promise.all(
-        selectedIds.map(id => updateMutation.mutateAsync({ id, data: { mrcestado: newStatus } }))
+        selectedIds.map(id => updateMutation.mutateAsync({ id, data: { mdiaestado: newStatus } }))
       );
       setRowSelection({});
     } catch (error) {
@@ -99,16 +99,17 @@ export const MarcaTable = () => {
   // Filtrado local
   const filteredData = useMemo(() => {
     if (!data?.items) return [];
-    let items = data.items.filter(m => m.mrcestado !== 'eliminado'); // Ocultar eliminados por defecto
+    let items = data.items.filter(m => m.mdiaestado !== 'eliminado'); // Ocultar eliminados por defecto
     
     if (statusFilter !== 'todos') {
-      items = items.filter((m) => m.mrcestado === statusFilter);
+      items = items.filter((m) => m.mdiaestado === statusFilter);
     }
     
     if (globalFilter) {
       const lowerQuery = globalFilter.toLowerCase();
       items = items.filter((m) => 
-        m.mrcnombre.toLowerCase().includes(lowerQuery)
+        m.mdianombre.toLowerCase().includes(lowerQuery) ||
+        m.mdiaabreviatura.toLowerCase().includes(lowerQuery)
       );
     }
     
@@ -123,8 +124,8 @@ export const MarcaTable = () => {
   const totalFilteredItems = filteredData.length;
   const pageCount = Math.ceil(totalFilteredItems / pageSize);
 
-  const meta: MarcaTableMeta = {
-    isJefe,
+  const meta: MedidaTableMeta = {
+    isJefeOrEmpleado,
     onEdit: handleEdit,
     onStatusChange: handleStatusChange,
   };
@@ -132,8 +133,8 @@ export const MarcaTable = () => {
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64 text-destructive space-y-4 bg-destructive/10 rounded-3xl p-8 border border-destructive/20">
-        <Tag className="h-12 w-12" />
-        <p className="text-lg font-medium">Error al cargar las marcas</p>
+        <Scale className="h-12 w-12" />
+        <p className="text-lg font-medium">Error al cargar las medidas</p>
       </div>
     );
   }
@@ -154,11 +155,11 @@ export const MarcaTable = () => {
         }}
         rowSelection={rowSelection}
         onRowSelectionChange={setRowSelection}
-        getRowId={(row) => row.mrcid}
+        getRowId={(row) => row.mdiaid}
         toolbar={{
           globalFilter,
           onGlobalFilterChange: setGlobalFilter,
-          searchPlaceholder: "Buscar por nombre...",
+          searchPlaceholder: "Buscar por nombre o abreviatura...",
           onAdvancedFilterClick: () => {},
           children: (
             <div className="flex gap-2">
@@ -195,7 +196,7 @@ export const MarcaTable = () => {
                   </Button>
                 </>
               ) : (
-                <>
+                <div className="flex items-center gap-2">
                   <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
                     <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
                       <SelectValue placeholder="Estado" />
@@ -206,15 +207,15 @@ export const MarcaTable = () => {
                       <SelectItem value="inactivo">Inactivo</SelectItem>
                     </SelectContent>
                   </Select>
-                </>
+                </div>
               )}
             </div>
           )
         }}
       />
 
-      <EditMarcaModal
-        marca={selectedMarca}
+      <EditMedidaModal
+        medida={selectedMedida}
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />

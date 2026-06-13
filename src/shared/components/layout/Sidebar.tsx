@@ -18,6 +18,7 @@ import {
   ChevronsUpDown,
   FolderTree,
   Tag,
+  Scale,
   Archive
 } from 'lucide-react';
 import {
@@ -73,6 +74,7 @@ export const Sidebar = ({ companyName, companyLogo }: SidebarProps) => {
         { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe'] },
         { name: 'Categorías', path: '/categorias', icon: FolderTree, roles: ['jefe'] },
         { name: 'Marcas', path: '/marcas', icon: Tag, roles: ['jefe'] },
+        { name: 'Medidas', path: '/medidas', icon: Scale, roles: ['jefe', 'empleado'] },
         { name: 'Inventario', path: '/stock', icon: Archive, roles: ['jefe', 'empleado'] },
       ]
     },
