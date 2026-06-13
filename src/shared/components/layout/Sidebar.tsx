@@ -19,6 +19,7 @@ import {
   FolderTree,
   Tag,
   Scale,
+  Truck,
   Archive
 } from 'lucide-react';
 import {
@@ -75,6 +76,7 @@ export const Sidebar = ({ companyName, companyLogo }: SidebarProps) => {
         { name: 'Categorías', path: '/categorias', icon: FolderTree, roles: ['jefe'] },
         { name: 'Marcas', path: '/marcas', icon: Tag, roles: ['jefe'] },
         { name: 'Medidas', path: '/medidas', icon: Scale, roles: ['jefe', 'empleado'] },
+        { name: 'Proveedores', path: '/proveedores', icon: Truck, roles: ['jefe', 'empleado'] },
         { name: 'Inventario', path: '/stock', icon: Archive, roles: ['jefe', 'empleado'] },
       ]
     },

@@ -227,7 +227,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                             className="flex h-11 w-full rounded-xl border border-border bg-transparent dark:bg-slate-900 text-foreground pl-10 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                           >
                             <option value="">Seleccione un proveedor</option>
-                            {proveedoresData?.items.map(prov => (
+                            {proveedoresData?.items.filter(prov => prov.provestado === 'activo').map(prov => (
                               <option key={prov.provid} value={prov.provid}>{prov.provnombre}</option>
                             ))}
                           </select>
