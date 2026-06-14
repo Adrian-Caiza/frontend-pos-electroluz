@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/api-proxy/(.*)",
+      "destination": "https://api.ferreconst.space/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/"
     }
