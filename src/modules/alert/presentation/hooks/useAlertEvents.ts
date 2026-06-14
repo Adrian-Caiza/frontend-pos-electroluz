@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { useAlertStore } from '../store/useAlertStore';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { toast } from 'sonner';
-import { mapToAlert } from '../../infrastructure/services/alertApi';
+import { mapToAlert, alertApi } from '../../infrastructure/services/alertApi';
 
 export const useAlertEvents = () => {
   const addAlert = useAlertStore((s) => s.addAlert);
@@ -36,37 +36,29 @@ export const useAlertEvents = () => {
     // ──────────────────────────────────────────────────────────────
     const fetchAlerts = async (showToasts: boolean = false) => {
       try {
-        const response = await fetch(`${API_URL}/alerts?page=1&pageSize=50`, {
-          headers: { 'Authorization': `Bearer ${token}` },
-          signal: abortController.signal,
-        });
+        const data = await alertApi.getAlerts(1, 50);
         
-        if (response.ok) {
-          const data = await response.json();
-          const unread = data.items
-            ?.filter((item: any) => item.alvisto === false)
-            .map(mapToAlert) || [];
-            
-          if (!abortController.signal.aborted) {
-            setUnreadAlerts(unread);
-            
-            // Si es un chequeo por polling, verificamos si hay alertas nuevas para mostrar toast
-            if (showToasts) {
-              const currentIds = new Set<string>();
-              unread.forEach((alert: any) => {
-                currentIds.add(alert.id);
-                if (!knownAlertIdsRef.current.has(alert.id)) {
-                  toast.warning('Nueva Alerta: ' + alert.message, {
-                    description: alert.branch?.name ? `Sucursal: ${alert.branch.name}` : undefined,
-                    duration: 5000,
-                  });
-                }
-              });
-              knownAlertIdsRef.current = currentIds;
-            } else {
-              // Si es la carga inicial, simplemente memorizamos los IDs actuales
-              unread.forEach((alert: any) => knownAlertIdsRef.current.add(alert.id));
-            }
+        const unread = data.items.filter((item: any) => item.isViewed === false);
+          
+        if (!abortController.signal.aborted) {
+          setUnreadAlerts(unread);
+          
+          // Si es un chequeo por polling, verificamos si hay alertas nuevas para mostrar toast
+          if (showToasts) {
+            const currentIds = new Set<string>();
+            unread.forEach((alert: any) => {
+              currentIds.add(alert.id);
+              if (!knownAlertIdsRef.current.has(alert.id)) {
+                toast.warning('Nueva Alerta: ' + alert.message, {
+                  description: alert.branch?.name ? `Sucursal: ${alert.branch.name}` : undefined,
+                  duration: 5000,
+                });
+              }
+            });
+            knownAlertIdsRef.current = currentIds;
+          } else {
+            // Si es la carga inicial, simplemente memorizamos los IDs actuales
+            unread.forEach((alert: any) => knownAlertIdsRef.current.add(alert.id));
           }
         }
       } catch (e: any) {
@@ -155,15 +147,9 @@ export const useAlertEvents = () => {
       } catch (error: any) {
         if (error.name !== 'AbortError') {
           console.error('SSE connection error:', error);
-          sseActive = false;
         }
       } finally {
         if (!abortController.signal.aborted) {
-          // Si SSE falló o se cerró, activamos Polling como Fallback de emergencia
-          if (!sseActive && !pollInterval) {
-            console.warn("SSE no disponible (Posible bloqueo de Vercel/NGINX). Activando Polling de respaldo...");
-            pollInterval = setInterval(() => fetchAlerts(true), 15000);
-          }
           // Intentamos reconectar SSE en el fondo cada 15s por si el servidor revive
           setTimeout(connectSSE, 15000);
         }
@@ -176,6 +162,12 @@ export const useAlertEvents = () => {
         connectSSE();
       }
     });
+
+    // ACTIVAMOS EL POLLING SIEMPRE EN PARALELO (cada 15s)
+    // Razón: NGINX acepta la conexión SSE (200 OK) pero retiene el body.
+    // Esto hace que `reader.read()` se quede colgado indefinidamente sin arrojar error,
+    // retrasando el fallback. Al correr en paralelo, garantizamos la entrega.
+    pollInterval = setInterval(() => fetchAlerts(true), 15000);
 
     return () => {
       abortController.abort();
