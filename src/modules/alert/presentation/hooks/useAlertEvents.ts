@@ -19,8 +19,10 @@ export const useAlertEvents = () => {
     const allowedRoles = ['jefe', 'empleado', 'administrador'];
     if (!allowedRoles.includes(userRole)) return;
 
-    // Usamos el proxy para evitar problemas de CORS/CORP en el navegador
-    const API_URL = '/api-proxy';
+    // Usamos la URL directa del backend (limpiando el slash final)
+    // No usamos el proxy porque Vercel corta las conexiones largas (SSE) y da 502 Bad Gateway.
+    const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const API_URL = rawApiUrl.replace(/\/+$/, '');
     const abortController = new AbortController();
 
     // ──────────────────────────────────────────────────────────────
