@@ -1,6 +1,6 @@
 import { useProductoStore } from '../store/useProductoStore';
 import { DetailPanel } from '../../../../shared/components/ui/detail-panel/DetailPanel';
-import { getImageUrl } from '../table/columns';
+import { getImageUrl } from '../../../../shared/utils/getImageUrl';
 import { Button } from '../../../../shared/components/ui/button';
 import { Pencil, Trash2, Package, Tag, Archive, BarChart3, TrendingUp, DollarSign } from 'lucide-react';
 import { Badge } from '../../../../shared/components/ui/badge';

@@ -13,7 +13,7 @@ import { useCheckouts } from '../../../../caja/presentation/hooks/useCheckouts';
 import { useClientes } from '../../../../cliente/presentation/hooks/useClientes';
 import { useMetodosPago } from '../../../../metodo-pago/presentation/hooks/useMetodosPago';
 import type { TerminalConfig } from './TerminalLayout';
-import { getImageUrl } from '../../../../producto/presentation/table/columns';
+import { getImageUrl } from '../../../../../shared/utils/getImageUrl';
 
 interface ProductSearchProps {
   config: TerminalConfig;

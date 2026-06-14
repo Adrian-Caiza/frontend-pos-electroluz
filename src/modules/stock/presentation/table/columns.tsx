@@ -10,7 +10,7 @@ import { Edit, PackageCheck, PackageX, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { Producto } from '../../../producto/domain/entities/Producto';
-import { getImageUrl } from '../../../producto/presentation/table/columns';
+import { getImageUrl } from '../../../../shared/utils/getImageUrl';
 
 export interface StockTableMeta {
   sucursalId: string;
