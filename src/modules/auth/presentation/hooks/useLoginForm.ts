@@ -10,11 +10,14 @@ import { LoginUseCase } from '../../application/use-cases/LoginUseCase';
 import { AuthRepository } from '../../infrastructure/repositories/AuthRepository';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 
+import { useState } from 'react';
+
 // In a real app with DI container, we'd inject this. For now we instantiate.
 const authRepository = new AuthRepository();
 const loginUseCase = new LoginUseCase(authRepository);
 
 export const useLoginForm = () => {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
   const setAuth = useAuthStore((state) => state.setAuth);
 
@@ -43,12 +46,18 @@ export const useLoginForm = () => {
     },
     onError: (error: any) => {
       // Manejar error 401, 422, 500, etc.
-      const message = error.response?.data?.message || 'Error al iniciar sesión';
-      toast.error(message);
+      let message = error.response?.data?.message;
+      if (message === 'Unauthorized' || error.response?.status === 401) {
+        message = 'Credenciales incorrectas.';
+      } else if (!message) {
+        message = 'Error al iniciar sesión.';
+      }
+      setErrorMessage(message);
     },
   });
 
   const onSubmit = (data: LoginFormData) => {
+    setErrorMessage(null);
     mutation.mutate(data);
   };
 
@@ -56,5 +65,6 @@ export const useLoginForm = () => {
     form,
     onSubmit,
     isPending: mutation.isPending,
+    errorMessage,
   };
 };

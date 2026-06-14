@@ -12,7 +12,7 @@ import {
 } from '@/shared/components/ui/form';
 
 export const LoginForm = () => {
-  const { form, onSubmit, isPending } = useLoginForm();
+  const { form, onSubmit, isPending, errorMessage } = useLoginForm();
 
   return (
     <div className="w-full space-y-6">
@@ -25,6 +25,13 @@ export const LoginForm = () => {
           Ingresa tus credenciales para acceder al sistema.
         </p>
       </div>
+
+      {errorMessage && (
+        <div className="p-3.5 rounded-lg border border-red-500/50 bg-red-500/10 text-red-500 flex items-center gap-3 text-sm animate-in fade-in slide-in-from-top-2">
+          <AlertCircle className="w-5 h-5 flex-shrink-0" />
+          <p>{errorMessage}</p>
+        </div>
+      )}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
