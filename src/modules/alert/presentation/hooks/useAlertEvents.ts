@@ -19,8 +19,8 @@ export const useAlertEvents = () => {
     const allowedRoles = ['jefe', 'empleado', 'administrador'];
     if (!allowedRoles.includes(userRole)) return;
 
-    const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    const API_URL = rawApiUrl.replace(/\/+$/, '');
+    // Usamos el proxy para evitar problemas de CORS/CORP en el navegador
+    const API_URL = '/api-proxy';
     const abortController = new AbortController();
 
     // ──────────────────────────────────────────────────────────────
