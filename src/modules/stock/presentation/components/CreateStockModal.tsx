@@ -22,9 +22,9 @@ import { useSucursales } from '../../../sucursal/presentation/hooks/useSucursale
 import { useProductos } from '../../../producto/presentation/hooks/useProductos';
 
 const formSchema = z.object({
-  stcksuid: z.string().min(1, 'Seleccione una sucursal'),
-  stckprdtoid: z.string().min(1, 'Seleccione un producto'),
-  stckcantidad: z.union([z.number(), z.string(), z.undefined()])
+  stcksuid: z.string().max(255, 'El texto es demasiado largo').min(1, 'Seleccione una sucursal'),
+  stckprdtoid: z.string().max(255, 'El texto es demasiado largo').min(1, 'Seleccione un producto'),
+  stckcantidad: z.union([z.number(), z.string().max(255, 'El texto es demasiado largo'), z.undefined()])
     .refine((val) => val !== '' && val !== undefined, { message: 'Ingrese una cantidad' })
     .transform((val) => Number(val))
     .refine((val) => !isNaN(val) && val >= 0, { message: 'La cantidad no puede ser negativa' })

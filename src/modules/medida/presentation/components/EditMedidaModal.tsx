@@ -21,8 +21,8 @@ import { useUpdateMedida } from '../hooks/useUpdateMedida';
 import type { Medida } from '../../domain/entities/Medida';
 
 const formSchema = z.object({
-  mdianombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(100, 'El nombre es muy largo'),
-  mdiaabreviatura: z.string().min(1, 'La abreviatura es requerida').max(10, 'Máximo 10 caracteres'),
+  mdianombre: z.string().max(255, 'El texto es demasiado largo').min(2, 'El nombre debe tener al menos 2 caracteres').max(100, 'El nombre es muy largo'),
+  mdiaabreviatura: z.string().max(255, 'El texto es demasiado largo').min(1, 'La abreviatura es requerida').max(10, 'Máximo 10 caracteres'),
 });
 
 type FormValues = z.infer<typeof formSchema>;

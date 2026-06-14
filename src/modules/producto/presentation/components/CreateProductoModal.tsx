@@ -40,16 +40,16 @@ import { useProveedores } from '../../../proveedor/presentation/hooks/useProveed
 import { useMedidas } from '../../../medida/presentation/hooks/useMedidas';
 
 const formSchema = z.object({
-  prdtoctgriaid: z.string().min(1, 'La categoría es requerida'),
-  prdtomrcid: z.string().min(1, 'La marca es requerida'),
-  prdtoprovid: z.string().min(1, 'El proveedor es requerido'),
-  prdtomdiaid: z.string().min(1, 'La medida es requerida'),
-  prdtocodigo: z.string().min(3, 'Mínimo 3 caracteres'),
-  prdtonombre: z.string().min(3, 'Mínimo 3 caracteres'),
-  prdtopreciocompra: z.string().min(1, 'Requerido').regex(/^\d+(\.\d{1,2})?$/, 'Máximo 2 decimales (ej: 10.50)'),
-  prdtoprecioventa: z.string().min(1, 'Requerido').regex(/^\d+(\.\d{1,2})?$/, 'Máximo 2 decimales (ej: 10.50)'),
-  prdtostockminimo: z.string().min(1, 'Requerido').regex(/^\d+$/, 'Debe ser un número entero'),
-  prdtostockmaximo: z.string().min(1, 'Requerido').regex(/^\d+$/, 'Debe ser un número entero'),
+  prdtoctgriaid: z.string().max(255, 'El texto es demasiado largo').min(1, 'La categoría es requerida'),
+  prdtomrcid: z.string().max(255, 'El texto es demasiado largo').min(1, 'La marca es requerida'),
+  prdtoprovid: z.string().max(255, 'El texto es demasiado largo').min(1, 'El proveedor es requerido'),
+  prdtomdiaid: z.string().max(255, 'El texto es demasiado largo').min(1, 'La medida es requerida'),
+  prdtocodigo: z.string().max(255, 'El texto es demasiado largo').min(3, 'Mínimo 3 caracteres'),
+  prdtonombre: z.string().max(255, 'El texto es demasiado largo').min(3, 'Mínimo 3 caracteres'),
+  prdtopreciocompra: z.string().max(255, 'El texto es demasiado largo').min(1, 'Requerido').regex(/^\d+(\.\d{1,2})?$/, 'Máximo 2 decimales (ej: 10.50)'),
+  prdtoprecioventa: z.string().max(255, 'El texto es demasiado largo').min(1, 'Requerido').regex(/^\d+(\.\d{1,2})?$/, 'Máximo 2 decimales (ej: 10.50)'),
+  prdtostockminimo: z.string().max(255, 'El texto es demasiado largo').min(1, 'Requerido').regex(/^\d+$/, 'Debe ser un número entero'),
+  prdtostockmaximo: z.string().max(255, 'El texto es demasiado largo').min(1, 'Requerido').regex(/^\d+$/, 'Debe ser un número entero'),
 });
 
 type FormValues = z.infer<typeof formSchema>;

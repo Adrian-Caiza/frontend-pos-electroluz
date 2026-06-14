@@ -22,10 +22,10 @@ import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useCreateUsuario } from '../hooks/useCreateUsuario';
 
 const formSchema = z.object({
-  usnombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-  usapodo: z.string().min(3, 'El apodo debe tener al menos 3 caracteres'),
-  uscorreo: z.string().email('Debe ser un correo válido').min(1, 'El correo es requerido'),
-  uspassword: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
+  usnombre: z.string().max(255, 'El texto es demasiado largo').min(3, 'El nombre debe tener al menos 3 caracteres'),
+  usapodo: z.string().max(255, 'El texto es demasiado largo').min(3, 'El apodo debe tener al menos 3 caracteres'),
+  uscorreo: z.string().max(255, 'El texto es demasiado largo').email('Debe ser un correo válido').min(1, 'El correo es requerido'),
+  uspassword: z.string().max(255, 'El texto es demasiado largo').min(8, 'La contraseña debe tener al menos 8 caracteres'),
   usrol: z.enum(['jefe', 'empleado'], { message: 'El rol es requerido' }),
 });
 

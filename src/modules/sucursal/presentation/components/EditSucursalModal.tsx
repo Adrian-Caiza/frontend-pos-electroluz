@@ -20,10 +20,10 @@ import {
 import { Input } from '../../../../shared/components/ui/input';
 
 const formSchema = z.object({
-  sunombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres').optional().or(z.literal('')),
+  sunombre: z.string().max(255, 'El texto es demasiado largo').min(3, 'El nombre debe tener al menos 3 caracteres').optional().or(z.literal('')),
   suidentificador: z.string().length(3, 'El identificador debe tener exactamente 3 dígitos').regex(/^\d+$/, 'Solo se permiten números').optional().or(z.literal('')),
-  sudireccion: z.string().optional(),
-  sucorreo: z.string().email('Debe ser un correo válido').or(z.literal('')).optional(),
+  sudireccion: z.string().max(255, 'El texto es demasiado largo').optional(),
+  sucorreo: z.string().max(255, 'El texto es demasiado largo').email('Debe ser un correo válido').or(z.literal('')).optional(),
 });
 
 interface EditSucursalModalProps {

@@ -25,10 +25,10 @@ import { useUpdateUsuario } from '../hooks/useUpdateUsuario';
 import { useUpdateUsuarioPassword } from '../hooks/useUpdateUsuarioPassword';
 
 const formSchema = z.object({
-  usnombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-  uscorreo: z.string().email('Debe ser un correo válido').min(1, 'El correo es requerido'),
-  uspassword: z.string().optional(),
-  uspasswordConfirm: z.string().optional(),
+  usnombre: z.string().max(255, 'El texto es demasiado largo').min(3, 'El nombre debe tener al menos 3 caracteres'),
+  uscorreo: z.string().max(255, 'El texto es demasiado largo').email('Debe ser un correo válido').min(1, 'El correo es requerido'),
+  uspassword: z.string().max(255, 'El texto es demasiado largo').optional(),
+  uspasswordConfirm: z.string().max(255, 'El texto es demasiado largo').optional(),
 }).refine((data) => {
   if (data.uspassword && data.uspassword.length > 0) {
     return data.uspassword.length >= 8;

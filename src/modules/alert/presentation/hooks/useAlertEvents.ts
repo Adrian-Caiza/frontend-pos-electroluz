@@ -10,58 +10,72 @@ export const useAlertEvents = () => {
   const token = useAuthStore((s) => s.token);
   const userRole = useAuthStore((s) => s.user?.usrol);
 
-  // Keep token in a ref so SSE reconnection always uses the latest value
   const tokenRef = useRef(token);
   tokenRef.current = token;
+
+  // Ref to track IDs we've already shown toasts for in the current cycle
+  const knownAlertIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!token || !userRole) return;
     const allowedRoles = ['jefe', 'empleado', 'administrador'];
     if (!allowedRoles.includes(userRole)) return;
 
-    // Usamos la URL directa del backend (limpiando el slash final)
-    // No usamos el proxy porque Vercel corta las conexiones largas (SSE) y da 502 Bad Gateway.
+    // We use the proxy to avoid CORS/CORP in development, 
+    // but in Vercel it may return 502 for long-lived SSE connections.
+    const isDev = import.meta.env.DEV;
     const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    const API_URL = rawApiUrl.replace(/\/+$/, '');
+    const API_URL = isDev ? '/api-proxy' : rawApiUrl.replace(/\/+$/, '');
+    
     const abortController = new AbortController();
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
+    let sseActive = false;
 
     // ──────────────────────────────────────────────────────────────
-    // Initial load: populate the bell with currently unread alerts.
-    // No toasts here — the user just loaded the page.
+    // 1. Fetch de las alertas actuales (Actualiza campana, sin toasts)
     // ──────────────────────────────────────────────────────────────
-    const fetchInitialUnread = async () => {
+    const fetchAlerts = async (showToasts: boolean = false) => {
       try {
         const response = await fetch(`${API_URL}/alerts?page=1&pageSize=50`, {
           headers: { 'Authorization': `Bearer ${token}` },
           signal: abortController.signal,
         });
+        
         if (response.ok) {
           const data = await response.json();
           const unread = data.items
             ?.filter((item: any) => item.alvisto === false)
             .map(mapToAlert) || [];
+            
           if (!abortController.signal.aborted) {
             setUnreadAlerts(unread);
+            
+            // Si es un chequeo por polling, verificamos si hay alertas nuevas para mostrar toast
+            if (showToasts) {
+              const currentIds = new Set<string>();
+              unread.forEach((alert: any) => {
+                currentIds.add(alert.id);
+                if (!knownAlertIdsRef.current.has(alert.id)) {
+                  toast.warning('Nueva Alerta: ' + alert.message, {
+                    description: alert.branch?.name ? `Sucursal: ${alert.branch.name}` : undefined,
+                    duration: 5000,
+                  });
+                }
+              });
+              knownAlertIdsRef.current = currentIds;
+            } else {
+              // Si es la carga inicial, simplemente memorizamos los IDs actuales
+              unread.forEach((alert: any) => knownAlertIdsRef.current.add(alert.id));
+            }
           }
         }
       } catch (e: any) {
-        if (e.name !== 'AbortError') {
-          console.error('Error fetching initial alerts:', e);
-        }
+        if (e.name !== 'AbortError') console.error('Error fetching alerts:', e);
       }
     };
 
     // ──────────────────────────────────────────────────────────────
-    // SSE: real-time stream for periodic reminders.
-    //
-    // The backend creates alerts every ~5 min for products below
-    // minimum stock and sends them via SSE. Every event is a
-    // legitimate reminder → show a toast and update the bell.
-    //
-    // Dedup: if the same alid arrives twice (SSE internal re-poll),
-    // the store already has it → isDuplicate → no double toast.
-    // When a new 5-min batch creates new alids, isDuplicate is
-    // false → toast fires → this is the periodic reminder.
+    // 2. Conexión SSE principal
     // ──────────────────────────────────────────────────────────────
     const connectSSE = async () => {
       try {
@@ -80,10 +94,16 @@ export const useAlertEvents = () => {
           throw new Error(`SSE connection failed: ${response.status}`);
         }
 
-        const reader = response.body?.getReader();
-        if (!reader) {
-          throw new Error('SSE response body is not readable');
+        sseActive = true;
+        
+        // Si SSE funciona, nos aseguramos de apagar el polling fallback
+        if (pollInterval) {
+          clearInterval(pollInterval);
+          pollInterval = null;
         }
+
+        const reader = response.body?.getReader();
+        if (!reader) throw new Error('SSE response body is not readable');
 
         const decoder = new TextDecoder();
         let buffer = '';
@@ -111,19 +131,17 @@ export const useAlertEvents = () => {
                   const parsed = JSON.parse(jsonStr);
                   const alertData = mapToAlert(parsed);
 
-                  // Check if this exact alid is already in the store
-                  // (prevents double-toasting within the same 5-min cycle)
+                  // Verificamos si este ID específico ya llegó para evitar toasts duplicados
                   const state = useAlertStore.getState();
                   const isDuplicate = state.unreadAlerts.some(a => a.id === alertData.id);
 
-                  // addAlert replaces by product+branch key (keeps latest alid)
+                  // addAlert reemplaza por Producto+Sucursal para actualizar el ID en la campana
                   addAlert(alertData);
+                  knownAlertIdsRef.current.add(alertData.id);
 
                   if (!isDuplicate) {
                     toast.warning('Nueva Alerta: ' + alertData.message, {
-                      description: alertData.branch?.name
-                        ? `Sucursal: ${alertData.branch.name}`
-                        : undefined,
+                      description: alertData.branch?.name ? `Sucursal: ${alertData.branch.name}` : undefined,
                       duration: 5000,
                     });
                   }
@@ -137,27 +155,31 @@ export const useAlertEvents = () => {
       } catch (error: any) {
         if (error.name !== 'AbortError') {
           console.error('SSE connection error:', error);
+          sseActive = false;
         }
       } finally {
-        // Reconnect after disconnect (unless the component unmounted)
         if (!abortController.signal.aborted) {
-          setTimeout(connectSSE, 5000);
+          // Si SSE falló o se cerró, activamos Polling como Fallback de emergencia
+          if (!sseActive && !pollInterval) {
+            console.warn("SSE no disponible (Posible bloqueo de Vercel/NGINX). Activando Polling de respaldo...");
+            pollInterval = setInterval(() => fetchAlerts(true), 15000);
+          }
+          // Intentamos reconectar SSE en el fondo cada 15s por si el servidor revive
+          setTimeout(connectSSE, 15000);
         }
       }
     };
 
-    // Bootstrap: initial fetch → SSE
-    const initialize = async () => {
-      await fetchInitialUnread();
+    // Inicializamos: primero llenamos la campana y luego intentamos SSE
+    fetchAlerts(false).then(() => {
       if (!abortController.signal.aborted) {
         connectSSE();
       }
-    };
-
-    initialize();
+    });
 
     return () => {
       abortController.abort();
+      if (pollInterval) clearInterval(pollInterval);
     };
   }, [token, userRole, addAlert, setUnreadAlerts]);
 };

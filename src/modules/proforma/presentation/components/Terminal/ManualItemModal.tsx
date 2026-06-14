@@ -21,7 +21,7 @@ import { Hash, AlignLeft, DollarSign } from 'lucide-react';
 import { useState } from 'react';
 
 const manualItemSchema = z.object({
-  descripcion: z.string().min(2, 'La descripción debe tener al menos 2 caracteres'),
+  descripcion: z.string().max(255, 'El texto es demasiado largo').min(2, 'La descripción debe tener al menos 2 caracteres'),
   cantidad: z.number({ message: 'Este campo numérico es requerido' }).int('Debe ser un número entero').min(1, 'La cantidad mínima es 1'),
   precioUnitario: z.number({ message: 'Este campo numérico es requerido' }).min(0.01, 'El precio debe ser mayor a 0').refine(val => /^\d+(\.\d{1,2})?$/.test(val.toString()), 'Máximo 2 decimales'),
 });

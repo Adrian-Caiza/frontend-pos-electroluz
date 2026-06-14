@@ -24,11 +24,11 @@ import { useCategorias } from '../../../categoria/presentation/hooks/useCategori
 import { useMarcas } from '../../../marca/presentation/hooks/useMarcas';
 
 const formSchema = z.object({
-  provnombre: z.string().min(3, 'Mínimo 3 caracteres').max(100, 'El nombre es muy largo'),
-  provtelefono: z.string().regex(/^\d{10}$/, 'Debe tener exactamente 10 dígitos numéricos'),
-  provcorreo: z.string().email('Formato de correo inválido').or(z.literal('')).nullable().optional(),
-  provctgriaid: z.string().optional().nullable(),
-  provmrcid: z.string().optional().nullable(),
+  provnombre: z.string().max(255, 'El texto es demasiado largo').min(3, 'Mínimo 3 caracteres').max(100, 'El nombre es muy largo'),
+  provtelefono: z.string().max(255, 'El texto es demasiado largo').regex(/^\d{10}$/, 'Debe tener exactamente 10 dígitos numéricos'),
+  provcorreo: z.string().max(255, 'El texto es demasiado largo').email('Formato de correo inválido').or(z.literal('')).nullable().optional(),
+  provctgriaid: z.string().max(255, 'El texto es demasiado largo').optional().nullable(),
+  provmrcid: z.string().max(255, 'El texto es demasiado largo').optional().nullable(),
 });
 
 type FormValues = z.infer<typeof formSchema>;

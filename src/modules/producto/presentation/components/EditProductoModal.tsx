@@ -41,16 +41,16 @@ import { useMedidas } from '../../../medida/presentation/hooks/useMedidas';
 import type { Producto } from '../../domain/entities/Producto';
 
 const formSchema = z.object({
-  prdtoctgriaid: z.string().optional(),
-  prdtomrcid: z.string().optional(),
-  prdtoprovid: z.string().optional(),
-  prdtomdiaid: z.string().optional(),
-  prdtocodigo: z.string().min(3).optional(),
-  prdtonombre: z.string().min(3).optional(),
-  prdtopreciocompra: z.string().optional().refine(val => !val || /^\d+(\.\d{1,2})?$/.test(val), 'Máximo 2 decimales (ej: 10.50)'),
-  prdtoprecioventa: z.string().optional().refine(val => !val || /^\d+(\.\d{1,2})?$/.test(val), 'Máximo 2 decimales (ej: 10.50)'),
-  prdtostockminimo: z.string().optional().refine(val => !val || /^\d+$/.test(val), 'Debe ser un número entero'),
-  prdtostockmaximo: z.string().optional().refine(val => !val || /^\d+$/.test(val), 'Debe ser un número entero'),
+  prdtoctgriaid: z.string().max(255, 'El texto es demasiado largo').optional(),
+  prdtomrcid: z.string().max(255, 'El texto es demasiado largo').optional(),
+  prdtoprovid: z.string().max(255, 'El texto es demasiado largo').optional(),
+  prdtomdiaid: z.string().max(255, 'El texto es demasiado largo').optional(),
+  prdtocodigo: z.string().max(255, 'El texto es demasiado largo').min(3).optional(),
+  prdtonombre: z.string().max(255, 'El texto es demasiado largo').min(3).optional(),
+  prdtopreciocompra: z.string().max(255, 'El texto es demasiado largo').optional().refine(val => !val || /^\d+(\.\d{1,2})?$/.test(val), 'Máximo 2 decimales (ej: 10.50)'),
+  prdtoprecioventa: z.string().max(255, 'El texto es demasiado largo').optional().refine(val => !val || /^\d+(\.\d{1,2})?$/.test(val), 'Máximo 2 decimales (ej: 10.50)'),
+  prdtostockminimo: z.string().max(255, 'El texto es demasiado largo').optional().refine(val => !val || /^\d+$/.test(val), 'Debe ser un número entero'),
+  prdtostockmaximo: z.string().max(255, 'El texto es demasiado largo').optional().refine(val => !val || /^\d+$/.test(val), 'Debe ser un número entero'),
   prdtoestado: z.enum(['activo', 'inactivo', 'eliminado']).optional(),
 });
 

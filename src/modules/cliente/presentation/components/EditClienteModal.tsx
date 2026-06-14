@@ -25,13 +25,13 @@ const formSchema = z.object({
   clntetipoidentificacion: z.enum(['cedula', 'ruc'], {
     message: 'El tipo de identificación es requerido',
   }),
-  clnteidentificacion: z.string()
+  clnteidentificacion: z.string().max(255, 'El texto es demasiado largo')
     .min(1, 'La identificación es requerida')
     .regex(/^[0-9]+$/, 'Solo se permiten números'),
-  clntenombre: z.string().min(3, 'El nombre debe tener al menos 3 caracteres'),
-  clntecorreo: z.string().email('Debe ser un correo válido').min(1, 'El correo es requerido'),
-  clntedireccion: z.string().min(5, 'La dirección es muy corta'),
-  clntetelefono: z.string()
+  clntenombre: z.string().max(255, 'El texto es demasiado largo').min(3, 'El nombre debe tener al menos 3 caracteres'),
+  clntecorreo: z.string().max(255, 'El texto es demasiado largo').email('Debe ser un correo válido').min(1, 'El correo es requerido'),
+  clntedireccion: z.string().max(255, 'El texto es demasiado largo').min(5, 'La dirección es muy corta'),
+  clntetelefono: z.string().max(255, 'El texto es demasiado largo')
     .min(10, 'El teléfono debe tener al menos 10 dígitos')
     .max(10, 'El teléfono no puede tener más de 10 dígitos')
     .regex(/^[0-9]+$/, 'Solo se permiten números'),

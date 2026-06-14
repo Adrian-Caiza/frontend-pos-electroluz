@@ -21,7 +21,7 @@ import { useUpdateStock } from '../hooks/useUpdateStock';
 import type { Stock } from '../../domain/entities/Stock';
 
 const formSchema = z.object({
-  stckcantidad: z.union([z.number(), z.string(), z.undefined()])
+  stckcantidad: z.union([z.number(), z.string().max(255, 'El texto es demasiado largo'), z.undefined()])
     .refine((val) => val !== '' && val !== undefined, { message: 'Ingrese una cantidad' })
     .transform((val) => Number(val))
     .refine((val) => !isNaN(val) && val >= 0, { message: 'La cantidad no puede ser negativa' })

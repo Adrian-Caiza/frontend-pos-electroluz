@@ -21,7 +21,7 @@ import {
 } from '../../../../shared/components/ui/form';
 
 const editCategoriaSchema = z.object({
-  ctgnombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(50, 'El nombre es muy largo'),
+  ctgnombre: z.string().max(255, 'El texto es demasiado largo').min(2, 'El nombre debe tener al menos 2 caracteres').max(50, 'El nombre es muy largo'),
   ctgriadescripcion: z.string().max(200, 'La descripción es muy larga').optional(),
   ctgriaestado: z.enum(['activo', 'inactivo', 'eliminado']),
 });

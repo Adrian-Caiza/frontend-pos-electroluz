@@ -21,7 +21,7 @@ import {
 } from '../../../../shared/components/ui/form';
 
 const createMetodoPagoSchema = z.object({
-  mpnombre: z.string().min(2, 'El nombre debe tener al menos 2 caracteres').max(50, 'El nombre es muy largo'),
+  mpnombre: z.string().max(255, 'El texto es demasiado largo').min(2, 'El nombre debe tener al menos 2 caracteres').max(50, 'El nombre es muy largo'),
 });
 
 type CreateMetodoPagoFormData = z.infer<typeof createMetodoPagoSchema>;

@@ -36,7 +36,7 @@ import { Store, Hash, MonitorSmartphone, Plus, Building2, Fingerprint } from 'lu
 
 const formSchema = z.object({
   cjidentificador: z.string().length(3, 'El identificador debe tener exactamente 3 dígitos').regex(/^\d+$/, 'Solo se permiten números'),
-  cjsuid: z.string().min(1, 'Debe seleccionar una sucursal'),
+  cjsuid: z.string().max(255, 'El texto es demasiado largo').min(1, 'Debe seleccionar una sucursal'),
 });
 
 export const CreateCheckoutModal = () => {
