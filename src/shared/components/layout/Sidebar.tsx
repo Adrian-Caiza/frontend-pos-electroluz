@@ -1,33 +1,26 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuthStore } from '../../stores/useAuthStore';
 import {
-  LayoutDashboard,
-  LogOut,
-  PackageSearch,
-  ShoppingCart,
-  Building2,
-  WalletCards,
-  Users,
-  UserCog,
-  Monitor,
-  Package,
-  Receipt,
   PanelLeftClose,
-  PanelLeftOpen,
-  ChevronsUpDown,
-  FolderTree,
-  Tag,
-  Scale,
-  Truck,
-  Archive
+  PanelLeftOpen
 } from 'lucide-react';
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+  StreamlineFlexDashboard3Solid,
+  MaterialSymbolsPointOfSale,
+  FaSolidFileInvoiceDollar,
+  FaSolidCashRegister,
+  FluentPeopleTeam20Filled,
+  IxProductCatalog,
+  MdiFileTree,
+  GisTags,
+  StreamlineUltimatePackageDimensionBold,
+  FluentVehicleTruckCube24Filled,
+  MingcuteInventoryFill,
+  ClarityEmployeeSolid,
+  SolarBuildings2Bold,
+  TeenyiconsCreditCardSolid
+} from '../icons/icons';
 import { cn } from '../../lib/utils';
 
 export interface SidebarProps {
@@ -57,35 +50,35 @@ export const Sidebar = ({ companyName, companyLogo }: SidebarProps) => {
     {
       group: 'Principal',
       items: [
-        { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard, roles: ['jefe'] },
+        { name: 'Dashboard', path: '/dashboard', icon: StreamlineFlexDashboard3Solid, roles: ['jefe'] },
       ]
     },
     {
       group: 'Ventas y Caja',
       items: [
-        { name: 'Terminal POS', path: '/terminal', icon: Monitor, roles: ['jefe', 'empleado', 'cajero'] },
-        { name: 'Historial Ventas', path: '/proformas', icon: Receipt, roles: ['jefe', 'empleado', 'cajero'] },
-        { name: 'Caja', path: '/caja', icon: ShoppingCart, roles: ['jefe', 'cajero'] },
-        { name: 'Clientes', path: '/clientes', icon: Users, roles: ['jefe', 'empleado'] },
+        { name: 'Terminal POS', path: '/terminal', icon: MaterialSymbolsPointOfSale, roles: ['jefe', 'empleado', 'cajero'] },
+        { name: 'Historial Ventas', path: '/proformas', icon: FaSolidFileInvoiceDollar, roles: ['jefe', 'empleado', 'cajero'] },
+        { name: 'Caja', path: '/caja', icon: FaSolidCashRegister, roles: ['jefe', 'cajero'] },
+        { name: 'Clientes', path: '/clientes', icon: FluentPeopleTeam20Filled, roles: ['jefe', 'empleado'] },
       ]
     },
     {
       group: 'Catálogo e Inventario',
       items: [
-        { name: 'Productos', path: '/productos', icon: Package, roles: ['jefe', 'empleado'] },
-        { name: 'Categorías', path: '/categorias', icon: FolderTree, roles: ['jefe', 'empleado'] },
-        { name: 'Marcas', path: '/marcas', icon: Tag, roles: ['jefe', 'empleado'] },
-        { name: 'Medidas', path: '/medidas', icon: Scale, roles: ['jefe', 'empleado'] },
-        { name: 'Proveedores', path: '/proveedores', icon: Truck, roles: ['jefe', 'empleado'] },
-        { name: 'Inventario', path: '/stock', icon: Archive, roles: ['jefe', 'empleado'] },
+        { name: 'Productos', path: '/productos', icon: IxProductCatalog, roles: ['jefe', 'empleado'] },
+        { name: 'Categorías', path: '/categorias', icon: MdiFileTree, roles: ['jefe', 'empleado'] },
+        { name: 'Marcas', path: '/marcas', icon: GisTags, roles: ['jefe', 'empleado'] },
+        { name: 'Medidas', path: '/medidas', icon: StreamlineUltimatePackageDimensionBold, roles: ['jefe', 'empleado'] },
+        { name: 'Proveedores', path: '/proveedores', icon: FluentVehicleTruckCube24Filled, roles: ['jefe', 'empleado'] },
+        { name: 'Inventario', path: '/stock', icon: MingcuteInventoryFill, roles: ['jefe', 'empleado'] },
       ]
     },
     {
       group: 'Administración',
       items: [
-        { name: 'Personal', path: '/usuarios', icon: UserCog, roles: ['jefe'] },
-        { name: 'Sucursales', path: '/sucursales', icon: Building2, roles: ['jefe'] },
-        { name: 'Métodos de Pago', path: '/metodos-pago', icon: WalletCards, roles: ['jefe', 'empleado'] },
+        { name: 'Personal', path: '/usuarios', icon: ClarityEmployeeSolid, roles: ['jefe'] },
+        { name: 'Sucursales', path: '/sucursales', icon: SolarBuildings2Bold, roles: ['jefe'] },
+        { name: 'Métodos de Pago', path: '/metodos-pago', icon: TeenyiconsCreditCardSolid, roles: ['jefe', 'empleado'] },
       ]
     }
   ];
