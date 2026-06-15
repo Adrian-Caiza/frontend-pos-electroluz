@@ -6,7 +6,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { LogOut, ChevronsUpDown } from 'lucide-react';
+import { ChevronsUpDown } from 'lucide-react';
+import { Fa7SolidUserCog, IonMdLogOut } from '../icons/icons';
 import { ProfileSettingsModal } from '../../../modules/usuario/presentation/components/ProfileSettingsModal';
 
 interface UserProfileMenuProps {
@@ -60,15 +61,16 @@ export const UserProfileMenu = ({ onLogout, userImage }: UserProfileMenuProps) =
         <DropdownMenuContent align="end" className="w-56 rounded-xl">
           <DropdownMenuItem 
             onClick={() => setIsProfileModalOpen(true)}
-            className="cursor-pointer rounded-lg text-muted-foreground hover:text-foreground focus:text-foreground p-2.5"
+            className="cursor-pointer rounded-lg text-muted-foreground hover:text-foreground focus:text-foreground p-2.5 flex items-center"
           >
+            <Fa7SolidUserCog className="w-4 h-4 mr-2" />
             <span>Configuración de Perfil</span>
           </DropdownMenuItem>
           <DropdownMenuItem 
             onClick={onLogout}
-            className="cursor-pointer rounded-lg text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/50 focus:text-rose-700 dark:focus:text-rose-400 p-2.5 mt-1"
+            className="cursor-pointer rounded-lg text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/50 focus:text-rose-700 dark:focus:text-rose-400 p-2.5 mt-1 flex items-center"
           >
-            <LogOut className="w-4 h-4 mr-2" />
+            <IonMdLogOut className="w-4 h-4 mr-2" />
             <span className="font-medium">Cerrar Sesión</span>
           </DropdownMenuItem>
         </DropdownMenuContent>

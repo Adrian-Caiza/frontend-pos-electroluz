@@ -32,7 +32,7 @@ export function DataTableProductCell({ name, sku, imageUrl }: DataTableProductCe
         {imageUrl ? (
           <img src={imageUrl} alt={name} className="w-full h-full object-cover" />
         ) : (
-          <div 
+          <div
             className="w-full h-full flex items-center justify-center text-xs font-semibold text-white shadow-inner"
             style={{ backgroundColor: bgColor }}
           >
