@@ -36,10 +36,14 @@ export const AlertBell = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative text-muted-foreground hover:text-foreground focus-visible:ring-0">
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="relative w-10 h-10 rounded-xl bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm shadow-sm transition-colors text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible:ring-0"
+        >
           <Bell className="w-5 h-5" />
           {unreadAlerts.length > 0 && (
-            <span className="absolute top-1.5 right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white ring-2 ring-card">
+            <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-card shadow-sm">
               {unreadAlerts.length > 99 ? '99+' : unreadAlerts.length}
             </span>
           )}
