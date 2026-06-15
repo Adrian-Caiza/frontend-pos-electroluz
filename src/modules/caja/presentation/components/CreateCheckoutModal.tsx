@@ -124,7 +124,9 @@ export const CreateCheckoutModal = () => {
                               <SelectValue placeholder={loadingSucursales ? "Cargando sucursales..." : "Seleccione una sucursal"} />
                             </SelectTrigger>
                             <SelectContent>
-                              {sucursalesData?.items.map((sucursal) => (
+                              {sucursalesData?.items
+                                .filter(s => s.suestado === 'activo')
+                                .map((sucursal) => (
                                 <SelectItem key={sucursal.suid} value={sucursal.suid}>
                                   {sucursal.sunombre} (ID: {sucursal.suidentificador})
                                 </SelectItem>
