@@ -6,6 +6,7 @@ import { AlertBell } from '../../../modules/alert/presentation/components/AlertB
 import { ThemeToggle } from '../ui/theme-toggle';
 import { UserProfileMenu } from './UserProfileMenu';
 import { getImageUrl } from '../../utils/getImageUrl';
+import { Breadcrumbs } from '../ui/breadcrumb';
 
 export const MainLayout = () => {
   const { user, company, refreshToken, logout } = useAuthStore();
@@ -52,8 +53,10 @@ export const MainLayout = () => {
             </span>
           </div>
           
-          {/* Desktop Spacer */}
-          <div className="hidden md:flex flex-1" />
+          {/* Desktop Spacer & Breadcrumbs */}
+          <div className="hidden md:flex flex-1 items-center">
+            <Breadcrumbs />
+          </div>
 
           {/* Right Actions */}
           <div className="flex items-center space-x-2 ml-auto">
