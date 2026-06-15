@@ -22,5 +22,5 @@ export function DataTableColumnHeader<TData, TValue>({
   title,
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
-  return <div className={cn("text-sm font-semibold text-slate-700", className)}>{title}</div>
+  return <div className={cn("text-sm font-semibold text-slate-700 dark:text-slate-200", className)}>{title}</div>
 }
