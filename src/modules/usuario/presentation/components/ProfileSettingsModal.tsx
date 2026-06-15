@@ -13,6 +13,7 @@ import {
   ModalField,
   ModalEntityCard,
 } from '../../../../shared/components/ui/modal';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   Form,
   FormControl,
@@ -63,6 +64,7 @@ export const ProfileSettingsModal = ({ open, onOpenChange }: ProfileSettingsModa
   
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
 
 
@@ -156,9 +158,17 @@ export const ProfileSettingsModal = ({ open, onOpenChange }: ProfileSettingsModa
     }
   };
 
+  const handleRequestClose = () => {
+    if (form.formState.isDirty || selectedImage) {
+      setIsConfirmOpen(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
   const footer = (
     <ModalFooter 
-      onCancel={() => onOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Cambios"
@@ -166,9 +176,10 @@ export const ProfileSettingsModal = ({ open, onOpenChange }: ProfileSettingsModa
   );
 
   return (
+    <>
     <BaseModal 
       isOpen={open} 
-      onClose={() => onOpenChange(false)}
+      onClose={handleRequestClose}
       title="Configuración de Perfil"
       subtitle="Actualiza tu información personal y contraseña."
       size="lg"
@@ -293,5 +304,20 @@ export const ProfileSettingsModal = ({ open, onOpenChange }: ProfileSettingsModa
         </form>
       </Form>
     </BaseModal>
+
+    <ConfirmDialog
+      isOpen={isConfirmOpen}
+      onClose={() => setIsConfirmOpen(false)}
+      onConfirm={() => {
+        setIsConfirmOpen(false);
+        onOpenChange(false);
+      }}
+      title="¿Descartar cambios?"
+      description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+      confirmText="Descartar"
+      cancelText="Continuar editando"
+      variant="warning"
+    />
+    </>
   );
 };

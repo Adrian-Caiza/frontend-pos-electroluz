@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 
@@ -56,8 +57,8 @@ export function BaseModal({
     '3xl': 'max-w-3xl',
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200" onClick={handleBackdropClick}>
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200" onClick={handleBackdropClick}>
       <div 
         ref={modalRef} 
         className={cn(
@@ -95,6 +96,7 @@ export function BaseModal({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
