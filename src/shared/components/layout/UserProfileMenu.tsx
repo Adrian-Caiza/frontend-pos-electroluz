@@ -8,6 +8,7 @@ import {
 } from '../ui/dropdown-menu';
 import { ChevronsUpDown } from 'lucide-react';
 import { Fa7SolidUserCog, IonMdLogOut } from '../icons/icons';
+import { ConfirmDialog } from '../ui/modal/ConfirmDialog';
 import { ProfileSettingsModal } from '../../../modules/usuario/presentation/components/ProfileSettingsModal';
 
 interface UserProfileMenuProps {
@@ -18,6 +19,7 @@ interface UserProfileMenuProps {
 export const UserProfileMenu = ({ onLogout, userImage }: UserProfileMenuProps) => {
   const { user } = useAuthStore();
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
   return (
     <>
@@ -67,7 +69,7 @@ export const UserProfileMenu = ({ onLogout, userImage }: UserProfileMenuProps) =
             <span>Configuración de Perfil</span>
           </DropdownMenuItem>
           <DropdownMenuItem 
-            onClick={onLogout}
+            onClick={() => setIsLogoutConfirmOpen(true)}
             className="cursor-pointer rounded-lg text-rose-600 focus:bg-rose-50 dark:focus:bg-rose-950/50 focus:text-rose-700 dark:focus:text-rose-400 p-2.5 mt-1 flex items-center"
           >
             <IonMdLogOut className="w-4 h-4 mr-2" />
@@ -79,6 +81,20 @@ export const UserProfileMenu = ({ onLogout, userImage }: UserProfileMenuProps) =
       <ProfileSettingsModal 
         open={isProfileModalOpen} 
         onOpenChange={setIsProfileModalOpen} 
+      />
+
+      <ConfirmDialog
+        isOpen={isLogoutConfirmOpen}
+        onClose={() => setIsLogoutConfirmOpen(false)}
+        onConfirm={() => {
+          setIsLogoutConfirmOpen(false);
+          onLogout();
+        }}
+        title="¿Cerrar Sesión?"
+        description="¿Estás seguro de que deseas cerrar sesión y salir del sistema?"
+        confirmText="Cerrar Sesión"
+        cancelText="Cancelar"
+        variant="destructive"
       />
     </>
   );
