@@ -35,9 +35,20 @@ export const ProformaStatusChart = ({ data, isLoading }: ProformaStatusChartProp
             tick={{ fontSize: 12, fill: 'var(--color-slate-500)' }} 
           />
           <Tooltip 
-            formatter={(value: any) => [`${value} proformas`, 'Cantidad']}
-            contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-            cursor={{ fill: 'var(--color-slate-50)' }}
+            cursor={{ fill: 'var(--muted)' }}
+            content={({ active, payload, label }) => {
+              if (active && payload && payload.length) {
+                return (
+                  <div className="bg-card border border-border p-3 rounded-lg shadow-md">
+                    <p className="text-sm font-semibold text-foreground mb-1">{label}</p>
+                    <p className="text-sm text-muted-foreground">
+                      Cantidad: <span className="font-semibold text-foreground">{payload[0].value} proformas</span>
+                    </p>
+                  </div>
+                );
+              }
+              return null;
+            }}
           />
           <Bar 
             dataKey="value" 

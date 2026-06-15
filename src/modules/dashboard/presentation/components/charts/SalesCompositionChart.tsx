@@ -10,19 +10,13 @@ interface SalesCompositionChartProps {
 const COLORS = ['#9b8afb', '#b6e454', '#fab251', '#f37c87', '#f4a1cd', '#fbc958'];
 
 export const SalesCompositionChart = ({ data, isLoading }: SalesCompositionChartProps) => {
-  const headerRight = (
-    <div className="flex items-center text-[13px] font-medium text-muted-foreground hover:text-foreground cursor-pointer transition-colors">
-      Ver Todos
-      <ArrowUpRight className="w-4 h-4 ml-0.5" />
-    </div>
-  );
+
 
   const totalValue = data.reduce((acc, curr) => acc + curr.value, 0);
 
   return (
     <ChartCardWrapper 
       title="Categorías Populares" 
-      headerRight={headerRight}
       className="border-none shadow-md bg-card"
       disableResponsiveContainer={true}
     >
@@ -33,15 +27,15 @@ export const SalesCompositionChart = ({ data, isLoading }: SalesCompositionChart
       ) : (
         <div className="flex flex-col h-full w-full items-center justify-start pt-2 pb-1">
           {/* Top: Donut Chart */}
-          <div className="relative w-[140px] h-[140px] shrink-0 mx-auto mb-4">
+          <div className="relative w-[170px] h-[170px] shrink-0 mx-auto mb-4">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
                 <Pie
                   data={data}
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={65}
+                  innerRadius={65}
+                  outerRadius={80}
                   paddingAngle={5}
                   cornerRadius={10}
                   dataKey="value"

@@ -16,7 +16,7 @@ import { Badge } from '../../../../shared/components/ui/badge';
 
 export const AlertBell = () => {
   useAlertEvents(); // Inicia la conexión SSE
-  const { unreadAlerts, removeUnreadAlert } = useAlertStore();
+  const { unreadAlerts, removeUnreadAlert, clearUnreadAlerts } = useAlertStore();
   const { mutate: markAsViewed } = useMarkAlertAsViewed();
 
   const handleMarkAsViewed = (id: string) => {
@@ -28,7 +28,9 @@ export const AlertBell = () => {
   };
 
   const handleMarkAllAsRead = () => {
-    unreadAlerts.forEach(alert => handleMarkAsViewed(alert.id));
+    const alertsToMark = [...unreadAlerts];
+    clearUnreadAlerts();
+    alertsToMark.forEach(alert => markAsViewed(alert.id));
   };
 
   return (
@@ -94,7 +96,7 @@ export const AlertBell = () => {
                   </div>
                   
                   {/* Body */}
-                  <div className="flex flex-col flex-1 min-w-0 pb-1">
+                  <div className="flex flex-col flex-1 min-w-0 pb-1 pr-6">
                     <p className="text-[13px] text-foreground font-medium leading-relaxed">
                       {alert.message}
                     </p>
