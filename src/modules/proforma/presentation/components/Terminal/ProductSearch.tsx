@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { Search, PackagePlus, Plus, Store, ShoppingCart, Users, WalletCards, UserPlus } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Search, PackagePlus, Plus, UserPlus, Hash, User, Mail, Phone } from 'lucide-react';
+import { SolarBuildings2Bold, FaSolidCashRegister, FluentPeopleTeam20Filled, TeenyiconsCreditCardSolid, FluentPersonEdit20Filled, IcRoundPersonAddAlt1 } from '../../../../../shared/components/icons/icons';
 import { useTerminalCart } from '../../hooks/useTerminalCart';
 import { useStocks } from '../../../../stock/presentation/hooks/useStocks';
 import { toast } from 'sonner';
@@ -8,12 +9,14 @@ import { Input } from '../../../../../shared/components/ui/input';
 import { Button } from '../../../../../shared/components/ui/button';
 import { ManualItemModal } from './ManualItemModal';
 import { CreateClienteModal } from '../../../../cliente/presentation/components/CreateClienteModal';
+import { EditClienteModal } from '../../../../cliente/presentation/components/EditClienteModal';
 import { useSucursales } from '../../../../sucursal/presentation/hooks/useSucursales';
 import { useCheckouts } from '../../../../caja/presentation/hooks/useCheckouts';
 import { useClientes } from '../../../../cliente/presentation/hooks/useClientes';
 import { useMetodosPago } from '../../../../metodo-pago/presentation/hooks/useMetodosPago';
 import type { TerminalConfig } from './TerminalLayout';
 import { getImageUrl } from '../../../../../shared/utils/getImageUrl';
+import { SearchableSelect } from '../../../../../shared/components/ui/SearchableSelect';
 
 interface ProductSearchProps {
   config: TerminalConfig;
@@ -25,6 +28,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const { addItem, items: cartItems } = useTerminalCart();
   const [isClienteModalOpen, setClienteModalOpen] = useState(false);
+  const [isEditClienteModalOpen, setEditClienteModalOpen] = useState(false);
 
   // Fetch lists for selectors
   const { data: sucursalesData } = useSucursales(1, 50);
@@ -36,6 +40,37 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
   const clientes = clientesData?.items.filter(c => c.clnteestado === 'activo') || [];
   const metodos = metodosData?.items.filter(m => m.mpestado === 'activo') || [];
   const cajas = cajasData?.items.filter(c => c.cjestado === 'activo' && (!config.sucursalId || c.cjsuid === config.sucursalId)) || [];
+
+  // Build SearchableSelect options
+  const sucursalOptions = useMemo(() =>
+    sucursales.map(s => ({ id: s.suid, label: s.sunombre })),
+    [sucursales]
+  );
+
+  const cajaOptions = useMemo(() =>
+    cajas.map(c => ({ id: c.cjid, label: c.cjidentificador })),
+    [cajas]
+  );
+
+  const clienteOptions = useMemo(() =>
+    clientes.map(c => ({
+      id: c.clnteid,
+      label: c.clntenombre,
+      sublabel: `${c.clntetipoidentificacion === 'ruc' ? 'RUC' : 'CI'}: ${c.clnteidentificacion}`,
+    })),
+    [clientes]
+  );
+
+  const metodoOptions = useMemo(() =>
+    metodos.map(m => ({ id: m.mpid, label: m.mpnombre })),
+    [metodos]
+  );
+
+  // Selected client data for info card
+  const selectedCliente = useMemo(() =>
+    clientes.find(c => c.clnteid === config.clienteId) || null,
+    [clientes, config.clienteId]
+  );
 
   // Debounce search input
   useEffect(() => {
@@ -83,83 +118,153 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
   return (
     <div className="bg-card rounded-2xl shadow-sm border border-border flex flex-col h-full overflow-hidden min-h-0">
       
-      {/* Settings Bar integrated directly */}
-      <div className="p-3 border-b border-border bg-muted/30">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {/* Settings Bar with SearchableSelects */}
+      <div className="p-4 border-b border-border bg-muted/10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-4">
           {/* Sucursal */}
-          <div className="relative">
-            <Store className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-            <select
-              className="w-full h-10 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm transition-colors hover:border-border cursor-pointer"
-              value={config.sucursalId || ''}
-              onChange={(e) => {
-                onChangeConfig('sucursalId', e.target.value || null);
-                onChangeConfig('cajaId', null);
-              }}
-            >
-              <option value="">Seleccionar Sucursal...</option>
-              {sucursales.map(s => (
-                <option key={s.suid} value={s.suid}>{s.sunombre}</option>
-              ))}
-            </select>
-          </div>
+          <SearchableSelect
+            icon={SolarBuildings2Bold}
+            placeholder="Buscar sucursal..."
+            options={sucursalOptions}
+            value={config.sucursalId}
+            onChange={(val) => {
+              onChangeConfig('sucursalId', val);
+              onChangeConfig('cajaId', null);
+            }}
+            emptyMessage="No se encontraron sucursales"
+          />
 
           {/* Caja */}
-          <div className="relative">
-            <ShoppingCart className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-            <select
-              className="w-full h-10 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm transition-colors hover:border-border cursor-pointer"
-              value={config.cajaId || ''}
-              onChange={(e) => onChangeConfig('cajaId', e.target.value || null)}
-              disabled={!config.sucursalId}
-            >
-              <option value="">{config.sucursalId ? 'Caja Registradora...' : 'Esperando Sucursal...'}</option>
-              {cajas.map(c => (
-                <option key={c.cjid} value={c.cjid}>{c.cjidentificador}</option>
-              ))}
-            </select>
-          </div>
+          <SearchableSelect
+            icon={FaSolidCashRegister}
+            placeholder={config.sucursalId ? 'Buscar caja...' : 'Esperando sucursal...'}
+            options={cajaOptions}
+            value={config.cajaId}
+            onChange={(val) => onChangeConfig('cajaId', val)}
+            disabled={!config.sucursalId}
+            emptyMessage="No hay cajas para esta sucursal"
+          />
 
           {/* Cliente */}
-          <div className="relative flex items-center gap-1.5">
-            <div className="relative flex-1">
-              <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-              <select
-                className="w-full h-10 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm transition-colors hover:border-border cursor-pointer"
-                value={config.clienteId || ''}
-                onChange={(e) => onChangeConfig('clienteId', e.target.value || null)}
-              >
-                <option value="">Cliente (Consumidor Final)...</option>
-                {clientes.map(c => (
-                  <option key={c.clnteid} value={c.clnteid}>{c.clntenombre}</option>
-                ))}
-              </select>
+          <div className="flex items-center gap-1.5">
+            <div className="flex-1 min-w-0">
+              <SearchableSelect
+                icon={FluentPeopleTeam20Filled}
+                placeholder="Buscar cliente..."
+                options={clienteOptions}
+                value={config.clienteId}
+                onChange={(val) => onChangeConfig('clienteId', val)}
+                emptyMessage="No se encontraron clientes"
+              />
             </div>
             <button
               type="button"
               onClick={() => setClienteModalOpen(true)}
-              className="h-10 px-3 flex items-center justify-center bg-background border border-border rounded-lg text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors shrink-0 shadow-sm"
+              className="h-10 w-10 flex items-center justify-center bg-background border border-border rounded-lg text-primary hover:bg-primary/10 transition-colors shrink-0 shadow-sm"
               title="Nuevo Cliente"
             >
-              <UserPlus className="w-4 h-4" />
+              <IcRoundPersonAddAlt1 className="w-5 h-5" />
             </button>
           </div>
 
           {/* Método de Pago */}
-          <div className="relative">
-            <WalletCards className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
-            <select
-              className="w-full h-10 pl-9 pr-8 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary appearance-none shadow-sm transition-colors hover:border-border cursor-pointer"
-              value={config.metodoPagoId || ''}
-              onChange={(e) => onChangeConfig('metodoPagoId', e.target.value || null)}
-            >
-              <option value="">Método de Pago...</option>
-              {metodos.map(m => (
-                <option key={m.mpid} value={m.mpid}>{m.mpnombre}</option>
-              ))}
-            </select>
-          </div>
+          <SearchableSelect
+            icon={TeenyiconsCreditCardSolid}
+            placeholder="Buscar método de pago..."
+            options={metodoOptions}
+            value={config.metodoPagoId}
+            onChange={(val) => onChangeConfig('metodoPagoId', val)}
+            emptyMessage="No se encontraron métodos"
+          />
         </div>
+
+        {/* Client Info Card — appears when a client is selected */}
+        {selectedCliente && (
+          <div className="mt-3 animate-in fade-in-0 slide-in-from-top-2 duration-300">
+            <div className="relative bg-background/60 border border-border rounded-xl p-3 pl-4 border-l-4 border-l-primary overflow-hidden">
+              {/* Subtle gradient background accent */}
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-transparent to-transparent pointer-events-none" />
+              
+              <div className="relative flex items-center gap-6 flex-wrap">
+                {/* Avatar / Icon */}
+                <div className="flex items-center justify-center w-9 h-9 rounded-full bg-primary/10 shrink-0">
+                  <User className="w-4 h-4 text-primary" />
+                </div>
+
+                {/* Cedula */}
+                <div className="flex items-center gap-2 min-w-0">
+                  <Hash className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold leading-none mb-0.5">
+                      {selectedCliente.clntetipoidentificacion === 'ruc' ? 'RUC' : 'Cédula'}
+                    </div>
+                    <div className="text-sm font-semibold text-foreground leading-none">
+                      {selectedCliente.clnteidentificacion}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Separador visual */}
+                <div className="hidden sm:block w-px h-8 bg-border" />
+
+                {/* Nombre */}
+                <div className="flex items-center gap-2 min-w-0">
+                  <User className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold leading-none mb-0.5">
+                      Nombre
+                    </div>
+                    <div className="text-sm font-semibold text-foreground leading-none truncate max-w-[200px]">
+                      {selectedCliente.clntenombre}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Separador visual */}
+                <div className="hidden sm:block w-px h-8 bg-border" />
+
+                {/* Correo */}
+                <div className="flex items-center gap-2 min-w-0">
+                  <Mail className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold leading-none mb-0.5">
+                      Correo
+                    </div>
+                    <div className="text-sm text-foreground leading-none truncate max-w-[200px]">
+                      {selectedCliente.clntecorreo}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Separador visual */}
+                <div className="hidden sm:block w-px h-8 bg-border" />
+
+                {/* Teléfono */}
+                <div className="flex items-center gap-2 min-w-0 flex-1">
+                  <Phone className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold leading-none mb-0.5">
+                      Teléfono
+                    </div>
+                    <div className="text-sm text-foreground leading-none">
+                      {selectedCliente.clntetelefono}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Edit Button */}
+                <button
+                  type="button"
+                  onClick={() => setEditClienteModalOpen(true)}
+                  className="flex items-center justify-center w-8 h-8 rounded-full text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors shrink-0 ml-auto"
+                  title="Editar Cliente"
+                >
+                  <FluentPersonEdit20Filled className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="p-4 border-b border-border flex items-center gap-3">
@@ -254,6 +359,12 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
       <CreateClienteModal 
         open={isClienteModalOpen} 
         onOpenChange={setClienteModalOpen} 
+      />
+
+      <EditClienteModal
+        open={isEditClienteModalOpen}
+        onOpenChange={setEditClienteModalOpen}
+        cliente={selectedCliente}
       />
     </div>
   );

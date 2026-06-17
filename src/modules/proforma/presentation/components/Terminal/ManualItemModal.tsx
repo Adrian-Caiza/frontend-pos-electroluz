@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Plus, PenTool } from 'lucide-react';
+import { BasilAddSolid } from '../../../../../shared/components/icons/icons';
 import { useTerminalCart } from '../../hooks/useTerminalCart';
 import {
   BaseModal,
@@ -69,7 +70,7 @@ export const ManualItemModal = () => {
   return (
     <>
       <Button onClick={() => setOpen(true)} variant="secondary" className="h-12 px-6 shadow-sm border border-slate-200">
-        <Plus className="w-5 h-5 mr-2" />
+        <BasilAddSolid className="w-9 h-9 mr-2" />
         Ítem Manual
       </Button>
 

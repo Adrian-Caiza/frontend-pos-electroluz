@@ -2,7 +2,9 @@ import { useEffect, useRef } from 'react';
 import { useAlertStore } from '../store/useAlertStore';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { toast } from 'sonner';
-import { mapToAlert, alertApi } from '../../infrastructure/services/alertApi';
+import { alertApi } from '../../infrastructure/services/alertApi';
+
+const POLL_INTERVAL_MS = 15_000; // 15 seconds
 
 export const useAlertEvents = () => {
   const addAlert = useAlertStore((s) => s.addAlert);
@@ -13,68 +15,85 @@ export const useAlertEvents = () => {
   const tokenRef = useRef(token);
   tokenRef.current = token;
 
-  // Ref to track IDs we've already shown toasts for in the current cycle
-  const knownAlertIdsRef = useRef<Set<string>>(new Set());
+  // Track product+branch keys we've already shown toasts for in the current batch.
+  // When the backend recreates alerts every ~5 min, the alid values change but
+  // the product+branch combinations stay the same. We use those keys to detect
+  // genuinely new alerts vs. the same batch being re-fetched within the 5-min window.
+  const knownKeysRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!token || !userRole) return;
     const allowedRoles = ['jefe', 'empleado', 'administrador'];
     if (!allowedRoles.includes(userRole)) return;
 
-    // We use the proxy to avoid CORS/CORP in development, 
-    // but in Vercel it may return 502 for long-lived SSE connections.
-    const isDev = import.meta.env.DEV;
-    const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-    const API_URL = isDev ? '/api-proxy' : rawApiUrl.replace(/\/+$/, '');
-    
     const abortController = new AbortController();
-    let pollInterval: ReturnType<typeof setInterval> | null = null;
-    let sseActive = false;
+
+    // Helper: stable key for a product+branch (survives backend re-creation of alerts)
+    const stableKey = (alert: { product?: { id: string }; branch?: { id: string } }) =>
+      `${alert.product?.id || ''}_${alert.branch?.id || ''}`;
 
     // ──────────────────────────────────────────────────────────────
-    // 1. Fetch de las alertas actuales (Actualiza campana, sin toasts)
+    // Fetch alerts using apiClient (handles auth, token refresh, CORS)
     // ──────────────────────────────────────────────────────────────
-    const fetchAlerts = async (showToasts: boolean = false) => {
+    const fetchAlerts = async (showToasts: boolean) => {
       try {
         const data = await alertApi.getAlerts(1, 50);
-        
-        const unread = data.items.filter((item: any) => item.isViewed === false);
-          
-        if (!abortController.signal.aborted) {
-          setUnreadAlerts(unread);
-          
-          // Si es un chequeo por polling, verificamos si hay alertas nuevas para mostrar toast
-          if (showToasts) {
-            const currentIds = new Set<string>();
-            unread.forEach((alert: any) => {
-              currentIds.add(alert.id);
-              if (!knownAlertIdsRef.current.has(alert.id)) {
-                toast.warning('Nueva Alerta: ' + alert.message, {
-                  description: alert.branch?.name ? `Sucursal: ${alert.branch.name}` : undefined,
-                  duration: 5000,
-                });
-              }
-            });
-            knownAlertIdsRef.current = currentIds;
-          } else {
-            // Si es la carga inicial, simplemente memorizamos los IDs actuales
-            unread.forEach((alert: any) => knownAlertIdsRef.current.add(alert.id));
+        if (abortController.signal.aborted) return;
+
+        // ALL visible alerts go in the bell — the alert system works as periodic
+        // reminders until the stock is replenished. We don't filter by isViewed
+        // because the backend recreates alerts every ~5 min as reminders.
+        const allAlerts = data.items;
+        setUnreadAlerts(allAlerts);
+
+        if (showToasts) {
+          // Compare current product+branch keys with known ones.
+          // If a key is new (not seen before), show a toast — it's a new reminder cycle.
+          const currentKeys = new Set<string>();
+          for (const alert of allAlerts) {
+            const key = stableKey(alert);
+            currentKeys.add(key);
+            if (!knownKeysRef.current.has(key)) {
+              toast.warning('Nueva Alerta: ' + alert.message, {
+                description: alert.branch?.name ? `Sucursal: ${alert.branch.name}` : undefined,
+                duration: 5000,
+              });
+            }
+          }
+
+          // Keys that disappeared → product went above min stock → forget them
+          // so they trigger toasts again if they reappear.
+          // Keys that are still present → keep them (no re-toast within same cycle).
+          knownKeysRef.current = currentKeys;
+        } else {
+          // Initial load — just memorize keys, no toasts
+          for (const alert of allAlerts) {
+            knownKeysRef.current.add(stableKey(alert));
           }
         }
       } catch (e: any) {
-        if (e.name !== 'AbortError') console.error('Error fetching alerts:', e);
+        if (e.name !== 'AbortError') {
+          console.error('Error fetching alerts:', e);
+        }
       }
     };
 
     // ──────────────────────────────────────────────────────────────
-    // 2. Conexión SSE principal
+    // SSE: real-time stream (works locally, may be blocked by proxies in prod)
     // ──────────────────────────────────────────────────────────────
     const connectSSE = async () => {
       try {
         const currentToken = tokenRef.current;
         if (!currentToken) return;
 
-        const response = await fetch(`${API_URL}/alerts/events`, {
+        // In dev we use the Vite proxy, in prod we hit the API directly.
+        const isDev = import.meta.env.DEV;
+        const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const sseUrl = isDev
+          ? '/api-proxy/alerts/events'
+          : `${rawApiUrl.replace(/\/+$/, '')}/alerts/events`;
+
+        const response = await fetch(sseUrl, {
           headers: {
             'Authorization': `Bearer ${currentToken}`,
             'Accept': 'text/event-stream',
@@ -84,14 +103,6 @@ export const useAlertEvents = () => {
 
         if (!response.ok) {
           throw new Error(`SSE connection failed: ${response.status}`);
-        }
-
-        sseActive = true;
-        
-        // Si SSE funciona, nos aseguramos de apagar el polling fallback
-        if (pollInterval) {
-          clearInterval(pollInterval);
-          pollInterval = null;
         }
 
         const reader = response.body?.getReader();
@@ -112,66 +123,42 @@ export const useAlertEvents = () => {
             if (!msg.trim() || msg.trim().startsWith(':')) continue;
 
             if (msg.includes('event: new-alert') || msg.includes('event:new-alert')) {
-              const dataLines = msg
-                .split(/\r?\n/)
-                .filter(line => line.startsWith('data:'))
-                .map(line => line.startsWith('data: ') ? line.substring(6) : line.substring(5));
-
-              if (dataLines.length > 0) {
-                const jsonStr = dataLines.join('\n');
-                try {
-                  const parsed = JSON.parse(jsonStr);
-                  const alertData = mapToAlert(parsed);
-
-                  // Verificamos si este ID específico ya llegó para evitar toasts duplicados
-                  const state = useAlertStore.getState();
-                  const isDuplicate = state.unreadAlerts.some(a => a.id === alertData.id);
-
-                  // addAlert reemplaza por Producto+Sucursal para actualizar el ID en la campana
-                  addAlert(alertData);
-                  knownAlertIdsRef.current.add(alertData.id);
-
-                  if (!isDuplicate) {
-                    toast.warning('Nueva Alerta: ' + alertData.message, {
-                      description: alertData.branch?.name ? `Sucursal: ${alertData.branch.name}` : undefined,
-                      duration: 5000,
-                    });
-                  }
-                } catch (e) {
-                  console.error('Error parsing alert event JSON', e);
-                }
-              }
+              // When SSE delivers an alert, trigger a full refresh so the bell
+              // and toast logic stays consistent with the polling path.
+              await fetchAlerts(true);
+              break; // One refresh per SSE batch is enough
             }
           }
         }
       } catch (error: any) {
         if (error.name !== 'AbortError') {
-          console.error('SSE connection error:', error);
+          console.error('SSE connection error (falling back to polling):', error);
         }
       } finally {
+        // Reconnect SSE after disconnect
         if (!abortController.signal.aborted) {
-          // Intentamos reconectar SSE en el fondo cada 15s por si el servidor revive
-          setTimeout(connectSSE, 15000);
+          setTimeout(connectSSE, 15_000);
         }
       }
     };
 
-    // Inicializamos: primero llenamos la campana y luego intentamos SSE
+    // ──────────────────────────────────────────────────────────────
+    // Bootstrap: initial fetch → SSE + polling
+    // ──────────────────────────────────────────────────────────────
     fetchAlerts(false).then(() => {
       if (!abortController.signal.aborted) {
         connectSSE();
       }
     });
 
-    // ACTIVAMOS EL POLLING SIEMPRE EN PARALELO (cada 15s)
-    // Razón: NGINX acepta la conexión SSE (200 OK) pero retiene el body.
-    // Esto hace que `reader.read()` se quede colgado indefinidamente sin arrojar error,
-    // retrasando el fallback. Al correr en paralelo, garantizamos la entrega.
-    pollInterval = setInterval(() => fetchAlerts(true), 15000);
+    // Polling runs in parallel as the primary delivery mechanism.
+    // SSE may be blocked by NGINX/Vercel proxies that buffer the stream,
+    // so polling guarantees delivery regardless of deployment environment.
+    const pollInterval = setInterval(() => fetchAlerts(true), POLL_INTERVAL_MS);
 
     return () => {
       abortController.abort();
-      if (pollInterval) clearInterval(pollInterval);
+      clearInterval(pollInterval);
     };
   }, [token, userRole, addAlert, setUnreadAlerts]);
 };

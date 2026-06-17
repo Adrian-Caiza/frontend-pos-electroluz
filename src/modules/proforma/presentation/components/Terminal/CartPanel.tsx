@@ -1,4 +1,5 @@
 import { ShoppingCart, Trash2, Minus, Plus, RefreshCw, Send } from 'lucide-react';
+import { MdiCartArrowDown } from '../../../../../shared/components/icons/icons';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { useTerminalCart } from '../../hooks/useTerminalCart';
@@ -91,7 +92,7 @@ export const CartPanel = ({ config, onSuccess, editId }: CartPanelProps) => {
       <div className="bg-card rounded-2xl shadow-sm border border-border flex flex-col h-full overflow-hidden min-h-0">
         <div className="p-4 border-b border-border flex items-center justify-between shrink-0">
           <h3 className="font-semibold text-foreground flex items-center">
-            <ShoppingCart className="w-5 h-5 mr-2 text-indigo-500" />
+            <MdiCartArrowDown className="w-5 h-5 mr-2 text-indigo-500" />
             Carrito de Compras
             <span className="ml-3 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-400 text-xs font-bold px-2.5 py-0.5 rounded-full">
               {cart.items.length}
@@ -111,7 +112,7 @@ export const CartPanel = ({ config, onSuccess, editId }: CartPanelProps) => {
         <div className="flex-1 overflow-y-auto p-3 bg-muted/20">
           {cart.items.length === 0 ? (
             <div className="h-full flex flex-col justify-center items-center text-muted-foreground p-6 text-center">
-              <ShoppingCart className="w-16 h-16 mb-4 text-muted/50" />
+              <MdiCartArrowDown className="w-16 h-16 mb-4 text-muted/50" />
               <p className="text-sm font-medium">Ticket Vacío</p>
               <p className="text-xs mt-1">Agrega productos o servicios para continuar.</p>
             </div>
