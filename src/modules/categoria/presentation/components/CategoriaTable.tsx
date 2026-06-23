@@ -18,15 +18,13 @@ import {
   SelectValue,
 } from '../../../../shared/components/ui/select';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
+import { useListFilters } from '../../../../shared/hooks/useListFilters';
 
 export const CategoriaTable = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('todos');
+  const { page, setPage, pageSize, setPageSize, search, setSearch, status, setStatus, debouncedSearch } = useListFilters(10);
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  const { data, isLoading } = useCategorias(1, 1000);
+  const { data, isLoading } = useCategorias(page, pageSize, debouncedSearch, status);
   const updateMutation = useUpdateCategoria();
   const { mutate: updateCategoria } = updateMutation;
   const { user } = useAuthStore();
@@ -47,7 +45,7 @@ export const CategoriaTable = () => {
     title: '',
     description: '',
     variant: 'default',
-    action: () => {},
+    action: () => { },
   });
 
   const handleEdit = (categoria: Categoria) => {
@@ -58,7 +56,7 @@ export const CategoriaTable = () => {
   const handleStatusChange = (categoria: Categoria, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
     let title = `¿Cambiar estado?`;
     let description = `¿Estás seguro de cambiar el estado de ${categoria.ctgnombre} a ${newStatus}?`;
-    
+
     if (newStatus === 'eliminado') {
       title = `¿Eliminar categoría?`;
       description = `¿Estás seguro de eliminar la categoría ${categoria.ctgnombre}? Esta acción no se puede deshacer.`;
@@ -96,33 +94,14 @@ export const CategoriaTable = () => {
     }
   };
 
-  // Filtrado local
-  const filteredData = useMemo(() => {
-    if (!data?.items) return [];
-    let items = data.items.filter(c => c.ctgriaestado !== 'eliminado'); // Ocultar eliminados por defecto
     
-    if (statusFilter !== 'todos') {
-      items = items.filter((c) => c.ctgriaestado === statusFilter);
-    }
-    
-    if (globalFilter) {
-      const lowerQuery = globalFilter.toLowerCase();
-      items = items.filter((c) => 
-        c.ctgnombre.toLowerCase().includes(lowerQuery) || 
-        (c.ctgriadescripcion && c.ctgriadescripcion.toLowerCase().includes(lowerQuery))
-      );
-    }
-    
-    return items;
-  }, [data?.items, globalFilter, statusFilter]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredData.slice(startIndex, startIndex + pageSize);
-  }, [filteredData, page, pageSize]);
+  
 
-  const totalFilteredItems = filteredData.length;
-  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+  
+  const tableData = data?.items || [];
+  const totalItems = data?.totalItems || 0;
+  const pageCount = data?.totalPages || 0;
 
   const meta: CategoriaTableMeta = {
     isJefe: isAuthorized,
@@ -134,11 +113,11 @@ export const CategoriaTable = () => {
     <>
       <DataTable
         columns={columns}
-        data={paginatedData}
+        data={tableData}
         meta={meta}
         isLoading={isLoading}
         pageCount={pageCount}
-        rowCount={totalFilteredItems}
+        rowCount={totalItems}
         pagination={{ pageIndex: page - 1, pageSize }}
         onPaginationChange={(newPagination) => {
           setPage(newPagination.pageIndex + 1);
@@ -148,16 +127,16 @@ export const CategoriaTable = () => {
         onRowSelectionChange={setRowSelection}
         getRowId={(row) => row.ctgriaid}
         toolbar={{
-          globalFilter,
-          onGlobalFilterChange: setGlobalFilter,
+          globalFilter: search,
+          onGlobalFilterChange: setSearch,
           searchPlaceholder: "Buscar por nombre o descripción...",
-          onAdvancedFilterClick: () => {},
+          onAdvancedFilterClick: () => { },
           children: (
             <div className="flex gap-2">
               {Object.keys(rowSelection).length > 0 ? (
                 <>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                     onClick={() => handleBulkAction('activo')}
@@ -166,8 +145,8 @@ export const CategoriaTable = () => {
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Activar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                     onClick={() => handleBulkAction('inactivo')}
@@ -176,8 +155,8 @@ export const CategoriaTable = () => {
                     <XCircle className="mr-2 h-4 w-4" />
                     Inactivar
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     className="h-9 text-slate-500 hover:text-slate-700"
                     onClick={() => setRowSelection({})}
@@ -187,7 +166,7 @@ export const CategoriaTable = () => {
                   </Button>
                 </>
               ) : (
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select value={status ?? 'todos'} onValueChange={(v) => setStatus(v === 'todos' ? undefined : v)}>
                   <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>
@@ -208,7 +187,7 @@ export const CategoriaTable = () => {
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />
-      
+
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
         onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}

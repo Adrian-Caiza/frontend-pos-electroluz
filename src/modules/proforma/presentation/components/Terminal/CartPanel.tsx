@@ -25,12 +25,16 @@ export const CartPanel = ({ config, onSuccess, editId }: CartPanelProps) => {
 
   const handleProcessSale = async () => {
     if (!config.sucursalId || !config.cajaId || !config.clienteId || !config.metodoPagoId) {
-      toast.warning('Por favor complete todos los parámetros de venta en el panel superior.');
+      toast.warning('Atención', {
+        description: 'Por favor complete todos los parámetros de venta en el panel superior.'
+      });
       return;
     }
 
     if (cart.items.length === 0) {
-      toast.warning('El carrito está vacío.');
+      toast.warning('Atención', {
+        description: 'El carrito está vacío.'
+      });
       return;
     }
 
@@ -45,14 +49,18 @@ export const CartPanel = ({ config, onSuccess, editId }: CartPanelProps) => {
     }));
 
     const handleMutateSuccess = () => {
-      toast.success(editId ? '¡Proforma actualizada con éxito!' : '¡Proforma generada con éxito!');
+      toast.success('Operación exitosa', {
+        description: editId ? '¡Proforma actualizada con éxito!' : '¡Proforma generada con éxito!'
+      });
       cart.clearCart();
       onSuccess();
     };
 
     const handleMutateError = (error: any) => {
       const backendError = error.response?.data?.message || error.response?.data?.error || error.message || 'Error desconocido';
-      toast.error(`Ocurrió un error al procesar la operación. Detalle: ${backendError}`);
+      toast.error('Ocurrió un error', {
+        description: `No se pudo procesar la operación. Detalle: ${backendError}`
+      });
     };
 
     if (editId) {

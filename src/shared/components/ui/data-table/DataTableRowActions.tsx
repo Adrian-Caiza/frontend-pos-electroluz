@@ -17,6 +17,7 @@ export interface DataTableRowActionItem {
   onClick: () => void
   variant?: 'default' | 'danger' | 'warning'
   separatorAbove?: boolean
+  disabled?: boolean
 }
 
 interface DataTableRowActionsProps {
@@ -51,9 +52,10 @@ export function DataTableRowActions({ actions, title }: DataTableRowActionsProps
           <div key={index}>
             {action.separatorAbove && <DropdownMenuSeparator className="-mx-2 my-1 bg-border" />}
             <DropdownMenuItem 
+              disabled={action.disabled}
               onClick={(e) => {
                 e.stopPropagation();
-                action.onClick();
+                if (!action.disabled) action.onClick();
               }}
               className={cn(
                 "px-3 py-2.5 rounded-lg cursor-pointer transition-colors",

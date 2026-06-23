@@ -19,6 +19,7 @@ import {
   X,
   Plus
 } from 'lucide-react';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -44,7 +45,7 @@ const formSchema = z.object({
   prdtomrcid: z.string().max(255, 'El texto es demasiado largo').min(1, 'La marca es requerida'),
   prdtoprovid: z.string().max(255, 'El texto es demasiado largo').min(1, 'El proveedor es requerido'),
   prdtomdiaid: z.string().max(255, 'El texto es demasiado largo').min(1, 'La medida es requerida'),
-  prdtocodigo: z.string().max(255, 'El texto es demasiado largo').min(3, 'Mínimo 3 caracteres'),
+  prdtocodigo: z.string().regex(/^\d{13}$/, 'Debe tener exactamente 13 números (ej. 7861000000093)'),
   prdtonombre: z.string().max(255, 'El texto es demasiado largo').min(3, 'Mínimo 3 caracteres'),
   prdtopreciocompra: z.string().max(255, 'El texto es demasiado largo').min(1, 'Requerido').regex(/^\d+(\.\d{1,2})?$/, 'Máximo 2 decimales (ej: 10.50)'),
   prdtoprecioventa: z.string().max(255, 'El texto es demasiado largo').min(1, 'Requerido').regex(/^\d+(\.\d{1,2})?$/, 'Máximo 2 decimales (ej: 10.50)'),
@@ -77,6 +78,16 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
   const { data: marcasData, isLoading: loadingMarcas } = useMarcas(1, 100);
   const { data: proveedoresData, isLoading: loadingProv } = useProveedores(1, 100);
   const { data: medidasData, isLoading: loadingMedidas } = useMedidas(1, 100);
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      setOpen(false);
+    }
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -130,13 +141,14 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
 
   const footer = (
     <ModalFooter 
-      onCancel={() => setOpen(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={createMutation.isPending}
       confirmLabel="Guardar Producto"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
       {!isControlled && (
@@ -148,7 +160,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
 
       <BaseModal 
         isOpen={open} 
-        onClose={() => setOpen(false)}
+        onClose={handleRequestClose}
         title="Registrar Producto"
         subtitle="Complete los detalles para añadir un nuevo producto al catálogo."
         size="2xl"
@@ -271,7 +283,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                   render={({ field, fieldState }) => (
                     <ModalField label="Código" required error={fieldState.error?.message}>
                       <FormControl>
-                        <Input icon={Barcode} className="h-11 rounded-xl" placeholder="Ej. PRD-001" {...field} />
+                        <Input icon={Barcode} className="h-11 rounded-xl" placeholder="Ej. 7861000000093" {...field} />
                       </FormControl>
                     </ModalField>
                   )}
@@ -369,7 +381,7 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
                             const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
                             if (fileInput) fileInput.value = '';
                           }}
-                          className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-sm hover:bg-rose-600 transition-colors z-10"
+                          className="absolute top-1 right-1 bg-rose-500 text-white rounded-full p-1 shadow-sm hover:bg-rose-600 transition-colors z-10"
                           title="Eliminar foto"
                         >
                           <X className="w-4 h-4" />
@@ -390,6 +402,20 @@ export const CreateProductoModal = ({ open: controlledOpen, onOpenChange: setCon
           </form>
         </Form>
       </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          setOpen(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
     </>
   );
 };

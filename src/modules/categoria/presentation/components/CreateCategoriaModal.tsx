@@ -5,6 +5,7 @@ import { useState, useEffect } from 'react';
 import { Tags, AlignLeft, Plus, FolderTree } from 'lucide-react';
 import { useCreateCategoria } from '../hooks/useCreateCategoria';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -31,6 +32,16 @@ export const CreateCategoriaModal = () => {
   const [open, setOpen] = useState(false);
   const { company } = useAuthStore();
   const { mutateAsync: createCategoria, isPending } = useCreateCategoria();
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      setOpen(false);
+    }
+  };
 
   const form = useForm<CreateCategoriaFormData>({
     resolver: zodResolver(createCategoriaSchema),
@@ -68,13 +79,14 @@ export const CreateCategoriaModal = () => {
 
   const footer = (
     <ModalFooter 
-      onCancel={() => setOpen(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Categoría"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
       <Button onClick={() => setOpen(true)}>
@@ -84,7 +96,7 @@ export const CreateCategoriaModal = () => {
 
       <BaseModal 
         isOpen={open} 
-        onClose={() => setOpen(false)}
+        onClose={handleRequestClose}
         title="Registrar Categoría"
         subtitle="Añade una nueva categoría para organizar tus productos."
         size="sm"
@@ -144,6 +156,20 @@ export const CreateCategoriaModal = () => {
           </form>
         </Form>
       </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          setOpen(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
     </>
   );
 };

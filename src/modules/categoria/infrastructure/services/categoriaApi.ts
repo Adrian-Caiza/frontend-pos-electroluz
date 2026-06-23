@@ -10,8 +10,11 @@ export interface PaginatedResponse<T> {
 }
 
 export const categoriaApi = {
-  getCategorias: async (page: number = 1, pageSize: number = 100): Promise<PaginatedResponse<Categoria>> => {
-    const response = await api.get('/categories', { params: { page, pageSize } });
+  getCategorias: async (page: number = 1, pageSize: number = 100, search?: string, status?: string): Promise<PaginatedResponse<Categoria>> => {
+    const params: Record<string, any> = { page, pageSize };
+    if (search) params.search = search;
+    if (status) params.status = status;
+    const response = await api.get('/categories', { params });
     return response.data;
   },
   getCategoriaById: async (id: string): Promise<Categoria> => {

@@ -83,16 +83,17 @@ export const columns: ColumnDef<Producto>[] = [
   },
   {
     id: "categoria",
-    accessorFn: (row) => `${row.categoria?.ctgnombre || ''} ${row.marca?.mrcnombre || ''}`,
+    accessorFn: (row) => `${row.categoria?.ctgnombre || (row as any).ctgria?.ctgnombre || ''} ${row.marca?.mrcnombre || ''}`,
     meta: { className: "hidden @6xl:table-cell" },
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Categoría / Marca" />
     ),
     cell: ({ row }) => {
       const producto = row.original;
+      const catNombre = producto.categoria?.ctgnombre || (producto as any).ctgria?.ctgnombre || 'S/C';
       return (
         <div className="flex flex-col">
-          <span className="text-sm text-foreground">{producto.categoria?.ctgnombre || 'S/C'}</span>
+          <span className="text-sm text-foreground">{catNombre}</span>
           <span className="text-xs text-muted-foreground">{producto.marca?.mrcnombre || 'S/M'}</span>
         </div>
       )

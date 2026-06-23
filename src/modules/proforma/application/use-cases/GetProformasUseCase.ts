@@ -9,7 +9,7 @@ export class GetProformasUseCase {
     this.proformaRepository = proformaRepository;
   }
 
-  async execute(page: number, pageSize: number): Promise<PaginatedResult<Proforma>> {
-    return await this.proformaRepository.getProformas(page, pageSize);
+  async execute(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResult<Proforma>> {
+    return await this.proformaRepository.getProformas(page, pageSize, search, status);
   }
 }

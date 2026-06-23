@@ -18,15 +18,13 @@ import {
   SelectValue,
 } from '../../../../shared/components/ui/select';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
+import { useListFilters } from '../../../../shared/hooks/useListFilters';
 
 export const SucursalTable = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('todos');
+  const { page, setPage, pageSize, setPageSize, search, setSearch, status, setStatus, debouncedSearch } = useListFilters(10);
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  const { data, isLoading } = useSucursales(1, 1000); // Fetch all for local pagination/filtering
+  const { data, isLoading } = useSucursales(page, pageSize, debouncedSearch, status); // Fetch all for local pagination/filtering
   const updateMutation = useUpdateSucursal();
   const { user } = useAuthStore();
   const isJefe = user?.usrol === 'jefe';
@@ -45,7 +43,7 @@ export const SucursalTable = () => {
     title: '',
     description: '',
     variant: 'default',
-    action: () => {},
+    action: () => { },
   });
 
   const handleEdit = (sucursal: Sucursal) => {
@@ -85,35 +83,14 @@ export const SucursalTable = () => {
     }
   };
 
-  // Filtrado local
-  const filteredData = useMemo(() => {
-    if (!data?.items) return [];
-    let items = data.items.filter((s) => s.suestado !== 'eliminado');
     
-    if (statusFilter !== 'todos') {
-      items = items.filter((s) => s.suestado === statusFilter);
-    }
-    
-    if (globalFilter) {
-      const lowerQuery = globalFilter.toLowerCase();
-      items = items.filter((s) => 
-        s.sunombre.toLowerCase().includes(lowerQuery) || 
-        s.suidentificador.toLowerCase().includes(lowerQuery) ||
-        (s.sudireccion && s.sudireccion.toLowerCase().includes(lowerQuery)) ||
-        (s.sucorreo && s.sucorreo.toLowerCase().includes(lowerQuery))
-      );
-    }
-    
-    return items;
-  }, [data?.items, globalFilter, statusFilter]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredData.slice(startIndex, startIndex + pageSize);
-  }, [filteredData, page, pageSize]);
+  
 
-  const totalFilteredItems = filteredData.length;
-  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+  
+  const tableData = data?.items || [];
+  const totalItems = data?.totalItems || 0;
+  const pageCount = data?.totalPages || 0;
 
   const meta: SucursalTableMeta = {
     isJefe,
@@ -125,11 +102,11 @@ export const SucursalTable = () => {
     <>
       <DataTable
         columns={columns}
-        data={paginatedData}
+        data={tableData}
         meta={meta}
         isLoading={isLoading}
         pageCount={pageCount}
-        rowCount={totalFilteredItems}
+        rowCount={totalItems}
         pagination={{ pageIndex: page - 1, pageSize }}
         onPaginationChange={(newPagination) => {
           setPage(newPagination.pageIndex + 1);
@@ -139,16 +116,16 @@ export const SucursalTable = () => {
         onRowSelectionChange={setRowSelection}
         getRowId={(row) => row.suid}
         toolbar={{
-          globalFilter,
-          onGlobalFilterChange: setGlobalFilter,
-          searchPlaceholder: "Buscar por nombre, ID o contacto...",
-          onAdvancedFilterClick: () => {},
+          globalFilter: search,
+          onGlobalFilterChange: setSearch,
+          searchPlaceholder: "Buscar por nombre o identificador...",
+          onAdvancedFilterClick: () => { },
           children: (
             <div className="flex gap-2">
               {Object.keys(rowSelection).length > 0 ? (
                 <>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                     onClick={() => handleBulkAction('activo')}
@@ -157,8 +134,8 @@ export const SucursalTable = () => {
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Activar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                     onClick={() => handleBulkAction('inactivo')}
@@ -167,8 +144,8 @@ export const SucursalTable = () => {
                     <XCircle className="mr-2 h-4 w-4" />
                     Inactivar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
                     onClick={() => handleBulkAction('eliminado')}
@@ -177,8 +154,8 @@ export const SucursalTable = () => {
                     <Trash2 className="mr-2 h-4 w-4" />
                     Eliminar
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     className="h-9 text-slate-500 hover:text-slate-700"
                     onClick={() => setRowSelection({})}
@@ -188,7 +165,7 @@ export const SucursalTable = () => {
                   </Button>
                 </>
               ) : (
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select value={status ?? 'todos'} onValueChange={(v) => setStatus(v === 'todos' ? undefined : v)}>
                   <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>

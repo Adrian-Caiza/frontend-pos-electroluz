@@ -13,13 +13,17 @@ export const useCreateCheckout = () => {
   return useMutation({
     mutationFn: (data: CreateCheckoutDto) => createCheckoutUseCase.execute(data),
     onSuccess: () => {
-      toast.success('Caja registrada exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Caja registrada exitosamente'
+      });
       // Invalidate queries to refetch the list
-      queryClient.invalidateQueries({ queryKey: ['checkouts'] });
+      queryClient.invalidateQueries({ queryKey: ['cajas'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al registrar la caja';
-      toast.error(message);
+      toast.error('Ocurrió un error', {
+        description: message
+      });
     },
   });
 };

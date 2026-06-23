@@ -32,10 +32,10 @@ export default function DashboardPage() {
 
       {/* Fila: Gráficos de Composición y Ranking */}
       <div className="grid gap-6 md:grid-cols-12">
-        <div className="md:col-span-12 lg:col-span-4">
+        <div className="md:col-span-6 lg:col-span-4">
           <TopProductsChart data={topProductsData} isLoading={isLoading} />
         </div>
-        <div className="md:col-span-12 lg:col-span-4">
+        <div className="md:col-span-6 lg:col-span-4">
           <SalesCompositionChart data={categoryCompositionData} isLoading={isLoading} />
         </div>
         <div className="md:col-span-12 lg:col-span-4">

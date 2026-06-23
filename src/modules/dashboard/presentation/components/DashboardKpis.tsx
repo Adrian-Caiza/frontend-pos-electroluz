@@ -67,10 +67,10 @@ export const DashboardKpis = () => {
   const activeProductosCount = productosData?.items?.filter(p => p.prdtoestado !== 'eliminado').length || 0;
   const activeClientesCount = clientesData?.items?.filter(c => c.clnteestado !== 'eliminado').length || 0;
   
-  const unreadAlertsCount = useAlertStore((state) => state.unreadAlerts.length);
+  const unreadAlertsCount = useAlertStore((state) => state.unseenCount);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
       <KpiCard
         title="Ventas Totales"
         value={proformasData?.totalItems || 0}

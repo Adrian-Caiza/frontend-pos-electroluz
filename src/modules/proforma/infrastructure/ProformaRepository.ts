@@ -4,8 +4,8 @@ import type { PaginatedResult } from '../../../shared/types/PaginatedResult';
 import { fetchProformas, createProforma, cancelProforma, payProforma, fetchProformaById, updateProforma, fetchProformaPdf } from './proformaApi';
 
 export class ProformaRepository implements IProformaRepository {
-  async getProformas(page: number, pageSize: number): Promise<PaginatedResult<Proforma>> {
-    return await fetchProformas(page, pageSize);
+  async getProformas(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResult<Proforma>> {
+    return await fetchProformas(page, pageSize, search, status);
   }
 
   async createProforma(data: CreateProformaDTO): Promise<Proforma> {

@@ -6,12 +6,12 @@ import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 const repository = new ProformaRepository();
 const getProformasUseCase = new GetProformasUseCase(repository);
 
-export const useProformas = (page: number, pageSize: number) => {
+export const useProformas = (page: number, pageSize: number, search?: string, status?: string) => {
   const { user } = useAuthStore();
-  
+
   return useQuery({
-    queryKey: ['proformas', user?.usemid, page, pageSize],
-    queryFn: () => getProformasUseCase.execute(page, pageSize),
+    queryKey: ['proformas', user?.usemid, page, pageSize, search, status],
+    queryFn: () => getProformasUseCase.execute(page, pageSize, search, status),
     enabled: !!user?.usemid,
     staleTime: 1000 * 30, // 30 seconds (keep it relatively fresh since sales happen often)
   });

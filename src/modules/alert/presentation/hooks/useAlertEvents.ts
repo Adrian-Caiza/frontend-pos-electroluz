@@ -1,164 +1,220 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import { useQueryClient } from '@tanstack/react-query';
 import { useAlertStore } from '../store/useAlertStore';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
+import { mapToAlert } from '../../infrastructure/services/alertApi';
 import { toast } from 'sonner';
-import { alertApi } from '../../infrastructure/services/alertApi';
-
-const POLL_INTERVAL_MS = 15_000; // 15 seconds
+import { useAlertSummary } from './useAlertSummary';
 
 export const useAlertEvents = () => {
-  const addAlert = useAlertStore((s) => s.addAlert);
-  const setUnreadAlerts = useAlertStore((s) => s.setUnreadAlerts);
   const token = useAuthStore((s) => s.token);
   const userRole = useAuthStore((s) => s.user?.usrol);
+  const queryClient = useQueryClient();
 
-  const tokenRef = useRef(token);
-  tokenRef.current = token;
+  const {
+    incrementUnseen,
+    decrementUnseen,
+    addBellAlert,
+    updateBellAlert,
+    removeBellAlert,
+    setUnseenCount
+  } = useAlertStore();
 
-  // Track product+branch keys we've already shown toasts for in the current batch.
-  // When the backend recreates alerts every ~5 min, the alid values change but
-  // the product+branch combinations stay the same. We use those keys to detect
-  // genuinely new alerts vs. the same batch being re-fetched within the 5-min window.
-  const knownKeysRef = useRef<Set<string>>(new Set());
+  // Load summary initially to set the badge count
+  const { data: summaryData } = useAlertSummary();
+
+  useEffect(() => {
+    if (summaryData) {
+      setUnseenCount(summaryData.totalUnseen);
+    }
+  }, [summaryData, setUnseenCount]);
+
+  const abortRef = useRef<AbortController | null>(null);
+
+  const startSSE = useCallback(() => {
+    if (abortRef.current) abortRef.current.abort();
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    const sseUrl = `${rawApiUrl.replace(/\/+$/, '')}/alerts/events`;
+
+    console.log('[AlertEvents] Connecting to SSE…', sseUrl);
+
+    fetchEventSource(sseUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'text/event-stream',
+      },
+      signal: controller.signal,
+      openWhenHidden: true,
+
+      async onopen(response) {
+        if (
+          response.ok &&
+          response.headers.get('content-type')?.includes('text/event-stream')
+        ) {
+          console.log('[AlertEvents] SSE connected ✓');
+          return;
+        }
+        if (response.status === 401) {
+          throw new Error('TOKEN_EXPIRED');
+        }
+        throw new Error(`SSE connection failed: ${response.status}`);
+      },
+
+      onmessage(event) {
+        if (!event.data) return;
+
+        console.log(`[AlertEvents] Raw message received | Event: ${event.event} | Data:`, event.data);
+
+        const playNotificationSound = () => {
+          try {
+            const audio = new Audio('/sounds/dragon-studio-notification-sound-effect-372475.mp3');
+            audio.play().catch(e => {
+              // Puede fallar si el usuario no ha interactuado con el DOM aún
+              console.warn('[AlertEvents] Audio play blocked:', e.message);
+            });
+          } catch (e) {
+            console.error('[AlertEvents] Audio init failed:', e);
+          }
+        };
+
+        const showGenericNotification = () => {
+          // Usamos toast.warning (o toast.info) en lugar del genérico 'toast()' 
+          // para que tome los estilos, iconos y bordes del diseño de tu sistema.
+          toast.warning('Nuevas notificaciones', {
+            id: 'generic-alert-toast',
+            description: 'Revisa la campana para ver los detalles de inventario o sistema.',
+            duration: 5000,
+          });
+          playNotificationSound();
+        };
+
+        try {
+          const rawAlert = JSON.parse(event.data);
+          const alert = mapToAlert(rawAlert);
+
+          switch (event.event) {
+            case 'alert-created':
+            case 'new-alert':
+              console.log('[AlertEvents] SSE event:', event.event, alert.message);
+
+              // Protegemos contra spam en caso de que el backend envíe 'new-alert' repetidamente
+              const state = useAlertStore.getState();
+              const alreadyExists = state.bellAlerts.some(a => a.id === alert.id);
+
+              if (!alreadyExists) {
+                incrementUnseen();
+                showGenericNotification();
+              }
+              addBellAlert(alert);
+              break;
+            case 'alert-updated':
+              console.log('[AlertEvents] SSE alert-updated:', alert.message);
+              if (!alert.isViewed) {
+                const state = useAlertStore.getState();
+                const wasInBell = state.bellAlerts.some(a => a.id === alert.id);
+
+                // Si la alerta NO estaba en la campana (porque ya la habíamos visto) 
+                // y el backend la vuelve a poner como "no vista" (re-trigger de 5 mins):
+                if (!wasInBell) {
+                  showGenericNotification();
+                }
+
+                // La agregamos/actualizamos en la campana
+                addBellAlert(alert);
+              } else {
+                // Alguien la marcó como leída en otro dispositivo
+                removeBellAlert(alert.id);
+              }
+              // Forzamos a que React Query refresque el badge para mantener la exactitud
+              queryClient.invalidateQueries({ queryKey: ['alert-summary'] });
+              break;
+            case 'alert-resolved':
+              console.log('[AlertEvents] SSE alert-resolved:', alert.message);
+              if (!alert.isViewed) {
+                decrementUnseen();
+              }
+              removeBellAlert(alert.id);
+              break;
+            case 'connected':
+              console.log('[AlertEvents] SSE handshake received');
+              break;
+          }
+        } catch (err) {
+          console.error('[AlertEvents] Failed to parse SSE alert data:', err);
+        }
+      },
+
+      onerror(err: any) {
+        if (err.message === 'TOKEN_EXPIRED') {
+          console.log('[AlertEvents] Token expired, executing refresh mechanism...');
+
+          // Abortamos la ejecución de fetchEventSource actual síncronamente para evitar bucles
+          if (abortRef.current) {
+            abortRef.current.abort();
+          }
+
+          const executeRefresh = async () => {
+            try {
+              const state = useAuthStore.getState();
+              if (!state.refreshToken) throw new Error('No refresh token available');
+
+              const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+              const res = await fetch(`${rawApiUrl}/auth/refresh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refreshToken: state.refreshToken })
+              });
+
+              if (!res.ok) {
+                throw new Error(`Refresh failed with status ${res.status}`);
+              }
+
+              const data = await res.json();
+
+              if (state.user && state.company) {
+                state.setAuth(state.user, state.company, data.accessToken, data.refreshToken);
+              }
+
+            } catch (refreshErr) {
+              console.error('[AlertEvents] SSE Refresh token failed -> logging out.', refreshErr);
+              useAuthStore.getState().logout();
+              window.location.href = '/auth/login';
+            }
+          };
+
+          // Disparamos la función asíncrona sin bloquear el hilo principal
+          executeRefresh();
+
+          return;
+        }
+
+        // Lanzamos otros errores para que fetchEventSource haga su retry automático con backoff
+        throw err;
+      },
+
+      onclose() {
+        console.log('[AlertEvents] SSE closed by server.');
+      },
+    });
+  }, [token, incrementUnseen, decrementUnseen, addBellAlert, updateBellAlert, removeBellAlert]);
+
+  const closeSSE = useCallback(() => {
+    if (abortRef.current) abortRef.current.abort();
+  }, []);
 
   useEffect(() => {
     if (!token || !userRole) return;
     const allowedRoles = ['jefe', 'empleado', 'administrador'];
     if (!allowedRoles.includes(userRole)) return;
 
-    const abortController = new AbortController();
+    startSSE();
 
-    // Helper: stable key for a product+branch (survives backend re-creation of alerts)
-    const stableKey = (alert: { product?: { id: string }; branch?: { id: string } }) =>
-      `${alert.product?.id || ''}_${alert.branch?.id || ''}`;
-
-    // ──────────────────────────────────────────────────────────────
-    // Fetch alerts using apiClient (handles auth, token refresh, CORS)
-    // ──────────────────────────────────────────────────────────────
-    const fetchAlerts = async (showToasts: boolean) => {
-      try {
-        const data = await alertApi.getAlerts(1, 50);
-        if (abortController.signal.aborted) return;
-
-        // ALL visible alerts go in the bell — the alert system works as periodic
-        // reminders until the stock is replenished. We don't filter by isViewed
-        // because the backend recreates alerts every ~5 min as reminders.
-        const allAlerts = data.items;
-        setUnreadAlerts(allAlerts);
-
-        if (showToasts) {
-          // Compare current product+branch keys with known ones.
-          // If a key is new (not seen before), show a toast — it's a new reminder cycle.
-          const currentKeys = new Set<string>();
-          for (const alert of allAlerts) {
-            const key = stableKey(alert);
-            currentKeys.add(key);
-            if (!knownKeysRef.current.has(key)) {
-              toast.warning('Nueva Alerta: ' + alert.message, {
-                description: alert.branch?.name ? `Sucursal: ${alert.branch.name}` : undefined,
-                duration: 5000,
-              });
-            }
-          }
-
-          // Keys that disappeared → product went above min stock → forget them
-          // so they trigger toasts again if they reappear.
-          // Keys that are still present → keep them (no re-toast within same cycle).
-          knownKeysRef.current = currentKeys;
-        } else {
-          // Initial load — just memorize keys, no toasts
-          for (const alert of allAlerts) {
-            knownKeysRef.current.add(stableKey(alert));
-          }
-        }
-      } catch (e: any) {
-        if (e.name !== 'AbortError') {
-          console.error('Error fetching alerts:', e);
-        }
-      }
-    };
-
-    // ──────────────────────────────────────────────────────────────
-    // SSE: real-time stream (works locally, may be blocked by proxies in prod)
-    // ──────────────────────────────────────────────────────────────
-    const connectSSE = async () => {
-      try {
-        const currentToken = tokenRef.current;
-        if (!currentToken) return;
-
-        // In dev we use the Vite proxy, in prod we hit the API directly.
-        const isDev = import.meta.env.DEV;
-        const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const sseUrl = isDev
-          ? '/api-proxy/alerts/events'
-          : `${rawApiUrl.replace(/\/+$/, '')}/alerts/events`;
-
-        const response = await fetch(sseUrl, {
-          headers: {
-            'Authorization': `Bearer ${currentToken}`,
-            'Accept': 'text/event-stream',
-          },
-          signal: abortController.signal,
-        });
-
-        if (!response.ok) {
-          throw new Error(`SSE connection failed: ${response.status}`);
-        }
-
-        const reader = response.body?.getReader();
-        if (!reader) throw new Error('SSE response body is not readable');
-
-        const decoder = new TextDecoder();
-        let buffer = '';
-
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-
-          buffer += decoder.decode(value, { stream: true });
-          const messages = buffer.split(/\r?\n\r?\n/);
-          buffer = messages.pop() || '';
-
-          for (const msg of messages) {
-            if (!msg.trim() || msg.trim().startsWith(':')) continue;
-
-            if (msg.includes('event: new-alert') || msg.includes('event:new-alert')) {
-              // When SSE delivers an alert, trigger a full refresh so the bell
-              // and toast logic stays consistent with the polling path.
-              await fetchAlerts(true);
-              break; // One refresh per SSE batch is enough
-            }
-          }
-        }
-      } catch (error: any) {
-        if (error.name !== 'AbortError') {
-          console.error('SSE connection error (falling back to polling):', error);
-        }
-      } finally {
-        // Reconnect SSE after disconnect
-        if (!abortController.signal.aborted) {
-          setTimeout(connectSSE, 15_000);
-        }
-      }
-    };
-
-    // ──────────────────────────────────────────────────────────────
-    // Bootstrap: initial fetch → SSE + polling
-    // ──────────────────────────────────────────────────────────────
-    fetchAlerts(false).then(() => {
-      if (!abortController.signal.aborted) {
-        connectSSE();
-      }
-    });
-
-    // Polling runs in parallel as the primary delivery mechanism.
-    // SSE may be blocked by NGINX/Vercel proxies that buffer the stream,
-    // so polling guarantees delivery regardless of deployment environment.
-    const pollInterval = setInterval(() => fetchAlerts(true), POLL_INTERVAL_MS);
-
-    return () => {
-      abortController.abort();
-      clearInterval(pollInterval);
-    };
-  }, [token, userRole, addAlert, setUnreadAlerts]);
+    return () => closeSSE();
+  }, [token, userRole, startSSE, closeSSE]);
 };

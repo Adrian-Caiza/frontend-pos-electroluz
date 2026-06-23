@@ -20,11 +20,15 @@ export const useUpdateProducto = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['productos'] });
-      toast.success('Producto actualizado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Producto actualizado exitosamente'
+      });
     },
     onError: (error: any) => {
       const errorMessage = error.response?.data?.message || 'Error al actualizar el producto';
-      toast.error(typeof errorMessage === 'string' ? errorMessage : 'Error de validación');
+      toast.error('Error de validación', {
+        description: typeof errorMessage === 'string' ? errorMessage : 'Revise los campos e intente de nuevo'
+      });
     },
   });
 };

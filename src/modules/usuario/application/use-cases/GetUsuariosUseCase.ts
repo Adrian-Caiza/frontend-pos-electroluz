@@ -8,7 +8,7 @@ export class GetUsuariosUseCase {
     this.repository = repository;
   }
 
-  async execute(page: number, pageSize: number): Promise<PaginatedUsuarios> {
-    return this.repository.getUsuarios(page, pageSize);
+  async execute(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedUsuarios> {
+    return this.repository.getUsuarios(page, pageSize, search, status);
   }
 }

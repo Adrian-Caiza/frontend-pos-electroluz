@@ -8,6 +8,7 @@ import { columns } from '../table/columns';
 import type { CheckoutTableMeta } from '../table/columns';
 import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { Button } from '../../../../shared/components/ui/button';
+import { useListFilters } from '../../../../shared/hooks/useListFilters';
 import {
   Select,
   SelectContent,
@@ -17,14 +18,10 @@ import {
 } from '../../../../shared/components/ui/select';
 
 export const CheckoutTable = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('todos');
+  const { page, setPage, pageSize, setPageSize, search, setSearch, status, setStatus, debouncedSearch } = useListFilters(10);
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
-  
-  // Obtenemos un número grande de registros para permitir filtrado local
-  const { data, isLoading, isError } = useCheckouts(1, 1000);
+
+    const { data, isLoading, isError } = useCheckouts(page, pageSize, debouncedSearch, status);
   const updateMutation = useUpdateCheckoutStatus();
   const { mutate: updateStatus } = updateMutation;
   const { user } = useAuthStore();
@@ -58,33 +55,14 @@ export const CheckoutTable = () => {
     onChangeStatus: handleStatusChange,
   };
 
-  // Filtrado local
-  const filteredData = useMemo(() => {
-    if (!data?.items) return [];
-    let items = data.items.filter((c) => c.cjestado !== 'eliminado');
     
-    if (statusFilter !== 'todos') {
-      items = items.filter((c) => c.cjestado === statusFilter);
-    }
-    
-    if (globalFilter) {
-      const lowerQuery = globalFilter.toLowerCase();
-      items = items.filter((c) => 
-        c.cjidentificador.toLowerCase().includes(lowerQuery) || 
-        c.sucursal?.sunombre?.toLowerCase().includes(lowerQuery)
-      );
-    }
-    
-    return items;
-  }, [data?.items, globalFilter, statusFilter]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredData.slice(startIndex, startIndex + pageSize);
-  }, [filteredData, page, pageSize]);
+  
 
-  const totalFilteredItems = filteredData.length;
-  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+  
+  const tableData = data?.items || [];
+  const totalItems = data?.totalItems || 0;
+  const pageCount = data?.totalPages || 0;
 
   if (isError) return <div className="p-4 text-center text-red-500">Error al cargar las cajas</div>;
 
@@ -92,7 +70,7 @@ export const CheckoutTable = () => {
     <div className="space-y-4">
       <DataTable
         columns={columns}
-        data={paginatedData}
+        data={tableData}
         meta={meta}
         isLoading={isLoading}
         pageCount={pageCount}
@@ -105,16 +83,16 @@ export const CheckoutTable = () => {
         onRowSelectionChange={setRowSelection}
         getRowId={(row) => row.cjid}
         toolbar={{
-          globalFilter,
-          onGlobalFilterChange: setGlobalFilter,
+          globalFilter: search,
+          onGlobalFilterChange: setSearch,
           searchPlaceholder: "Buscar por identificador o sucursal...",
-          onAdvancedFilterClick: () => {},
+          onAdvancedFilterClick: () => { },
           children: (
             <div className="flex gap-2">
               {Object.keys(rowSelection).length > 0 ? (
                 <>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                     onClick={() => handleBulkAction('activo')}
@@ -123,8 +101,8 @@ export const CheckoutTable = () => {
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Activar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                     onClick={() => handleBulkAction('inactivo')}
@@ -133,8 +111,8 @@ export const CheckoutTable = () => {
                     <XCircle className="mr-2 h-4 w-4" />
                     Inactivar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
                     onClick={() => handleBulkAction('eliminado')}
@@ -143,8 +121,8 @@ export const CheckoutTable = () => {
                     <Trash2 className="mr-2 h-4 w-4" />
                     Eliminar
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     className="h-9 text-slate-500 hover:text-slate-700"
                     onClick={() => setRowSelection({})}
@@ -154,7 +132,7 @@ export const CheckoutTable = () => {
                   </Button>
                 </>
               ) : (
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select value={status ?? 'todos'} onValueChange={(v) => setStatus(v === 'todos' ? undefined : v)}>
                   <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>

@@ -18,12 +18,16 @@ export const useUpdateSucursal = () => {
   return useMutation({
     mutationFn: ({ id, data }: UpdateParams) => updateSucursalUseCase.execute(id, data),
     onSuccess: () => {
-      toast.success('Sucursal actualizada exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Sucursal actualizada exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['sucursales'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar la sucursal';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

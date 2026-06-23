@@ -28,9 +28,10 @@ import { ThemeProvider } from './shared/components/theme-provider';
 
 const HomeRedirect = () => {
   const { user } = useAuthStore();
-  if (user?.usrol === 'jefe') return <Navigate to="/dashboard" replace />;
-  if (user?.usrol === 'cajero') return <Navigate to="/caja" replace />;
-  if (user?.usrol === 'empleado') return <Navigate to="/terminal" replace />;
+  const role = user?.usrol?.toLowerCase();
+  if (role === 'jefe') return <Navigate to="/dashboard" replace />;
+  if (role === 'cajero') return <Navigate to="/caja" replace />;
+  if (role === 'empleado') return <Navigate to="/terminal" replace />;
   return <Navigate to="/unauthorized" replace />;
 };
 

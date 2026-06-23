@@ -20,6 +20,7 @@ import {
   Activity
 } from 'lucide-react';
 import { getImageUrl } from '../../../../shared/utils/getImageUrl';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -45,7 +46,7 @@ const formSchema = z.object({
   prdtomrcid: z.string().max(255, 'El texto es demasiado largo').optional(),
   prdtoprovid: z.string().max(255, 'El texto es demasiado largo').optional(),
   prdtomdiaid: z.string().max(255, 'El texto es demasiado largo').optional(),
-  prdtocodigo: z.string().max(255, 'El texto es demasiado largo').min(3).optional(),
+  prdtocodigo: z.string().regex(/^\d{13}$/, 'Debe tener exactamente 13 números (ej. 7861000000093)'),
   prdtonombre: z.string().max(255, 'El texto es demasiado largo').min(3).optional(),
   prdtopreciocompra: z.string().max(255, 'El texto es demasiado largo').optional().refine(val => !val || /^\d+(\.\d{1,2})?$/.test(val), 'Máximo 2 decimales (ej: 10.50)'),
   prdtoprecioventa: z.string().max(255, 'El texto es demasiado largo').optional().refine(val => !val || /^\d+(\.\d{1,2})?$/.test(val), 'Máximo 2 decimales (ej: 10.50)'),
@@ -73,6 +74,16 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
   const { data: proveedoresData, isLoading: loadingProv } = useProveedores(1, 100);
   const { data: medidasData, isLoading: loadingMedidas } = useMedidas(1, 100);
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -83,17 +94,25 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
 
   useEffect(() => {
     if (producto && open) {
+      const parseNum = (val: string | number | undefined | null, isInt = false) => {
+        if (val === undefined || val === null || val === '') return '';
+        const cleanVal = String(val).replace(',', '.');
+        const num = Number(cleanVal);
+        if (isNaN(num)) return String(val);
+        return isInt ? Math.round(num).toString() : num.toString();
+      };
+
       form.reset({
-        prdtoctgriaid: producto.categoria?.ctgriaid || '',
+        prdtoctgriaid: producto.categoria?.ctgriaid || (producto as any).ctgria?.ctgriaid || '',
         prdtomrcid: producto.marca?.mrcid || '',
         prdtoprovid: producto.proveedor?.provid || '',
         prdtomdiaid: producto.medida?.mdiaid || '',
         prdtocodigo: producto.prdtocodigo,
         prdtonombre: producto.prdtonombre,
-        prdtopreciocompra: producto.prdtopreciocompra,
-        prdtoprecioventa: producto.prdtoprecioventa,
-        prdtostockminimo: producto.prdtostockminimo,
-        prdtostockmaximo: producto.prdtostockmaximo,
+        prdtopreciocompra: parseNum(producto.prdtopreciocompra),
+        prdtoprecioventa: parseNum(producto.prdtoprecioventa),
+        prdtostockminimo: parseNum(producto.prdtostockminimo, true),
+        prdtostockmaximo: parseNum(producto.prdtostockmaximo, true),
         prdtoestado: producto.prdtoestado,
       });
       setImagePreview(producto.prdtoimagen);
@@ -128,17 +147,19 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
 
   const footer = (
     <ModalFooter 
-      onCancel={() => onOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={updateMutation.isPending}
       confirmLabel="Guardar Cambios"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
-    <BaseModal 
+    <>
+      <BaseModal 
       isOpen={open} 
-      onClose={() => onOpenChange(false)}
+      onClose={handleRequestClose}
       title="Editar Producto"
       subtitle={`Modificando información del producto ${producto?.prdtocodigo || ''}.`}
       size="2xl"
@@ -170,7 +191,7 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
                           className="flex h-11 w-full rounded-xl border border-border bg-transparent dark:bg-slate-900 text-foreground pl-10 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           <option value="">Seleccione una categoría</option>
-                          {categoriasData?.items.filter(cat => cat.ctgriaestado === 'activo' || cat.ctgriaid === producto?.categoria?.ctgriaid).map(cat => (
+                          {categoriasData?.items.filter(cat => cat.ctgriaestado === 'activo' || cat.ctgriaid === producto?.categoria?.ctgriaid || cat.ctgriaid === (producto as any)?.ctgria?.ctgriaid).map(cat => (
                             <option key={cat.ctgriaid} value={cat.ctgriaid}>{cat.ctgnombre}</option>
                           ))}
                         </select>
@@ -262,7 +283,7 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
                 render={({ field, fieldState }) => (
                   <ModalField label="Código" required error={fieldState.error?.message}>
                     <FormControl>
-                      <Input icon={Barcode} className="h-11 rounded-xl" placeholder="Ej. PRD-001" {...field} />
+                      <Input icon={Barcode} className="h-11 rounded-xl" placeholder="Ej. 7861000000093" {...field} />
                     </FormControl>
                   </ModalField>
                 )}
@@ -384,7 +405,7 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
                           const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
                           if (fileInput) fileInput.value = '';
                         }}
-                        className="absolute -top-2 -right-2 bg-rose-500 text-white rounded-full p-1 shadow-sm hover:bg-rose-600 transition-colors z-10"
+                        className="absolute top-1 right-1 bg-rose-500 text-white rounded-full p-1 shadow-sm hover:bg-rose-600 transition-colors z-10"
                         title="Eliminar foto"
                       >
                         <X className="w-4 h-4" />
@@ -405,5 +426,20 @@ export const EditProductoModal = ({ producto, open, onOpenChange }: EditProducto
         </form>
       </Form>
     </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          onOpenChange(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
+    </>
   );
 };

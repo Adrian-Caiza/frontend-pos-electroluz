@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { Sheet, SheetContent, SheetTitle } from '../ui/sheet';
 import { useAuthStore } from '../../stores/useAuthStore';
 import {
   PanelLeftClose,
@@ -26,9 +27,11 @@ import { cn } from '../../lib/utils';
 export interface SidebarProps {
   companyName?: string;
   companyLogo?: string | null;
+  isMobileOpen?: boolean;
+  onMobileOpenChange?: (open: boolean) => void;
 }
 
-export const Sidebar = ({ companyName, companyLogo }: SidebarProps) => {
+export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenChange }: SidebarProps) => {
   const location = useLocation();
   const { user } = useAuthStore();
 
@@ -88,9 +91,9 @@ export const Sidebar = ({ companyName, companyLogo }: SidebarProps) => {
     items: group.items.filter(item => item.roles.includes(user?.usrol || ''))
   })).filter(group => group.items.length > 0);
 
-  return (
+  const sidebarContent = (
     <aside className={cn(
-      "group relative z-20 flex flex-col bg-sidebar rounded-3xl transition-all duration-300 ease-in-out hidden md:flex h-full",
+      "group relative z-20 flex flex-col bg-sidebar rounded-3xl transition-all duration-300 ease-in-out h-full",
       isExpanded ? "w-56" : "w-[72px] hover:w-56"
     )}>
       {/* Header section (Company Logo) */}
@@ -223,5 +226,25 @@ export const Sidebar = ({ companyName, companyLogo }: SidebarProps) => {
         }
       `}</style>
     </aside>
+  );
+
+  return (
+    <>
+      <div className="hidden md:block h-full">
+        {sidebarContent}
+      </div>
+
+      <Sheet open={isMobileOpen} onOpenChange={onMobileOpenChange}>
+        <SheetContent side="left" className="p-0 w-max bg-transparent border-none">
+          <div className="sr-only"><SheetTitle>Menú de navegación</SheetTitle></div>
+          <div className="h-full py-4 pl-4 pr-1">
+            {/* Forzamos a expandido en móvil */}
+            <div className="h-full w-56 [&>aside]:w-full">
+              {sidebarContent}
+            </div>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };

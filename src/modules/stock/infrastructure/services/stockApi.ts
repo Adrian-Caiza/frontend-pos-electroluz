@@ -7,10 +7,11 @@ import type {
 } from '../../domain/entities/Stock';
 
 export const stockApi = {
-  getStocksBySucursal: async (suidentificador: string | undefined, stcksuid: string | undefined, page: number, pageSize: number): Promise<PaginatedStocks> => {
+  getStocksBySucursal: async (suidentificador: string | undefined, stcksuid: string | undefined, page: number, pageSize: number, search?: string): Promise<PaginatedStocks> => {
     const params: any = { page, pageSize };
     if (stcksuid) params.stcksuid = stcksuid;
     else if (suidentificador) params.suidentificador = suidentificador;
+    if (search) params.search = search;
 
     const response = await apiClient.get('/stocks', { params });
     return response.data;

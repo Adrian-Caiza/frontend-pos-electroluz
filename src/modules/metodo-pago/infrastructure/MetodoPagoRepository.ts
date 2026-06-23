@@ -1,16 +1,16 @@
 import type { IMetodoPagoRepository } from '../domain/IMetodoPagoRepository';
 import type { MetodoPago, CreateMetodoPagoDTO, UpdateMetodoPagoDTO } from '../domain/MetodoPago';
 import type { PaginatedResult } from '../../../shared/types/PaginatedResult';
-import { 
-  fetchMetodosPago, 
-  fetchMetodoPagoById, 
-  createMetodoPago, 
-  updateMetodoPago 
+import {
+  fetchMetodosPago,
+  fetchMetodoPagoById,
+  createMetodoPago,
+  updateMetodoPago
 } from './metodoPagoApi';
 
 export class MetodoPagoRepository implements IMetodoPagoRepository {
-  async getMetodosPago(page: number, pageSize: number): Promise<PaginatedResult<MetodoPago>> {
-    return await fetchMetodosPago(page, pageSize);
+  async getMetodosPago(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResult<MetodoPago>> {
+    return await fetchMetodosPago(page, pageSize, search, status);
   }
 
   async getMetodoPagoById(id: string): Promise<MetodoPago> {

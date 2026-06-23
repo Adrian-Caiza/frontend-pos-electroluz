@@ -5,6 +5,7 @@ import { useProformas } from '../../hooks/useProformas';
 import { useCancelProforma } from '../../hooks/useCancelProforma';
 import { usePayProforma } from '../../hooks/usePayProforma';
 import { useProformaPdf } from '../../hooks/useProformaPdf';
+import { useSendProforma } from '../../hooks/useSendProforma';
 import { DataTable } from '../../../../../shared/components/ui/data-table/DataTable';
 import { columns } from '../../table/columns';
 import type { ProformaTableMeta } from '../../table/columns';
@@ -18,20 +19,19 @@ import {
   SelectValue,
 } from '../../../../../shared/components/ui/select';
 import { ConfirmDialog } from '../../../../../shared/components/ui/modal/ConfirmDialog';
+import { useListFilters } from '../../../../../shared/hooks/useListFilters';
 
 export const ProformaTable = () => {
   const navigate = useNavigate();
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('todos');
+  const { page, setPage, pageSize, setPageSize, search, setSearch, status, setStatus, debouncedSearch } = useListFilters(10);
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const { data, isLoading } = useProformas(1, 1000); // Fetch all for local filtering
+  const { data, isLoading } = useProformas(page, pageSize, debouncedSearch, status);
   const { mutateAsync: cancelProforma, isPending: isCanceling } = useCancelProforma();
   const { mutateAsync: payProforma, isPending: isPaying } = usePayProforma();
   const { mutate: viewPdf, isPending: isViewingPdf } = useProformaPdf();
+  const { mutate: sendProforma, isPending: isSending } = useSendProforma();
 
   const [confirmDialog, setConfirmDialog] = useState<{
     isOpen: boolean;
@@ -44,7 +44,7 @@ export const ProformaTable = () => {
     title: '',
     description: '',
     variant: 'default',
-    action: () => {},
+    action: () => { },
   });
 
   const handleCancel = async (id: string) => {
@@ -80,7 +80,7 @@ export const ProformaTable = () => {
     setConfirmDialog({
       isOpen: true,
       title: action === 'cancelar' ? '¿Cancelar Proformas?' : '¿Pagar Proformas?',
-      description: action === 'cancelar' 
+      description: action === 'cancelar'
         ? `¿Estás seguro de CANCELAR ${selectedIds.length} proformas?`
         : `¿Confirmas el PAGO de ${selectedIds.length} proformas?`,
       variant: action === 'cancelar' ? 'destructive' : 'info',
@@ -101,130 +101,108 @@ export const ProformaTable = () => {
     });
   };
 
-  // Filtrado local
-  const filteredData = useMemo(() => {
-    if (!data?.items) return [];
-    let items = data.items;
     
-    if (statusFilter !== 'todos') {
-      items = items.filter((p) => p.prfmaestado === statusFilter);
-    }
-    
-    if (globalFilter) {
-      const lowerQuery = globalFilter.toLowerCase();
-      items = items.filter((p) => {
-        const clienteObj = (p.receptor as any).cliente || p.receptor;
-        const doc = clienteObj.clnteidentificacion || clienteObj.identificacion || '';
-        const nombre = clienteObj.clntenombre || '';
-        
-        return p.prfmaidentificador.toLowerCase().includes(lowerQuery) || 
-               nombre.toLowerCase().includes(lowerQuery) ||
-               doc.toLowerCase().includes(lowerQuery);
-      });
-    }
-    
-    return items;
-  }, [data?.items, globalFilter, statusFilter]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredData.slice(startIndex, startIndex + pageSize);
-  }, [filteredData, page, pageSize]);
+  
 
-  const totalFilteredItems = filteredData.length;
-  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+  
+  const tableData = data?.items || [];
+  const totalItems = data?.totalItems || 0;
+  const pageCount = data?.totalPages || 0;
 
   const meta: ProformaTableMeta = {
     onCancel: handleCancel,
     onPay: handlePay,
     onEdit: (id: string) => navigate(`/terminal?edit=${id}`),
     onViewPdf: (id: string) => viewPdf(id),
+    onSend: (id: string, channel: 'email' | 'whatsapp') => sendProforma({ id, channel }),
     isCanceling,
     isPaying,
+    isSending,
   };
 
   return (
     <>
-    <DataTable
-      columns={columns}
-      data={paginatedData}
-      meta={meta}
-      isLoading={isLoading}
-      pageCount={pageCount}
-      rowCount={totalFilteredItems}
-      pagination={{ pageIndex: page - 1, pageSize }}
-      onPaginationChange={(newPagination) => {
-        setPage(newPagination.pageIndex + 1);
-        setPageSize(newPagination.pageSize);
-      }}
-      rowSelection={rowSelection}
-      onRowSelectionChange={setRowSelection}
-      getRowId={(row) => row.prfmaid}
-      toolbar={{
-        globalFilter,
-        onGlobalFilterChange: setGlobalFilter,
-        searchPlaceholder: "Buscar por comprobante, cliente o CI/RUC...",
-        onAdvancedFilterClick: () => {},
-        children: (
-          <div className="flex gap-2">
-            {Object.keys(rowSelection).length > 0 ? (
-              <>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
-                  onClick={() => handleBulkAction('pagar')}
-                  disabled={isProcessingBulk || isCanceling || isPaying}
-                >
-                  <CheckCircle2 className="mr-2 h-4 w-4" />
-                  Pagar Seleccionadas
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
-                  onClick={() => handleBulkAction('cancelar')}
-                  disabled={isProcessingBulk || isCanceling || isPaying}
-                >
-                  <XCircle className="mr-2 h-4 w-4" />
-                  Cancelar Seleccionadas
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm"
-                  className="h-9 text-slate-500 hover:text-slate-700"
-                  onClick={() => setRowSelection({})}
-                  disabled={isProcessingBulk || isCanceling || isPaying}
-                >
-                  Deseleccionar
-                </Button>
-              </>
-            ) : (
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
-                  <SelectValue placeholder="Estado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos los Estados</SelectItem>
-                  <SelectItem value="emitida">Emitida</SelectItem>
-                  <SelectItem value="pagada">Pagada</SelectItem>
-                  <SelectItem value="anulada">Anulada</SelectItem>
-                </SelectContent>
-              </Select>
-            )}
-          </div>
-        )
-      }}
-    />
-    <ConfirmDialog
-      isOpen={confirmDialog.isOpen}
-      onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
-      onConfirm={confirmDialog.action}
-      title={confirmDialog.title}
-      description={confirmDialog.description}
-      variant={confirmDialog.variant}
-      isLoading={isCanceling || isPaying || isProcessingBulk}
-    />
+      <DataTable
+        columns={columns}
+        data={tableData}
+        meta={meta}
+        isLoading={isLoading}
+        pageCount={pageCount}
+        rowCount={totalItems}
+        pagination={{ pageIndex: page - 1, pageSize }}
+        onPaginationChange={(newPagination) => {
+          setPage(newPagination.pageIndex + 1);
+          setPageSize(newPagination.pageSize);
+        }}
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+        getRowId={(row) => row.prfmaid}
+        toolbar={{
+          globalFilter: search,
+          onGlobalFilterChange: setSearch,
+          searchPlaceholder: "Buscar por comprobante, cliente o CI/RUC...",
+          onAdvancedFilterClick: () => { },
+          children: (
+            <div className="flex gap-2">
+              {Object.keys(rowSelection).length > 0 ? (
+                <>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                    onClick={() => handleBulkAction('pagar')}
+                    disabled={isProcessingBulk || isCanceling || isPaying}
+                  >
+                    <CheckCircle2 className="mr-2 h-4 w-4" />
+                    Pagar Seleccionadas
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                    onClick={() => handleBulkAction('cancelar')}
+                    disabled={isProcessingBulk || isCanceling || isPaying}
+                  >
+                    <XCircle className="mr-2 h-4 w-4" />
+                    Cancelar Seleccionadas
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-9 text-slate-500 hover:text-slate-700"
+                    onClick={() => setRowSelection({})}
+                    disabled={isProcessingBulk || isCanceling || isPaying}
+                  >
+                    Deseleccionar
+                  </Button>
+                </>
+              ) : (
+                <Select value={status ?? 'todos'} onValueChange={(v) => setStatus(v === 'todos' ? undefined : v)}>
+                  <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
+                    <SelectValue placeholder="Estado" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="todos">Todos los Estados</SelectItem>
+                    <SelectItem value="emitida">Emitida</SelectItem>
+                    <SelectItem value="pagada">Pagada</SelectItem>
+                    <SelectItem value="anulada">Anulada</SelectItem>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          )
+        }}
+      />
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={confirmDialog.action}
+        title={confirmDialog.title}
+        description={confirmDialog.description}
+        variant={confirmDialog.variant}
+        isLoading={isCanceling || isPaying || isProcessingBulk}
+      />
     </>
   );
 };

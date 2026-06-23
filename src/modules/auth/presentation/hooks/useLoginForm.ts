@@ -35,7 +35,9 @@ export const useLoginForm = () => {
     mutationFn: (data: LoginFormData) => loginUseCase.execute(data),
     onSuccess: (data) => {
       setAuth(data.user, data.company, data.accessToken, data.refreshToken);
-      toast.success('Inicio de sesión exitoso');
+      toast.success('Operación exitosa', {
+        description: 'Inicio de sesión exitoso'
+      });
       
       // Role-based redirection
       if (data.user.usrol === 'cajero') {

@@ -12,7 +12,7 @@ export class ProductoRepository implements IProductoRepository {
     return productoApi.update(id, data);
   }
 
-  async getProductos(page: number, pageSize: number): Promise<PaginatedResponse<Producto>> {
-    return productoApi.getAll(page, pageSize);
+  async getProductos(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResponse<Producto>> {
+    return productoApi.getAll(page, pageSize, search, status);
   }
 }

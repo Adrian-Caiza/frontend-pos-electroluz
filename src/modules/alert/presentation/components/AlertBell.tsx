@@ -1,4 +1,5 @@
-import { Bell, PackageSearch, AlertTriangle, Check, RefreshCw } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, PackageSearch, AlertTriangle, Check, RefreshCw, Loader2 } from 'lucide-react';
 import { Button } from '../../../../shared/components/ui/button';
 import {
   DropdownMenu,
@@ -8,33 +9,48 @@ import {
 import { useAlertStore } from '../store/useAlertStore';
 import { useAlertEvents } from '../hooks/useAlertEvents';
 import { useMarkAlertAsViewed } from '../hooks/useMarkAlertAsViewed';
-import { cn } from '../../../../shared/lib/utils';
+import { alertApi } from '../../infrastructure/services/alertApi';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Badge } from '../../../../shared/components/ui/badge';
 
 export const AlertBell = () => {
-  useAlertEvents(); // Inicia la conexión SSE
-  const { unreadAlerts, removeUnreadAlert, clearUnreadAlerts } = useAlertStore();
+  useAlertEvents(); // Starts SSE
+  
+  const { unseenCount, bellAlerts, setBellAlerts, removeBellAlert, clearBellAlerts, decrementUnseen } = useAlertStore();
   const { mutate: markAsViewed } = useMarkAlertAsViewed();
+  
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsLoading(true);
+      alertApi.getAlerts(1, 15, { visible: true, visto: false })
+        .then((res) => {
+          setBellAlerts(res.items);
+        })
+        .catch(console.error)
+        .finally(() => setIsLoading(false));
+    }
+  }, [isOpen, setBellAlerts]);
 
   const handleMarkAsViewed = (id: string) => {
-    markAsViewed(id, {
-      onSuccess: () => {
-        removeUnreadAlert(id);
-      }
-    });
+    // Ya no hacemos actualizaciones optimistas locales
+    markAsViewed(id);
   };
 
   const handleMarkAllAsRead = () => {
-    const alertsToMark = [...unreadAlerts];
-    clearUnreadAlerts();
-    alertsToMark.forEach(alert => markAsViewed(alert.id));
+    // Ya no limpiamos la UI de forma optimista
+    // Iteramos y mandamos al servidor, la confirmación actualizará la UI
+    bellAlerts.forEach(alert => {
+      markAsViewed(alert.id);
+    });
   };
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button 
           variant="ghost" 
@@ -42,9 +58,9 @@ export const AlertBell = () => {
           className="relative w-10 h-10 rounded-xl bg-white/50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700/50 border border-slate-200/50 dark:border-slate-700/50 backdrop-blur-sm shadow-sm transition-colors text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white focus-visible:ring-0"
         >
           <Bell className="w-5 h-5" />
-          {unreadAlerts.length > 0 && (
+          {unseenCount > 0 && (
             <span className="absolute -top-1 -right-1 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white ring-2 ring-card shadow-sm">
-              {unreadAlerts.length > 99 ? '99+' : unreadAlerts.length}
+              {unseenCount > 99 ? '99+' : unseenCount}
             </span>
           )}
         </Button>
@@ -58,20 +74,24 @@ export const AlertBell = () => {
             <h3 className="font-semibold text-foreground text-[15px]">Notificaciones</h3>
           </div>
           <div className="flex items-center gap-2">
-            {unreadAlerts.length > 0 && (
+            {unseenCount > 0 && (
               <Badge variant="secondary" className="px-2 py-0.5 text-[11px] font-medium bg-muted text-muted-foreground hover:bg-muted shadow-none">
-                {unreadAlerts.length} nuevas
+                {unseenCount} nuevas
               </Badge>
             )}
             <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full">
-              <RefreshCw className="w-3.5 h-3.5" />
+              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
             </Button>
           </div>
         </div>
 
         {/* Content */}
         <div className="max-h-[400px] overflow-y-auto p-3 space-y-2 bg-slate-50/50 dark:bg-slate-900/20">
-          {unreadAlerts.length === 0 ? (
+          {isLoading && bellAlerts.length === 0 ? (
+            <div className="py-12 flex justify-center items-center">
+              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+            </div>
+          ) : bellAlerts.length === 0 ? (
             <div className="py-12 text-center text-muted-foreground flex flex-col items-center justify-center">
               <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center mb-3">
                 <Bell className="w-6 h-6 text-muted-foreground/50" />
@@ -81,7 +101,7 @@ export const AlertBell = () => {
             </div>
           ) : (
             <div className="flex flex-col gap-2">
-              {unreadAlerts.slice(0, 15).map((alert) => (
+              {bellAlerts.map((alert) => (
                 <div 
                   key={alert.id} 
                   className="group relative flex gap-3 p-3 rounded-xl border border-border bg-card shadow-sm hover:border-emerald-500/30 hover:shadow-md transition-all duration-200"
@@ -137,7 +157,9 @@ export const AlertBell = () => {
                   </button>
                   
                   {/* Unread dot indicator */}
-                  <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-emerald-500 group-hover:hidden transition-all shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  {!alert.isViewed && (
+                    <div className="absolute top-4 right-4 w-2 h-2 rounded-full bg-emerald-500 group-hover:hidden transition-all shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                  )}
                 </div>
               ))}
             </div>
@@ -148,7 +170,7 @@ export const AlertBell = () => {
         <div className="flex items-center justify-between p-3 border-t border-border bg-card sticky bottom-0 z-10">
           <button 
             onClick={handleMarkAllAsRead}
-            disabled={unreadAlerts.length === 0}
+            disabled={bellAlerts.length === 0}
             className="text-[13px] font-semibold text-muted-foreground hover:text-foreground disabled:opacity-50 transition-colors underline-offset-4 hover:underline focus-visible:outline-none"
           >
             Marcar todo como leído

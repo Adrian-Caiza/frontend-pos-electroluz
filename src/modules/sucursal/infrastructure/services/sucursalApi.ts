@@ -2,9 +2,12 @@ import { apiClient } from '../../../../shared/lib/apiClient';
 import type { PaginatedSucursales, Sucursal, CreateSucursalDto, UpdateSucursalDto } from '../../domain/entities/Sucursal';
 
 export const sucursalApi = {
-  getSucursales: async (page: number, pageSize: number): Promise<PaginatedSucursales> => {
+  getSucursales: async (page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedSucursales> => {
+    const params: Record<string, any> = { page, pageSize };
+    if (search) params.search = search;
+    if (status) params.status = status;
     const response = await apiClient.get<PaginatedSucursales>('/branches', {
-      params: { page, pageSize },
+      params,
     });
     return response.data;
   },

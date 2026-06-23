@@ -6,6 +6,7 @@ import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useCreateCheckout } from '../hooks/useCreateCheckout';
 import { useSucursales } from '../../../sucursal/presentation/hooks/useSucursales';
 import { Button } from '../../../../shared/components/ui/button';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -47,6 +48,16 @@ export const CreateCheckoutModal = () => {
   // Asumimos que traemos suficientes sucursales (ej. 100) para el dropdown
   const { data: sucursalesData, isLoading: loadingSucursales } = useSucursales(1, 100);
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      handleOpenChange(false);
+    }
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -80,13 +91,14 @@ export const CreateCheckoutModal = () => {
 
   const footer = (
     <ModalFooter 
-      onCancel={() => handleOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Caja"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
       <Button onClick={() => setOpen(true)}>
@@ -95,7 +107,7 @@ export const CreateCheckoutModal = () => {
 
       <BaseModal 
         isOpen={open} 
-        onClose={() => handleOpenChange(false)}
+        onClose={handleRequestClose}
         title="Registrar Nueva Caja"
         subtitle="Crea una caja asignándole un identificador de 3 dígitos y vinculándola a una sucursal."
         size="md"
@@ -155,6 +167,20 @@ export const CreateCheckoutModal = () => {
           </form>
         </Form>
       </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          handleOpenChange(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
     </>
   );
 };

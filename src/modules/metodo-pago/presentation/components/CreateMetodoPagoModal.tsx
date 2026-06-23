@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { WalletCards, Type, Hash, Plus, Wallet } from 'lucide-react';
 import { useCreateMetodoPago } from '../hooks/useCreateMetodoPago';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -30,6 +31,17 @@ export const CreateMetodoPagoModal = () => {
   const [open, setOpen] = useState(false);
   const { user } = useAuthStore();
   const { mutateAsync: createMetodoPago, isPending } = useCreateMetodoPago();
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      setOpen(false);
+      form.reset();
+    }
+  };
 
   const form = useForm<CreateMetodoPagoFormData>({
     resolver: zodResolver(createMetodoPagoSchema),
@@ -57,16 +69,14 @@ export const CreateMetodoPagoModal = () => {
 
   const footer = (
     <ModalFooter 
-      onCancel={() => {
-        setOpen(false);
-        form.reset();
-      }} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Método"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
       <Button onClick={() => setOpen(true)}>
@@ -76,10 +86,7 @@ export const CreateMetodoPagoModal = () => {
 
       <BaseModal 
         isOpen={open} 
-        onClose={() => {
-          setOpen(false);
-          form.reset();
-        }}
+        onClose={handleRequestClose}
         title="Registrar Método de Pago"
         subtitle="Añade un nuevo método de pago para ser usado en las transacciones."
         size="sm"
@@ -122,6 +129,21 @@ export const CreateMetodoPagoModal = () => {
           </form>
         </Form>
       </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          setOpen(false);
+          form.reset();
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
     </>
   );
 };

@@ -3,8 +3,8 @@ import type { CreateProveedorDto, UpdateProveedorDto, Proveedor } from '../../do
 import type { PaginatedResponse } from '../../../categoria/infrastructure/services/categoriaApi';
 
 export class ProveedorRepository {
-  async getProveedores(page: number, pageSize: number): Promise<PaginatedResponse<Proveedor>> {
-    return proveedorApiService.getProveedores(page, pageSize);
+  async getProveedores(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResponse<Proveedor>> {
+    return proveedorApiService.getProveedores(page, pageSize, search, status);
   }
 
   async getProveedorById(id: string): Promise<Proveedor> {

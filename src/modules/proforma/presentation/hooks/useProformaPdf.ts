@@ -14,12 +14,16 @@ export const useProformaPdf = () => {
       if (data.documento && data.documento.docurl) {
         window.open(data.documento.docurl, '_blank', 'noopener,noreferrer');
       } else {
-        toast.error('La proforma no tiene un documento PDF disponible');
+        toast.error('Ocurrió un error', {
+        description: 'La proforma no tiene un documento PDF disponible'
+      });
       }
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al obtener el PDF de la proforma';
-      toast.error(message);
+      toast.error('Ocurrió un error', {
+        description: message
+      });
     },
   });
 };

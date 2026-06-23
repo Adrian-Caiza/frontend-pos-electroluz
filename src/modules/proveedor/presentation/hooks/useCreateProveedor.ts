@@ -9,7 +9,9 @@ export const useCreateProveedor = () => {
   return useMutation<Proveedor, Error, CreateProveedorDto>({
     mutationFn: (data: CreateProveedorDto) => proveedorRepository.createProveedor(data),
     onSuccess: () => {
-      toast.success('Proveedor registrado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Proveedor registrado exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['proveedores'] });
     },
     onError: (error: any) => {
@@ -18,7 +20,9 @@ export const useCreateProveedor = () => {
       const displayMessage = serverMessage
         ? (Array.isArray(serverMessage) ? serverMessage[0] : serverMessage)
         : error.message || 'Error al registrar el proveedor';
-      toast.error(displayMessage);
+      toast.error('Ocurrió un error', {
+        description: displayMessage
+      });
     },
   });
 };

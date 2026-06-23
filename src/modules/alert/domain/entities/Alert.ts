@@ -4,6 +4,7 @@ export interface Alert {
   message: string;
   isViewed: boolean;
   createdAt: string;
+  updatedAt?: string;
   currentQuantity?: number;
   minStock?: number;
   maxStock?: number;
@@ -25,4 +26,11 @@ export interface PaginatedAlerts {
   pageSize: number;
   totalItems: number;
   totalPages: number;
+}
+
+export interface AlertSummary {
+  totalVisible: number;
+  totalUnseen: number;
+  byType: { type: string; totalVisible: number; totalUnseen: number }[];
+  byBranch: { suid: string; sunombre: string; suidentificador: string; totalVisible: number; totalUnseen: number }[];
 }

@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import {  useEffect , useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { UserCog, User, Mail, Phone, MapPin, Hash } from 'lucide-react';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -62,6 +63,16 @@ interface EditClienteModalProps {
 export const EditClienteModal = ({ cliente, open, onOpenChange }: EditClienteModalProps) => {
   const { mutate: updateCliente, isPending } = useUpdateCliente();
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -119,17 +130,19 @@ export const EditClienteModal = ({ cliente, open, onOpenChange }: EditClienteMod
 
   const footer = (
     <ModalFooter 
-      onCancel={() => onOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Cambios"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
-    <BaseModal 
+    <>
+      <BaseModal 
       isOpen={open} 
-      onClose={() => onOpenChange(false)}
+      onClose={handleRequestClose}
       title="Editar Cliente"
       subtitle="Actualice la información del cliente existente."
       size="lg"
@@ -237,5 +250,20 @@ export const EditClienteModal = ({ cliente, open, onOpenChange }: EditClienteMod
         </form>
       </Form>
     </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          onOpenChange(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
+    </>
   );
 };

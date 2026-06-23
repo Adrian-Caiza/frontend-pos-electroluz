@@ -24,14 +24,14 @@ export function ModalFooter({
   children
 }: ModalFooterProps) {
   return (
-    <div className="flex items-center justify-end space-x-3 w-full">
+    <div className="flex flex-col-reverse sm:flex-row items-center sm:justify-end gap-3 w-full">
       {children}
       <Button 
         type="button" 
         variant="outline" 
         onClick={onCancel}
         disabled={isLoading}
-        className="rounded-xl px-6 font-medium text-foreground border-border hover:bg-muted"
+        className="rounded-xl px-6 font-medium text-foreground border-border hover:bg-muted w-full sm:w-auto min-h-[44px] sm:min-h-0"
       >
         {cancelLabel}
       </Button>
@@ -39,7 +39,7 @@ export function ModalFooter({
         type="button" 
         onClick={onConfirm}
         disabled={isDisabled || isLoading}
-        className={`rounded-xl px-6 font-medium text-white shadow-md transition-all
+        className={`rounded-xl px-6 font-medium text-white shadow-md transition-all w-full sm:w-auto min-h-[44px] sm:min-h-0
           ${confirmVariant === 'primary' 
             ? 'bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-primary dark:hover:bg-primary/90 shadow-primary/20' 
             : 'bg-red-600 hover:bg-red-700 shadow-red-600/20'}`}

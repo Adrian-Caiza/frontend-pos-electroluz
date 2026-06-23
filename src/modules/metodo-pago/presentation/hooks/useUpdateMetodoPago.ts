@@ -13,7 +13,7 @@ export const useUpdateMetodoPago = () => {
     mutationFn: ({ id, data }: { id: string; data: UpdateMetodoPagoDTO }) => 
       updateMetodoPagoUseCase.execute(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['metodos-pago'] });
+      queryClient.invalidateQueries({ queryKey: ['metodosPago'] });
     },
   });
 };

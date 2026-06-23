@@ -8,8 +8,8 @@ import type {
 import { clienteApi } from '../services/clienteApi';
 
 export class ClienteRepository implements IClienteRepository {
-  async getClientes(page: number, pageSize: number): Promise<PaginatedClientes> {
-    return clienteApi.getClientes(page, pageSize);
+  async getClientes(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedClientes> {
+    return clienteApi.getClientes(page, pageSize, search, status);
   }
 
   async createCliente(data: CreateClienteDto): Promise<Cliente> {

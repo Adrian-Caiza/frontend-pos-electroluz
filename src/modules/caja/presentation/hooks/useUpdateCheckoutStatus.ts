@@ -18,12 +18,16 @@ export const useUpdateCheckoutStatus = () => {
   return useMutation({
     mutationFn: ({ id, data }: UpdateParams) => updateCheckoutStatusUseCase.execute(id, data),
     onSuccess: () => {
-      toast.success('Estado actualizado correctamente');
-      queryClient.invalidateQueries({ queryKey: ['checkouts'] });
+      toast.success('Operación exitosa', {
+        description: 'Estado actualizado correctamente'
+      });
+      queryClient.invalidateQueries({ queryKey: ['cajas'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar el estado';
-      toast.error(message);
+      toast.error('Ocurrió un error', {
+        description: message
+      });
     },
   });
 };

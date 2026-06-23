@@ -4,5 +4,5 @@ import type { PaginatedResponse } from '../../../categoria/infrastructure/servic
 export interface IProductoRepository {
   createProducto(data: CreateProductoDto): Promise<Producto>;
   updateProducto(id: string, data: UpdateProductoDto): Promise<Producto>;
-  getProductos(page: number, pageSize: number): Promise<PaginatedResponse<Producto>>;
+  getProductos(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResponse<Producto>>;
 }

@@ -18,12 +18,10 @@ import {
   SelectValue,
 } from '../../../../shared/components/ui/select';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
+import { useListFilters } from '../../../../shared/hooks/useListFilters';
 
 export const MarcaTable = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('todos');
+  const { page, setPage, pageSize, setPageSize, search, setSearch, status, setStatus, debouncedSearch } = useListFilters(10);
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
   const { data, isLoading, error } = useMarcas(1, 1000);
@@ -47,7 +45,7 @@ export const MarcaTable = () => {
     title: '',
     description: '',
     variant: 'default',
-    action: () => {},
+    action: () => { },
   });
 
   const handleEdit = (marca: Marca) => {
@@ -58,7 +56,7 @@ export const MarcaTable = () => {
   const handleStatusChange = (marca: Marca, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
     let title = `¿Cambiar estado?`;
     let description = `¿Estás seguro de cambiar el estado de ${marca.mrcnombre} a ${newStatus}?`;
-    
+
     if (newStatus === 'eliminado') {
       title = `¿Eliminar marca?`;
       description = `¿Estás seguro de eliminar la marca ${marca.mrcnombre}? Esta acción no se puede deshacer.`;
@@ -96,32 +94,14 @@ export const MarcaTable = () => {
     }
   };
 
-  // Filtrado local
-  const filteredData = useMemo(() => {
-    if (!data?.items) return [];
-    let items = data.items.filter(m => m.mrcestado !== 'eliminado'); // Ocultar eliminados por defecto
     
-    if (statusFilter !== 'todos') {
-      items = items.filter((m) => m.mrcestado === statusFilter);
-    }
-    
-    if (globalFilter) {
-      const lowerQuery = globalFilter.toLowerCase();
-      items = items.filter((m) => 
-        m.mrcnombre.toLowerCase().includes(lowerQuery)
-      );
-    }
-    
-    return items;
-  }, [data?.items, globalFilter, statusFilter]);
 
-  const paginatedData = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredData.slice(startIndex, startIndex + pageSize);
-  }, [filteredData, page, pageSize]);
+  
 
-  const totalFilteredItems = filteredData.length;
-  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+  
+  const tableData = data?.items || [];
+  const totalItems = data?.totalItems || 0;
+  const pageCount = data?.totalPages || 0;
 
   const meta: MarcaTableMeta = {
     isJefe: isAuthorized,
@@ -142,11 +122,11 @@ export const MarcaTable = () => {
     <>
       <DataTable
         columns={columns}
-        data={paginatedData}
+        data={tableData}
         meta={meta}
         isLoading={isLoading}
         pageCount={pageCount}
-        rowCount={totalFilteredItems}
+        rowCount={totalItems}
         pagination={{ pageIndex: page - 1, pageSize }}
         onPaginationChange={(newPagination) => {
           setPage(newPagination.pageIndex + 1);
@@ -156,16 +136,16 @@ export const MarcaTable = () => {
         onRowSelectionChange={setRowSelection}
         getRowId={(row) => row.mrcid}
         toolbar={{
-          globalFilter,
-          onGlobalFilterChange: setGlobalFilter,
+          globalFilter: search,
+          onGlobalFilterChange: setSearch,
           searchPlaceholder: "Buscar por nombre...",
-          onAdvancedFilterClick: () => {},
+          onAdvancedFilterClick: () => { },
           children: (
             <div className="flex gap-2">
               {Object.keys(rowSelection).length > 0 ? (
                 <>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                     onClick={() => handleBulkAction('activo')}
@@ -174,8 +154,8 @@ export const MarcaTable = () => {
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Activar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                     onClick={() => handleBulkAction('inactivo')}
@@ -184,8 +164,8 @@ export const MarcaTable = () => {
                     <XCircle className="mr-2 h-4 w-4" />
                     Inactivar
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     className="h-9 text-slate-500 hover:text-slate-700"
                     onClick={() => setRowSelection({})}
@@ -196,7 +176,7 @@ export const MarcaTable = () => {
                 </>
               ) : (
                 <>
-                  <Select value={statusFilter} onValueChange={(val: any) => setStatusFilter(val)}>
+                  <Select value={status ?? 'todos'} onValueChange={(v) => setStatus(v === 'todos' ? undefined : v)}>
                     <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
                       <SelectValue placeholder="Estado" />
                     </SelectTrigger>
@@ -218,7 +198,7 @@ export const MarcaTable = () => {
         open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
       />
-      
+
       <ConfirmDialog
         isOpen={confirmDialog.isOpen}
         onClose={() => setConfirmDialog(prev => ({ ...prev, isOpen: false }))}

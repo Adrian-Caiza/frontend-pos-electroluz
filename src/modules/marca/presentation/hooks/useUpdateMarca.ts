@@ -12,12 +12,16 @@ export const useUpdateMarca = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<Marca> }) => 
       repository.updateMarca(id, data),
     onSuccess: () => {
-      toast.success('Marca actualizada exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Marca actualizada exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['marcas'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar la marca';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

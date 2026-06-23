@@ -8,7 +8,7 @@ export class GetStocksUseCase {
     this.repository = repository;
   }
 
-  async execute(suidentificador: string | undefined, stcksuid: string | undefined, page: number, pageSize: number): Promise<PaginatedStocks> {
-    return this.repository.getStocksBySucursal(suidentificador, stcksuid, page, pageSize);
+  async execute(suidentificador: string | undefined, stcksuid: string | undefined, page: number, pageSize: number, search?: string): Promise<PaginatedStocks> {
+    return this.repository.getStocksBySucursal(suidentificador, stcksuid, page, pageSize, search);
   }
 }

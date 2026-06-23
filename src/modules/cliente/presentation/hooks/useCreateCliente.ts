@@ -13,12 +13,16 @@ export const useCreateCliente = () => {
   return useMutation({
     mutationFn: (data: CreateClienteDto) => useCase.execute(data),
     onSuccess: () => {
-      toast.success('Cliente registrado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Cliente registrado exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al registrar el cliente';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

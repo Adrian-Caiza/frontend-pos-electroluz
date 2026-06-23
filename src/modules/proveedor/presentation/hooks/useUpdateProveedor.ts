@@ -9,12 +9,16 @@ export const useUpdateProveedor = () => {
   return useMutation<Proveedor, Error, { id: string; data: UpdateProveedorDto }>({
     mutationFn: ({ id, data }) => proveedorRepository.updateProveedor(id, data),
     onSuccess: () => {
-      toast.success('Proveedor actualizado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Proveedor actualizado exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['proveedores'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar el proveedor';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

@@ -8,8 +8,8 @@ import type {
 import { stockApi } from '../services/stockApi';
 
 export class StockRepository implements IStockRepository {
-  async getStocksBySucursal(suidentificador: string | undefined, stcksuid: string | undefined, page: number, pageSize: number): Promise<PaginatedStocks> {
-    return stockApi.getStocksBySucursal(suidentificador, stcksuid, page, pageSize);
+  async getStocksBySucursal(suidentificador: string | undefined, stcksuid: string | undefined, page: number, pageSize: number, search?: string): Promise<PaginatedStocks> {
+    return stockApi.getStocksBySucursal(suidentificador, stcksuid, page, pageSize, search);
   }
 
   async createStock(data: CreateStockDto): Promise<Stock> {

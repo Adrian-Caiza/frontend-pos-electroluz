@@ -7,7 +7,7 @@ export class GetCheckoutsUseCase {
     this.checkoutRepository = checkoutRepository;
   }
 
-  execute(page: number, pageSize: number): Promise<PaginatedCheckouts> {
-    return this.checkoutRepository.getCheckouts(page, pageSize);
+  execute(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedCheckouts> {
+    return this.checkoutRepository.getCheckouts(page, pageSize, search, status);
   }
 }

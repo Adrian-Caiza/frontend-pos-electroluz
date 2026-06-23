@@ -7,7 +7,7 @@ import type {
 } from '../entities/Usuario';
 
 export interface IUsuarioRepository {
-  getUsuarios(page: number, pageSize: number): Promise<PaginatedUsuarios>;
+  getUsuarios(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedUsuarios>;
   createUsuario(data: CreateUsuarioDto): Promise<Usuario>;
   updateUsuario(id: string, data: UpdateUsuarioDto): Promise<Usuario>;
   updateUsuarioStatus(id: string, data: UpdateUsuarioStatusDto): Promise<{ message: string }>;

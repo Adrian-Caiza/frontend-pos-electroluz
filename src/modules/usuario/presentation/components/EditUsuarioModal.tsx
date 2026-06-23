@@ -6,6 +6,7 @@ import { UserCog, User, Mail, Lock, Shield, UploadCloud, X, Camera } from 'lucid
 import { getImageUrl } from '../../../../shared/utils/getImageUrl';
 import { toast } from 'sonner';
 import { useUpdateUsuarioPassword } from '../hooks/useUpdateUsuarioPassword';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -66,6 +67,16 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
 
 
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -94,7 +105,9 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('La imagen no debe superar los 5MB');
+        toast.error('Ocurrió un error', {
+        description: 'La imagen no debe superar los 5MB'
+      });
         return;
       }
       setSelectedImage(file);
@@ -163,17 +176,19 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
 
   const footer = (
     <ModalFooter 
-      onCancel={() => onOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Cambios"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
-    <BaseModal 
+    <>
+      <BaseModal 
       isOpen={open} 
-      onClose={() => onOpenChange(false)}
+      onClose={handleRequestClose}
       title="Editar Usuario"
       subtitle="Actualice la información y permisos del usuario."
       size="lg"
@@ -319,5 +334,20 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
         </form>
       </Form>
     </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          onOpenChange(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
+    </>
   );
 };

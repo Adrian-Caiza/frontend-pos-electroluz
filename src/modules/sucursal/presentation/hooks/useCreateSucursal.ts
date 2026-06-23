@@ -24,12 +24,16 @@ export const useCreateSucursal = () => {
       return created;
     },
     onSuccess: () => {
-      toast.success('Sucursal creada exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Sucursal creada exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['sucursales'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al crear la sucursal';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

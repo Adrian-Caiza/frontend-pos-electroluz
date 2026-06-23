@@ -2,35 +2,53 @@ import { create } from 'zustand';
 import type { Alert } from '../../domain/entities/Alert';
 
 /** Stable key for a product-branch combination (survives backend alert re-creation) */
-export function alertKey(alert: Alert): string {
+function alertKey(alert: Alert): string {
   return `${alert.product?.id || ''}_${alert.branch?.id || ''}`;
 }
 
 interface AlertStore {
-  unreadAlerts: Alert[];
-  addAlert: (alert: Alert) => void;
-  setUnreadAlerts: (alerts: Alert[]) => void;
-  removeUnreadAlert: (id: string) => void;
-  clearUnreadAlerts: () => void;
+  // Badge count (from GET /alerts/summary)
+  unseenCount: number;
+  setUnseenCount: (count: number) => void;
+  incrementUnseen: () => void;
+  decrementUnseen: () => void;
+
+  // Bell dropdown alerts (loaded on demand)
+  bellAlerts: Alert[];
+  setBellAlerts: (alerts: Alert[]) => void;
+  addBellAlert: (alert: Alert) => void;
+  updateBellAlert: (alert: Alert) => void;
+  removeBellAlert: (id: string) => void;
+  clearBellAlerts: () => void;
 }
 
 export const useAlertStore = create<AlertStore>((set) => ({
-  unreadAlerts: [],
+  unseenCount: 0,
+  setUnseenCount: (count) => set({ unseenCount: Math.max(0, count) }),
+  incrementUnseen: () => set((state) => ({ unseenCount: state.unseenCount + 1 })),
+  decrementUnseen: () => set((state) => ({ unseenCount: Math.max(0, state.unseenCount - 1) })),
 
-  addAlert: (alert) => set((state) => {
-    const key = alertKey(alert);
-    // Replace any existing alert for the same product+branch.
-    // The backend recreates alerts every ~5 min with new alid values,
-    // so we replace by product+branch key to keep the latest alid.
-    const filtered = state.unreadAlerts.filter(a => alertKey(a) !== key);
-    return { unreadAlerts: [alert, ...filtered] };
+  bellAlerts: [],
+
+  setBellAlerts: (alerts) => set({ bellAlerts: alerts }),
+
+  addBellAlert: (newAlert) => set((state) => {
+    // If we already have it in the bell, update it instead of duplicate
+    const exists = state.bellAlerts.some(a => a.id === newAlert.id);
+    if (exists) {
+      return { bellAlerts: state.bellAlerts.map(a => a.id === newAlert.id ? newAlert : a) };
+    }
+    // Add to the top
+    return { bellAlerts: [newAlert, ...state.bellAlerts] };
   }),
 
-  setUnreadAlerts: (alerts) => set({ unreadAlerts: alerts }),
-
-  removeUnreadAlert: (id) => set((state) => ({
-    unreadAlerts: state.unreadAlerts.filter(a => a.id !== id),
+  updateBellAlert: (updatedAlert) => set((state) => ({
+    bellAlerts: state.bellAlerts.map(a => a.id === updatedAlert.id ? updatedAlert : a)
   })),
 
-  clearUnreadAlerts: () => set({ unreadAlerts: [] }),
+  removeBellAlert: (id) => set((state) => ({
+    bellAlerts: state.bellAlerts.filter(a => a.id !== id),
+  })),
+
+  clearBellAlerts: () => set({ bellAlerts: [] }),
 }));

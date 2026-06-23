@@ -5,9 +5,9 @@ import { GetCheckoutsUseCase } from '../../application/use-cases/GetCheckoutsUse
 const checkoutRepository = new CheckoutRepository();
 const getCheckoutsUseCase = new GetCheckoutsUseCase(checkoutRepository);
 
-export const useCheckouts = (page: number, pageSize: number) => {
+export const useCheckouts = (page: number, pageSize: number, search?: string, status?: string) => {
   return useQuery({
-    queryKey: ['checkouts', page, pageSize],
-    queryFn: () => getCheckoutsUseCase.execute(page, pageSize),
+    queryKey: ['cajas', page, pageSize, search, status],
+    queryFn: () => getCheckoutsUseCase.execute(page, pageSize, search, status),
   });
 };

@@ -12,12 +12,16 @@ export const useUpdateCategoria = () => {
     mutationFn: ({ id, data }: { id: string; data: Partial<Categoria> }) => 
       repository.updateCategoria(id, data),
     onSuccess: () => {
-      toast.success('Categoría actualizada exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Categoría actualizada exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['categorias'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar la categoría';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

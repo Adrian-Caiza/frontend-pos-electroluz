@@ -8,9 +8,12 @@ import type {
 } from '../../domain/entities/Usuario';
 
 export const usuarioApi = {
-  getUsuarios: async (page: number, pageSize: number): Promise<PaginatedUsuarios> => {
+  getUsuarios: async (page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedUsuarios> => {
+    const params: Record<string, any> = { page, pageSize };
+    if (search) params.search = search;
+    if (status) params.status = status;
     const response = await apiClient.get('/users', {
-      params: { page, pageSize },
+      params,
     });
     return response.data;
   },

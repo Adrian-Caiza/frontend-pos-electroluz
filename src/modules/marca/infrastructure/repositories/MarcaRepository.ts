@@ -3,8 +3,8 @@ import type { Marca } from '../../domain/entities/Marca';
 import type { PaginatedResponse } from '../../../categoria/infrastructure/services/categoriaApi';
 
 export class MarcaRepository {
-  async getMarcas(page: number, pageSize: number): Promise<PaginatedResponse<Marca>> {
-    return marcaApi.getMarcas(page, pageSize);
+  async getMarcas(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResponse<Marca>> {
+    return marcaApi.getMarcas(page, pageSize, search, status);
   }
 
   async getMarcaById(id: string): Promise<Marca> {

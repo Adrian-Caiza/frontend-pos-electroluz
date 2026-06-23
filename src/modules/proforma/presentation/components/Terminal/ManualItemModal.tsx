@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { Plus, PenTool } from 'lucide-react';
 import { BasilAddSolid } from '../../../../../shared/components/icons/icons';
 import { useTerminalCart } from '../../hooks/useTerminalCart';
+import { ConfirmDialog } from '../../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -33,6 +34,17 @@ export const ManualItemModal = () => {
   const [open, setOpen] = useState(false);
   const addItem = useTerminalCart(state => state.addItem);
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      setOpen(false);
+      form.reset();
+    }
+  };
+
   const form = useForm<ManualItemFormData>({
     resolver: zodResolver(manualItemSchema),
     mode: 'onChange',
@@ -58,15 +70,13 @@ export const ManualItemModal = () => {
 
   const footer = (
     <ModalFooter 
-      onCancel={() => {
-        setOpen(false);
-        form.reset();
-      }} 
+      onCancel={handleRequestClose}
       onConfirm={form.handleSubmit(onSubmit)} 
       confirmLabel="Agregar al Carrito"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
       <Button onClick={() => setOpen(true)} variant="secondary" className="h-12 px-6 shadow-sm border border-slate-200">
@@ -76,10 +86,7 @@ export const ManualItemModal = () => {
 
       <BaseModal 
         isOpen={open} 
-        onClose={() => {
-          setOpen(false);
-          form.reset();
-        }}
+        onClose={handleRequestClose}
         title="Agregar Servicio o Ítem Manual"
         subtitle="Registra temporalmente un servicio o artículo que no está en el inventario."
         size="md"
@@ -155,6 +162,21 @@ export const ManualItemModal = () => {
           </form>
         </Form>
       </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          setOpen(false);
+          form.reset();
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
     </>
   );
 };

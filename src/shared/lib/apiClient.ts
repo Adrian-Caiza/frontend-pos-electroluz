@@ -64,7 +64,9 @@ apiClient.interceptors.response.use(
     }
 
     const errorMessage = error.response?.data?.message || error.response?.data?.error || "Ha ocurrido un error inesperado. Intente nuevamente.";
-    toast.error(errorMessage);
+    toast.error('Ocurrió un error', {
+        description: errorMessage
+      });
 
     return Promise.reject(error);
   }

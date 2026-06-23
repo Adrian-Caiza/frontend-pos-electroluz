@@ -7,7 +7,7 @@ export class GetSucursalesUseCase {
     this.sucursalRepository = sucursalRepository;
   }
 
-  execute(page: number, pageSize: number): Promise<PaginatedSucursales> {
-    return this.sucursalRepository.getSucursales(page, pageSize);
+  execute(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedSucursales> {
+    return this.sucursalRepository.getSucursales(page, pageSize, search, status);
   }
 }

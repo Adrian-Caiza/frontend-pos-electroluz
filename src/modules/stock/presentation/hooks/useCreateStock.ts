@@ -13,12 +13,16 @@ export const useCreateStock = () => {
   return useMutation({
     mutationFn: (data: CreateStockDto) => useCase.execute(data),
     onSuccess: () => {
-      toast.success('Stock registrado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Stock registrado exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['stocks'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al registrar el stock';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

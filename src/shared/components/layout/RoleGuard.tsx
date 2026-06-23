@@ -13,7 +13,7 @@ export const RoleGuard = ({ children, allowedRoles }: RoleGuardProps) => {
     return <Navigate to="/auth/login" replace />;
   }
 
-  if (!allowedRoles.includes(user.usrol)) {
+  if (!allowedRoles.map(r => r.toLowerCase()).includes(user.usrol.toLowerCase())) {
     return <Navigate to="/unauthorized" replace />;
   }
 

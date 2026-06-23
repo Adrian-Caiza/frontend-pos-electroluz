@@ -74,7 +74,7 @@ export const ProductDetailPanel = () => {
               </p>
               <div className="flex flex-wrap gap-2 mt-3">
                 <Badge variant="secondary" className="bg-indigo-50 text-indigo-700 hover:bg-indigo-50 border-indigo-100 shadow-none dark:bg-indigo-900/50 dark:text-indigo-300 dark:border-indigo-800">
-                  {selectedProduct.categoria?.ctgnombre || 'Sin Categoría'}
+                  {selectedProduct.categoria?.ctgnombre || (selectedProduct as any).ctgria?.ctgnombre || 'Sin Categoría'}
                 </Badge>
                 <Badge variant="outline" className="text-muted-foreground bg-card">
                   {selectedProduct.marca?.mrcnombre || 'Sin Marca'}
@@ -106,7 +106,9 @@ export const ProductDetailPanel = () => {
             <div className="grid grid-cols-2 gap-4 p-4 rounded-xl bg-card border border-border shadow-sm">
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground">Categoría</p>
-                <p className="text-sm font-medium text-foreground">{selectedProduct.categoria?.ctgnombre || 'N/A'}</p>
+                <p className="text-sm font-medium text-foreground">
+                  {selectedProduct.categoria?.ctgnombre || (selectedProduct as any).ctgria?.ctgnombre || 'Sin Categoría'}
+                </p>
               </div>
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground">Marca</p>

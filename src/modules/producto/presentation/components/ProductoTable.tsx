@@ -1,10 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import type { RowSelectionState } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
 import { Button } from '../../../../shared/components/ui/button';
 
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
+import { useListFilters } from '../../../../shared/hooks/useListFilters';
 import { useProductos } from '../hooks/useProductos';
 import { useUpdateProducto } from '../hooks/useUpdateProducto';
 import { useProductoStore } from '../store/useProductoStore';
@@ -22,13 +23,16 @@ import {
 } from '../../../../shared/components/ui/select';
 
 export const ProductoTable = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [statusFilter, setStatusFilter] = useState('todos');
+  const {
+    page, setPage,
+    pageSize, setPageSize,
+    search, setSearch,
+    status, setStatus,
+    debouncedSearch
+  } = useListFilters(10);
 
-  // Fetch all products since we are doing client-side filtering
-  const { data, isLoading } = useProductos(1, 10000);
+  // Server-side filtering
+  const { data, isLoading } = useProductos(page, pageSize, debouncedSearch, status);
   const updateMutation = useUpdateProducto();
   const { user } = useAuthStore();
   const isAuthorized = user?.usrol === 'jefe' || user?.usrol === 'empleado';
@@ -39,36 +43,10 @@ export const ProductoTable = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  // Client-side filtering of the current page data (since API doesn't support it yet)
-  const filteredData = useMemo(() => {
-    if (!data?.items) return [];
-    let items = data.items.filter((p) => p.prdtoestado !== 'eliminado');
-    
-    if (statusFilter !== 'todos') {
-      items = items.filter((p) => p.prdtoestado === statusFilter);
-    }
-    
-    if (globalFilter) {
-      const lowerQuery = globalFilter.toLowerCase();
-      items = items.filter((p) => 
-        p.prdtonombre.toLowerCase().includes(lowerQuery) || 
-        p.prdtocodigo.toLowerCase().includes(lowerQuery) ||
-        p.categoria?.ctgnombre.toLowerCase().includes(lowerQuery) ||
-        p.marca?.mrcnombre.toLowerCase().includes(lowerQuery)
-      );
-    }
-    
-    return items;
-  }, [data?.items, statusFilter, globalFilter]);
-
-  // Handle pagination locally from the filtered dataset
-  const paginatedData = useMemo(() => {
-    const startIndex = (page - 1) * pageSize;
-    return filteredData.slice(startIndex, startIndex + pageSize);
-  }, [filteredData, page, pageSize]);
-
-  const totalFilteredItems = filteredData.length;
-  const pageCount = Math.ceil(totalFilteredItems / pageSize);
+  // Use server response data
+  const tableData = data?.items || [];
+  const totalItems = data?.totalItems || 0;
+  const pageCount = data?.totalPages || 0;
 
   const handleStatusChange = (producto: Producto, newStatus: 'activo' | 'inactivo' | 'eliminado') => {
     updateMutation.mutate({
@@ -109,10 +87,10 @@ export const ProductoTable = () => {
     <>
       <DataTable
         columns={columns}
-        data={paginatedData}
+        data={tableData}
         isLoading={isLoading}
         pageCount={pageCount}
-        rowCount={totalFilteredItems}
+        rowCount={totalItems}
         pagination={{ pageIndex: page - 1, pageSize }}
         onPaginationChange={(newPagination) => {
           setPage(newPagination.pageIndex + 1);
@@ -125,9 +103,9 @@ export const ProductoTable = () => {
         onRowClick={(row) => openDetail(row.original)}
         selectedRowId={selectedProduct?.prdtoid}
         toolbar={{
-          globalFilter,
-          onGlobalFilterChange: setGlobalFilter,
-          searchPlaceholder: "Buscar por nombre, código, categoría o marca...",
+          globalFilter: search,
+          onGlobalFilterChange: setSearch,
+          searchPlaceholder: "Buscar por código o nombre...",
           onAdvancedFilterClick: () => {}, // Adding this will render the "Filtros" button
           children: (
             <div className="flex gap-2">
@@ -174,7 +152,7 @@ export const ProductoTable = () => {
                   </Button>
                 </>
               ) : (
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select value={status ?? 'todos'} onValueChange={(v) => setStatus(v === 'todos' ? undefined : v)}>
                   <SelectTrigger className="w-[180px] bg-card shadow-sm border-border">
                     <SelectValue placeholder="Estado" />
                   </SelectTrigger>

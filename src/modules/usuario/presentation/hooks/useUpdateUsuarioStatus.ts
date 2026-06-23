@@ -15,7 +15,9 @@ export const useUpdateUsuarioStatus = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateUsuarioStatusDto }) => useCase.execute(id, data),
     onSuccess: (updatedUsuario, variables) => {
-      toast.success('Estado del usuario actualizado');
+      toast.success('Operación exitosa', {
+        description: 'Estado del usuario actualizado'
+      });
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
 
       // If the updated user is the current user, update the global store
@@ -27,7 +29,9 @@ export const useUpdateUsuarioStatus = () => {
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al cambiar estado del usuario';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

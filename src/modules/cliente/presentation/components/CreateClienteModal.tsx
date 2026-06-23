@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import {  useEffect , useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { UserPlus, User, Mail, Phone, MapPin, Hash } from 'lucide-react';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -56,11 +57,22 @@ type FormValues = z.infer<typeof formSchema>;
 interface CreateClienteModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onSuccess?: (cliente: any) => void;
 }
 
-export const CreateClienteModal = ({ open, onOpenChange }: CreateClienteModalProps) => {
+export const CreateClienteModal = ({ open, onOpenChange, onSuccess }: CreateClienteModalProps) => {
   const { company } = useAuthStore();
   const { mutate: createCliente, isPending } = useCreateCliente();
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -87,9 +99,10 @@ export const CreateClienteModal = ({ open, onOpenChange }: CreateClienteModalPro
     createCliente(
       { ...values, clnteemid: company.emid },
       {
-        onSuccess: () => {
+        onSuccess: (newCliente) => {
           onOpenChange(false);
           form.reset();
+          if (onSuccess) onSuccess(newCliente);
         },
       }
     );
@@ -97,17 +110,19 @@ export const CreateClienteModal = ({ open, onOpenChange }: CreateClienteModalPro
 
   const footer = (
     <ModalFooter 
-      onCancel={() => onOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Cliente"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
-    <BaseModal 
+    <>
+      <BaseModal 
       isOpen={open} 
-      onClose={() => onOpenChange(false)}
+      onClose={handleRequestClose}
       title="Registrar Nuevo Cliente"
       subtitle="Complete los datos personales y de contacto del cliente."
       size="lg"
@@ -215,5 +230,20 @@ export const CreateClienteModal = ({ open, onOpenChange }: CreateClienteModalPro
         </form>
       </Form>
     </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          onOpenChange(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
+    </>
   );
 };

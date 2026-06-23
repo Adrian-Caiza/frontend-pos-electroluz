@@ -10,11 +10,15 @@ export const useUpdateUsuarioPassword = () => {
   return useMutation({
     mutationFn: ({ id, uspassword }: { id: string; uspassword: string }) => useCase.execute(id, uspassword),
     onSuccess: () => {
-      toast.success('Contraseña actualizada exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Contraseña actualizada exitosamente'
+      });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar la contraseña';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

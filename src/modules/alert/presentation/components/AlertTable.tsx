@@ -23,20 +23,17 @@ export const AlertTable = () => {
   
   const selectedSuid = suidFilter === 'todas' ? undefined : suidFilter;
   
-  const { data, isLoading } = useAlerts(page, pageSize, selectedSuid);
+  const { data, isLoading } = useAlerts(page, pageSize, { suid: selectedSuid });
   const { data: sucursalesData } = useSucursales(1, 100); // fetch all for filter
   
   const { mutate: markAsViewed } = useMarkAlertAsViewed();
-  const { removeUnreadAlert } = useAlertStore();
+  const { removeBellAlert } = useAlertStore();
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const handleMarkAsViewed = (id: string) => {
-    markAsViewed(id, {
-      onSuccess: () => {
-        removeUnreadAlert(id);
-      }
-    });
+    // Ya no hacemos actualizaciones optimistas locales
+    markAsViewed(id);
   };
 
   const meta: AlertTableMeta = {

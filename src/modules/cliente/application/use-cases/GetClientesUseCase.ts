@@ -8,7 +8,7 @@ export class GetClientesUseCase {
     this.repository = repository;
   }
 
-  async execute(page: number, pageSize: number): Promise<PaginatedClientes> {
-    return this.repository.getClientes(page, pageSize);
+  async execute(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedClientes> {
+    return this.repository.getClientes(page, pageSize, search, status);
   }
 }

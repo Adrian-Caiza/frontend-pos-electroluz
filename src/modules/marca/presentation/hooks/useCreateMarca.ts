@@ -11,12 +11,16 @@ export const useCreateMarca = () => {
   return useMutation({
     mutationFn: (data: Partial<Marca>) => repository.createMarca(data),
     onSuccess: () => {
-      toast.success('Marca creada exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Marca creada exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['marcas'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al crear la marca';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

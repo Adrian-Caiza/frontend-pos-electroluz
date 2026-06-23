@@ -17,6 +17,7 @@ interface SearchableSelectProps {
   disabled?: boolean;
   renderOption?: (option: SearchableOption, isSelected: boolean) => ReactNode;
   emptyMessage?: string;
+  onSearchChange?: (search: string) => void;
 }
 
 export function SearchableSelect({
@@ -28,6 +29,7 @@ export function SearchableSelect({
   disabled = false,
   renderOption,
   emptyMessage = 'Sin resultados',
+  onSearchChange,
 }: SearchableSelectProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
@@ -63,8 +65,9 @@ export function SearchableSelect({
       onChange(id);
       setIsOpen(false);
       setSearch('');
+      if (onSearchChange) onSearchChange('');
     },
-    [onChange],
+    [onChange, onSearchChange],
   );
 
   const handleClear = useCallback(
@@ -72,8 +75,9 @@ export function SearchableSelect({
       e.stopPropagation();
       onChange(null);
       setSearch('');
+      if (onSearchChange) onSearchChange('');
     },
-    [onChange],
+    [onChange, onSearchChange],
   );
 
   const handleInputFocus = () => {
@@ -84,6 +88,7 @@ export function SearchableSelect({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
+    if (onSearchChange) onSearchChange(e.target.value);
     if (!isOpen) setIsOpen(true);
   };
 
@@ -91,6 +96,7 @@ export function SearchableSelect({
     if (e.key === 'Escape') {
       setIsOpen(false);
       setSearch('');
+      if (onSearchChange) onSearchChange('');
       inputRef.current?.blur();
     }
   };
@@ -174,7 +180,7 @@ export function SearchableSelect({
       {isOpen && !disabled && (
         <div
           className={cn(
-            'absolute z-50 w-full mt-1.5 py-1 rounded-xl border border-border bg-popover shadow-lg',
+            'absolute z-[150] w-full mt-1.5 py-1 rounded-xl border border-border bg-popover shadow-lg',
             'max-h-60 overflow-y-auto',
             'animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 duration-150',
           )}

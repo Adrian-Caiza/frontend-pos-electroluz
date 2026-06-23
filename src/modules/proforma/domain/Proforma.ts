@@ -20,10 +20,18 @@ export interface ProformaEmisor {
 }
 
 export interface ProformaReceptor {
-  clnteid: string;
-  clntenombre: string;
-  clnteidentificacion: string;
+  clnteid?: string;
+  clntenombre?: string;
+  clnteidentificacion?: string;
   clntecorreo?: string | null;
+  clntetelefono?: string | null;
+  cliente?: {
+    clnteid: string;
+    clntenombre: string;
+    clnteidentificacion: string;
+    clntecorreo?: string | null;
+    clntetelefono?: string | null;
+  };
 }
 
 export interface ProformaTotal {

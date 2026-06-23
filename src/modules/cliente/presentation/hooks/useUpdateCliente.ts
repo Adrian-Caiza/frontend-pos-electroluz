@@ -13,12 +13,16 @@ export const useUpdateCliente = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateClienteDto }) => useCase.execute(id, data),
     onSuccess: () => {
-      toast.success('Cliente actualizado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Cliente actualizado exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['clientes'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar el cliente';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

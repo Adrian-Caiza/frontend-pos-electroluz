@@ -3,8 +3,8 @@ import type { CreateMedidaDto, UpdateMedidaDto, Medida } from '../../domain/enti
 import type { PaginatedResponse } from '../../../categoria/infrastructure/services/categoriaApi';
 
 export class MedidaRepository {
-  async getMedidas(page: number, pageSize: number): Promise<PaginatedResponse<Medida>> {
-    return medidaApi.getMedidas(page, pageSize);
+  async getMedidas(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResponse<Medida>> {
+    return medidaApi.getMedidas(page, pageSize, search, status);
   }
 
   async getMedidaById(id: string): Promise<Medida> {

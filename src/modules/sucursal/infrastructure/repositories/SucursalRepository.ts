@@ -3,8 +3,8 @@ import type { PaginatedSucursales, Sucursal, CreateSucursalDto, UpdateSucursalDt
 import { sucursalApi } from '../services/sucursalApi';
 
 export class SucursalRepository implements ISucursalRepository {
-  async getSucursales(page: number, pageSize: number): Promise<PaginatedSucursales> {
-    return sucursalApi.getSucursales(page, pageSize);
+  async getSucursales(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedSucursales> {
+    return sucursalApi.getSucursales(page, pageSize, search, status);
   }
 
   async createSucursal(data: CreateSucursalDto): Promise<Sucursal> {

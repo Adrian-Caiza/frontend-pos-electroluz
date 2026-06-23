@@ -12,7 +12,7 @@ export const useCreateMetodoPago = () => {
   return useMutation({
     mutationFn: (data: CreateMetodoPagoDTO) => createMetodoPagoUseCase.execute(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['metodos-pago'] });
+      queryClient.invalidateQueries({ queryKey: ['metodosPago'] });
     },
   });
 };

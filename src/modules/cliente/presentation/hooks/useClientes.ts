@@ -6,12 +6,12 @@ import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 const repository = new ClienteRepository();
 const useCase = new GetClientesUseCase(repository);
 
-export const useClientes = (page: number, pageSize: number) => {
+export const useClientes = (page: number, pageSize: number, search?: string, status?: string) => {
   const { user } = useAuthStore();
 
   return useQuery({
-    queryKey: ['clientes', page, pageSize],
-    queryFn: () => useCase.execute(page, pageSize),
+    queryKey: ['clientes', page, pageSize, search, status],
+    queryFn: () => useCase.execute(page, pageSize, search, status),
     enabled: !!user,
   });
 };

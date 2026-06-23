@@ -5,9 +5,9 @@ import { GetSucursalesUseCase } from '../../application/use-cases/GetSucursalesU
 const sucursalRepository = new SucursalRepository();
 const getSucursalesUseCase = new GetSucursalesUseCase(sucursalRepository);
 
-export const useSucursales = (page: number, pageSize: number) => {
+export const useSucursales = (page: number, pageSize: number, search?: string, status?: string) => {
   return useQuery({
-    queryKey: ['sucursales', page, pageSize],
-    queryFn: () => getSucursalesUseCase.execute(page, pageSize),
+    queryKey: ['sucursales', page, pageSize, search, status],
+    queryFn: () => getSucursalesUseCase.execute(page, pageSize, search, status),
   });
 };

@@ -49,7 +49,7 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
     title: '',
     description: '',
     variant: 'default',
-    action: () => {},
+    action: () => { },
   });
 
   const handleEdit = (stock: Stock) => {
@@ -93,19 +93,19 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
   const filteredData = useMemo(() => {
     if (!data?.items) return [];
     let items = data.items.filter((s) => s.stckestado !== 'eliminado');
-    
+
     if (statusFilter !== 'todos') {
       items = items.filter((s) => s.stckestado === statusFilter);
     }
-    
+
     if (globalFilter) {
       const lowerQuery = globalFilter.toLowerCase();
-      items = items.filter((s) => 
-        s.producto.prdtonombre.toLowerCase().includes(lowerQuery) || 
+      items = items.filter((s) =>
+        s.producto.prdtonombre.toLowerCase().includes(lowerQuery) ||
         s.producto.prdtocodigo.toLowerCase().includes(lowerQuery)
       );
     }
-    
+
     return items;
   }, [data?.items, globalFilter, statusFilter]);
 
@@ -145,13 +145,13 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
           globalFilter,
           onGlobalFilterChange: setGlobalFilter,
           searchPlaceholder: "Buscar por nombre de producto o código...",
-          onAdvancedFilterClick: () => {},
+          onAdvancedFilterClick: () => { },
           children: (
             <div className="flex gap-2">
               {Object.keys(rowSelection).length > 0 ? (
                 <>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                     onClick={() => handleBulkAction('activo')}
@@ -160,8 +160,8 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
                     <PackageCheck className="mr-2 h-4 w-4" />
                     Activar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                     onClick={() => handleBulkAction('inactivo')}
@@ -170,8 +170,8 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
                     <PackageX className="mr-2 h-4 w-4" />
                     Inactivar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
                     onClick={() => handleBulkAction('eliminado')}
@@ -180,8 +180,8 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
                     <Trash2 className="mr-2 h-4 w-4" />
                     Dar de baja
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     className="h-9 text-slate-500 hover:text-slate-700"
                     onClick={() => setRowSelection({})}

@@ -15,7 +15,9 @@ export const useUpdateUsuario = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateUsuarioDto }) => useCase.execute(id, data),
     onSuccess: (updatedUsuario, variables) => {
-      toast.success('Usuario actualizado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Usuario actualizado exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
 
       // If the updated user is the current user, update the global store
@@ -32,7 +34,9 @@ export const useUpdateUsuario = () => {
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar el usuario';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

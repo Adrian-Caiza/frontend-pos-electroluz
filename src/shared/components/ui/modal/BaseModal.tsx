@@ -58,11 +58,11 @@ export function BaseModal({
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 sm:p-6 animate-in fade-in duration-200" onClick={handleBackdropClick}>
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-0 sm:p-4 md:p-6 animate-in fade-in duration-200" onClick={handleBackdropClick}>
       <div 
         ref={modalRef} 
         className={cn(
-          "bg-card rounded-[20px] shadow-2xl flex flex-col w-full max-h-[calc(100vh-2rem)] sm:max-h-[calc(100vh-4rem)] overflow-hidden animate-in zoom-in-95 duration-200",
+          "bg-card rounded-none sm:rounded-[20px] shadow-2xl flex flex-col w-full h-[100dvh] sm:h-auto sm:max-h-[calc(100vh-2rem)] md:max-h-[calc(100vh-4rem)] overflow-hidden animate-in zoom-in-95 duration-200",
           sizeClasses[size]
         )}
       >

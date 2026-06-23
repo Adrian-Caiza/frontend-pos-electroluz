@@ -1,10 +1,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useEffect } from 'react';
+import {  useEffect , useState } from 'react';
 import { Tags, AlignLeft, FolderTree } from 'lucide-react';
 import { useUpdateCategoria } from '../hooks/useUpdateCategoria';
 import type { Categoria } from '../../domain/entities/Categoria';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -36,6 +37,16 @@ interface EditCategoriaModalProps {
 
 export const EditCategoriaModal = ({ categoria, open, onOpenChange }: EditCategoriaModalProps) => {
   const { mutateAsync: updateCategoria, isPending } = useUpdateCategoria();
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
 
   const form = useForm<EditCategoriaFormData>({
     resolver: zodResolver(editCategoriaSchema),
@@ -81,7 +92,7 @@ export const EditCategoriaModal = ({ categoria, open, onOpenChange }: EditCatego
 
   const footer = (
     <ModalFooter 
-      onCancel={() => onOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Cambios"
@@ -90,10 +101,12 @@ export const EditCategoriaModal = ({ categoria, open, onOpenChange }: EditCatego
 
   if (!categoria) return null;
 
+  form.formState.isDirty; // Force tracking
   return (
-    <BaseModal 
+    <>
+      <BaseModal 
       isOpen={open} 
-      onClose={() => onOpenChange(false)}
+      onClose={handleRequestClose}
       title="Editar Categoría"
       subtitle="Modifica la información o el estado de la categoría."
       size="sm"
@@ -173,5 +186,20 @@ export const EditCategoriaModal = ({ categoria, open, onOpenChange }: EditCatego
         </form>
       </Form>
     </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          onOpenChange(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
+    </>
   );
 };

@@ -11,12 +11,16 @@ export const useCreateCategoria = () => {
   return useMutation({
     mutationFn: (data: Partial<Categoria>) => repository.createCategoria(data),
     onSuccess: () => {
-      toast.success('Categoría creada exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Categoría creada exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['categorias'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al crear la categoría';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

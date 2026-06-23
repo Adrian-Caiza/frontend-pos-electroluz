@@ -13,12 +13,16 @@ export const useUpdateStock = () => {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdateStockDto }) => useCase.execute(id, data),
     onSuccess: () => {
-      toast.success('Stock actualizado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Stock actualizado exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['stocks'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al actualizar el stock';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

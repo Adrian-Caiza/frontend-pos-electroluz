@@ -94,7 +94,9 @@ export const ProfileSettingsModal = ({ open, onOpenChange }: ProfileSettingsModa
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error('La imagen no debe superar los 5MB');
+        toast.error('Ocurrió un error', {
+        description: 'La imagen no debe superar los 5MB'
+      });
         return;
       }
       setSelectedImage(file);
@@ -175,6 +177,7 @@ export const ProfileSettingsModal = ({ open, onOpenChange }: ProfileSettingsModa
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
     <BaseModal 

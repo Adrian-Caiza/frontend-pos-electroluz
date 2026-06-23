@@ -48,6 +48,8 @@ export const LoginForm = () => {
                       icon={Building2}
                       className="h-12 bg-white dark:bg-gray-950" 
                       disabled={isPending}
+                      inputMode="numeric"
+                      maxLength={13}
                     />
                   </FormControl>
                   {fieldState.error && (
@@ -74,6 +76,7 @@ export const LoginForm = () => {
                       icon={User}
                       className="h-12 bg-white dark:bg-gray-950"
                       disabled={isPending}
+                      autoComplete="username"
                     />
                   </FormControl>
                   {fieldState.error && (
@@ -100,6 +103,8 @@ export const LoginForm = () => {
                       icon={Lock}
                       className="h-12 bg-white dark:bg-gray-950"
                       disabled={isPending}
+                      autoComplete="current-password"
+                      type="password"
                     />
                   </FormControl>
                   {fieldState.error && (

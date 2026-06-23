@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { Input } from '../../../../shared/components/ui/input';
 import { Truck, Phone, Mail, FolderTree, Tag } from 'lucide-react';
 import { Button } from '../../../../shared/components/ui/button';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -51,6 +52,16 @@ export const CreateProveedorModal = ({ open: controlledOpen, onOpenChange: setCo
   const { data: categoriasData, isLoading: loadingCat } = useCategorias(1, 100);
   const { data: marcasData, isLoading: loadingMarcas } = useMarcas(1, 100);
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      setOpen(false);
+    }
+  };
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -89,13 +100,14 @@ export const CreateProveedorModal = ({ open: controlledOpen, onOpenChange: setCo
 
   const footer = (
     <ModalFooter 
-      onCancel={() => setOpen(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={createMutation.isPending}
       confirmLabel="Registrar Proveedor"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
       {!isControlled && (
@@ -107,7 +119,7 @@ export const CreateProveedorModal = ({ open: controlledOpen, onOpenChange: setCo
 
       <BaseModal 
         isOpen={open} 
-        onClose={() => setOpen(false)}
+        onClose={handleRequestClose}
         title="Registrar Proveedor"
         subtitle="Agrega un nuevo proveedor a tu catálogo."
         size="2xl"
@@ -242,6 +254,20 @@ export const CreateProveedorModal = ({ open: controlledOpen, onOpenChange: setCo
           </form>
         </Form>
       </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          setOpen(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
     </>
   );
 };

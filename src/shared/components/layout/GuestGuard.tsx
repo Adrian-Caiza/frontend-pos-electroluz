@@ -11,9 +11,10 @@ export const GuestGuard = ({ children }: GuestGuardProps) => {
 
   // If there's a token, redirect to their respective dashboard
   if (token && user) {
-    if (user.usrol === 'jefe') return <Navigate to="/dashboard" replace />;
-    if (user.usrol === 'cajero') return <Navigate to="/caja" replace />;
-    if (user.usrol === 'empleado') return <Navigate to="/terminal" replace />;
+    const role = user.usrol?.toLowerCase();
+    if (role === 'jefe') return <Navigate to="/dashboard" replace />;
+    if (role === 'cajero') return <Navigate to="/caja" replace />;
+    if (role === 'empleado') return <Navigate to="/terminal" replace />;
     return <Navigate to="/unauthorized" replace />;
   }
 

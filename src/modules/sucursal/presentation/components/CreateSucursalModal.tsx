@@ -6,6 +6,7 @@ import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useCreateSucursal } from '../hooks/useCreateSucursal';
 import { Button } from '../../../../shared/components/ui/button';
 import { Building2, Hash, MapPin, Mail, Store } from 'lucide-react';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -31,6 +32,16 @@ export const CreateSucursalModal = () => {
   const [open, setOpen] = useState(false);
   const { company } = useAuthStore();
   const { mutate: createSucursal, isPending } = useCreateSucursal();
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      handleOpenChange(false);
+    }
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -75,13 +86,14 @@ export const CreateSucursalModal = () => {
 
   const footer = (
     <ModalFooter 
-      onCancel={() => handleOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Sucursal"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
       <Button onClick={() => setOpen(true)}>
@@ -90,7 +102,7 @@ export const CreateSucursalModal = () => {
 
       <BaseModal 
         isOpen={open} 
-        onClose={() => handleOpenChange(false)}
+        onClose={handleRequestClose}
         title="Registrar Nueva Sucursal"
         subtitle="Añade una nueva sucursal a tu empresa. El identificador debe ser único."
         size="md"
@@ -162,6 +174,20 @@ export const CreateSucursalModal = () => {
           </form>
         </Form>
       </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          handleOpenChange(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
     </>
   );
 };

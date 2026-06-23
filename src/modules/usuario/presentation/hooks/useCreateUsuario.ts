@@ -13,12 +13,16 @@ export const useCreateUsuario = () => {
   return useMutation({
     mutationFn: (data: CreateUsuarioDto) => useCase.execute(data),
     onSuccess: () => {
-      toast.success('Usuario registrado exitosamente');
+      toast.success('Operación exitosa', {
+        description: 'Usuario registrado exitosamente'
+      });
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
     },
     onError: (error: any) => {
       const message = error.response?.data?.message || 'Error al registrar el usuario';
-      toast.error(Array.isArray(message) ? message[0] : message);
+      toast.error('Ocurrió un error', {
+        description: Array.isArray(message) ? message[0] : message
+      });
     },
   });
 };

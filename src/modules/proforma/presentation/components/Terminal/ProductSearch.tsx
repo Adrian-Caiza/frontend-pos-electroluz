@@ -26,13 +26,15 @@ interface ProductSearchProps {
 export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [clienteSearch, setClienteSearch] = useState('');
+  const [debouncedClienteSearch, setDebouncedClienteSearch] = useState('');
   const { addItem, items: cartItems } = useTerminalCart();
   const [isClienteModalOpen, setClienteModalOpen] = useState(false);
   const [isEditClienteModalOpen, setEditClienteModalOpen] = useState(false);
 
   // Fetch lists for selectors
   const { data: sucursalesData } = useSucursales(1, 50);
-  const { data: clientesData } = useClientes(1, 100);
+  const { data: clientesData } = useClientes(1, 100, debouncedClienteSearch);
   const { data: metodosData } = useMetodosPago(1, 50);
   const { data: cajasData } = useCheckouts(1, 100);
 
@@ -80,27 +82,38 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedClienteSearch(clienteSearch);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [clienteSearch]);
+
   const { data, isLoading } = useStocks(
     undefined,
     config.sucursalId || undefined,
     1,
-    100
+    100,
+    debouncedSearch
   );
 
   const { data: productosData } = useProductos(1, 1000);
 
-  const filteredItems = data?.items.filter(stock =>
-    stock.stckestado === 'activo' && (
-      !debouncedSearch ||
-      stock.producto.prdtonombre.toLowerCase().includes(debouncedSearch.toLowerCase()) ||
-      stock.producto.prdtocodigo.toLowerCase().includes(debouncedSearch.toLowerCase())
-    )
-  ) || [];
+  const filteredItems = data?.items.filter(stock => {
+    const productoData = productosData?.items.find(p => p.prdtoid === stock.producto.prdtoid);
+    // Si la data de productos ya cargó, verificamos que el producto esté activo
+    // Si no ha cargado, permitimos que se muestre temporalmente para no retrasar el renderizado (o lo bloqueamos)
+    const isProductActive = productosData ? (productoData?.prdtoestado === 'activo') : true;
+
+    return stock.stckestado === 'activo' && isProductActive;
+  }) || [];
 
   const handleAddProduct = (stock: any, productoData: any, availableStock: number) => {
     // Only add if there is stock available
     if (availableStock <= 0) {
-      toast.error('No hay existencias disponibles para este producto en la sucursal seleccionada.');
+      toast.error('Ocurrió un error', {
+        description: 'No hay existencias disponibles para este producto en la sucursal seleccionada.'
+      });
       return;
     }
 
@@ -155,15 +168,17 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
                 value={config.clienteId}
                 onChange={(val) => onChangeConfig('clienteId', val)}
                 emptyMessage="No se encontraron clientes"
+                onSearchChange={setClienteSearch}
               />
             </div>
             <button
               type="button"
               onClick={() => setClienteModalOpen(true)}
-              className="h-10 w-10 flex items-center justify-center bg-background border border-border rounded-lg text-primary hover:bg-primary/10 transition-colors shrink-0 shadow-sm"
-              title="Nuevo Cliente"
+              className="h-10 px-3 flex items-center gap-1.5 justify-center bg-primary text-primary-foreground font-medium border border-primary hover:bg-primary/90 rounded-lg transition-colors shrink-0 shadow-sm"
+              title="Registrar Nuevo Cliente"
             >
               <IcRoundPersonAddAlt1 className="w-5 h-5" />
+              <span className="hidden sm:inline">Nuevo</span>
             </button>
           </div>
 
@@ -354,6 +369,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
       <CreateClienteModal
         open={isClienteModalOpen}
         onOpenChange={setClienteModalOpen}
+        onSuccess={(cliente) => onChangeConfig('clienteId', cliente.clnteid)}
       />
 
       <EditClienteModal

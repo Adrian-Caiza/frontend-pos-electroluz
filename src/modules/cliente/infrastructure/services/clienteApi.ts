@@ -7,10 +7,11 @@ import type {
 } from '../../domain/entities/Cliente';
 
 export const clienteApi = {
-  getClientes: async (page: number, pageSize: number): Promise<PaginatedClientes> => {
-    const response = await apiClient.get('/clients', {
-      params: { page, pageSize },
-    });
+  getClientes: async (page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedClientes> => {
+    const params: Record<string, any> = { page, pageSize };
+    if (search) params.search = search;
+    if (status) params.status = status;
+    const response = await apiClient.get('/clients', { params });
     return response.data;
   },
 

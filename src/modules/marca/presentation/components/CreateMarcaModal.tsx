@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { Button } from '../../../../shared/components/ui/button';
 import { Input } from '../../../../shared/components/ui/input';
 import { Tag, Plus } from 'lucide-react';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -42,6 +43,16 @@ export const CreateMarcaModal = ({ open: controlledOpen, onOpenChange: setContro
   const { company } = useAuthStore();
   const createMutation = useCreateMarca();
 
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      setOpen(false);
+    }
+  };
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -72,13 +83,14 @@ export const CreateMarcaModal = ({ open: controlledOpen, onOpenChange: setContro
 
   const footer = (
     <ModalFooter 
-      onCancel={() => setOpen(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={createMutation.isPending}
       confirmLabel="Crear Marca"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
     <>
       {!isControlled && (
@@ -90,7 +102,7 @@ export const CreateMarcaModal = ({ open: controlledOpen, onOpenChange: setContro
 
       <BaseModal 
         isOpen={open} 
-        onClose={() => setOpen(false)}
+        onClose={handleRequestClose}
         title="Crear Nueva Marca"
         subtitle="Complete la información para registrar una nueva marca en el sistema."
         footer={footer}
@@ -126,6 +138,20 @@ export const CreateMarcaModal = ({ open: controlledOpen, onOpenChange: setContro
           </form>
         </Form>
       </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          setOpen(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
     </>
   );
 };

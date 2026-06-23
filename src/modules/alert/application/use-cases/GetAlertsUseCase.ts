@@ -8,7 +8,7 @@ export class GetAlertsUseCase {
     this.repository = repository;
   }
 
-  async execute(page: number, pageSize: number, suid?: string): Promise<PaginatedAlerts> {
-    return this.repository.getAlerts(page, pageSize, suid);
+  async execute(page: number, pageSize: number, opts?: { suid?: string; visible?: boolean; visto?: boolean; tipo?: string }): Promise<PaginatedAlerts> {
+    return this.repository.getAlerts(page, pageSize, opts);
   }
 }

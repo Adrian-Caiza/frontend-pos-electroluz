@@ -9,7 +9,7 @@ export class GetMetodosPagoUseCase {
     this.metodoPagoRepository = metodoPagoRepository;
   }
 
-  async execute(page: number, pageSize: number): Promise<PaginatedResult<MetodoPago>> {
-    return await this.metodoPagoRepository.getMetodosPago(page, pageSize);
+  async execute(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResult<MetodoPago>> {
+    return await this.metodoPagoRepository.getMetodosPago(page, pageSize, search, status);
   }
 }

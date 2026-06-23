@@ -5,16 +5,13 @@ import { PackageSearch, AlertTriangle, CheckCircle2 } from 'lucide-react';
 import { Button } from '../../../../shared/components/ui/button';
 
 export const AlertsFeed = () => {
-  const unreadAlerts = useAlertStore((state) => state.unreadAlerts);
-  const removeUnreadAlert = useAlertStore((state) => state.removeUnreadAlert);
+  const bellAlerts = useAlertStore((state) => state.bellAlerts);
+  const removeBellAlert = useAlertStore((state) => state.removeBellAlert);
   const { mutate: markAsViewed, isPending } = useMarkAlertAsViewed();
 
   const handleMarkAsViewed = (id: string) => {
-    markAsViewed(id, {
-      onSuccess: () => {
-        removeUnreadAlert(id);
-      }
-    });
+    removeBellAlert(id);
+    markAsViewed(id);
   };
 
   return (
@@ -23,7 +20,7 @@ export const AlertsFeed = () => {
         <CardTitle className="text-lg font-semibold text-foreground">Centro de Alertas</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 p-0 overflow-y-auto max-h-[400px]">
-        {unreadAlerts.length === 0 ? (
+        {bellAlerts.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-48 text-center px-4">
             <CheckCircle2 className="w-10 h-10 text-emerald-400 mb-3" />
             <p className="text-sm font-medium text-foreground">Todo está en orden</p>
@@ -31,7 +28,7 @@ export const AlertsFeed = () => {
           </div>
         ) : (
           <ul className="divide-y divide-border">
-            {unreadAlerts.map((alert) => (
+            {bellAlerts.map((alert) => (
               <li key={alert.id} className="p-4 hover:bg-muted transition-colors group">
                 <div className="flex gap-3">
                   <div className="mt-0.5">

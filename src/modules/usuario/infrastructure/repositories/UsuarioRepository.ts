@@ -9,8 +9,8 @@ import type {
 import { usuarioApi } from '../services/usuarioApi';
 
 export class UsuarioRepository implements IUsuarioRepository {
-  async getUsuarios(page: number, pageSize: number): Promise<PaginatedUsuarios> {
-    return usuarioApi.getUsuarios(page, pageSize);
+  async getUsuarios(page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedUsuarios> {
+    return usuarioApi.getUsuarios(page, pageSize, search, status);
   }
 
   async createUsuario(data: CreateUsuarioDto): Promise<Usuario> {

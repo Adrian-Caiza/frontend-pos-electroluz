@@ -2,11 +2,12 @@ import { apiClient } from '../../../shared/lib/apiClient';
 import type { PaginatedResult } from '../../../shared/types/PaginatedResult';
 import type { Proforma, CreateProformaDTO, UpdateProformaDTO, ProformaPdfResponse } from '../domain/Proforma';
 
-export const fetchProformas = async (page: number, pageSize: number): Promise<PaginatedResult<Proforma>> => {
-  const { data } = await apiClient.get<PaginatedResult<Proforma>>('/proformas', {
-    params: { page, pageSize }
-  });
-  
+export const fetchProformas = async (page: number, pageSize: number, search?: string, status?: string): Promise<PaginatedResult<Proforma>> => {
+  const params: Record<string, any> = { page, pageSize };
+  if (search) params.search = search;
+  if (status) params.status = status;
+  const { data } = await apiClient.get<PaginatedResult<Proforma>>('/proformas', { params });
+
   // Flatten 'proforma' wrapper from response
   return {
     items: data.items.map((item: any) => item.proforma),
@@ -18,17 +19,17 @@ export const fetchProformas = async (page: number, pageSize: number): Promise<Pa
 };
 
 export const createProforma = async (proforma: CreateProformaDTO): Promise<Proforma> => {
-  const { data } = await apiClient.post<{proforma: Proforma}>('/proformas', proforma);
+  const { data } = await apiClient.post<{ proforma: Proforma }>('/proformas', proforma);
   return data.proforma;
 };
 
 export const fetchProformaById = async (id: string): Promise<Proforma> => {
-  const { data } = await apiClient.get<{proforma: Proforma}>(`/proformas/${id}`);
+  const { data } = await apiClient.get<{ proforma: Proforma }>(`/proformas/${id}`);
   return data.proforma;
 };
 
 export const updateProforma = async (id: string, proforma: UpdateProformaDTO): Promise<Proforma> => {
-  const { data } = await apiClient.put<{proforma: Proforma}>(`/proformas/${id}`, proforma);
+  const { data } = await apiClient.put<{ proforma: Proforma }>(`/proformas/${id}`, proforma);
   return data.proforma;
 };
 
@@ -41,6 +42,11 @@ export const payProforma = async (id: string): Promise<void> => {
 };
 
 export const fetchProformaPdf = async (id: string): Promise<ProformaPdfResponse> => {
-  const { data } = await apiClient.get<{proforma: ProformaPdfResponse}>(`/proformas/${id}/pdf`);
+  const { data } = await apiClient.get<{ proforma: ProformaPdfResponse }>(`/proformas/${id}/pdf`);
   return data.proforma;
+};
+
+export const sendProforma = async (id: string, channel: 'email' | 'whatsapp'): Promise<{ message: string }> => {
+  const { data } = await apiClient.post<{ message: string }>(`/proformas/${id}/send`, { channel });
+  return data;
 };

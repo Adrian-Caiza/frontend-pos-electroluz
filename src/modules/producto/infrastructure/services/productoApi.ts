@@ -47,8 +47,11 @@ export const productoApi = {
     return response.data;
   },
 
-  getAll: async (page: number = 1, pageSize: number = 10): Promise<PaginatedResponse<Producto>> => {
-    const response = await api.get('/products', { params: { page, pageSize } });
+  getAll: async (page: number = 1, pageSize: number = 10, search?: string, status?: string): Promise<PaginatedResponse<Producto>> => {
+    const params: Record<string, any> = { page, pageSize };
+    if (search) params.search = search;
+    if (status) params.status = status;
+    const response = await api.get('/products', { params });
     return response.data;
   }
 };

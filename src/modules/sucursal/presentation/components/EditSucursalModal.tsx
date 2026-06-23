@@ -5,6 +5,7 @@ import * as z from 'zod';
 import { useUpdateSucursal } from '../hooks/useUpdateSucursal';
 import type { Sucursal } from '../../domain/entities/Sucursal';
 import { Building2, Hash, MapPin, Mail } from 'lucide-react';
+import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
   ModalFooter,
@@ -34,6 +35,16 @@ interface EditSucursalModalProps {
 
 export const EditSucursalModal = ({ sucursal, open, onOpenChange }: EditSucursalModalProps) => {
   const { mutate: updateSucursal, isPending } = useUpdateSucursal();
+
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+
+  const handleRequestClose = () => {
+    if (form.formState.isDirty) {
+      setIsConfirmOpen(true);
+    } else {
+      onOpenChange(false);
+    }
+  };
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -76,17 +87,19 @@ export const EditSucursalModal = ({ sucursal, open, onOpenChange }: EditSucursal
 
   const footer = (
     <ModalFooter 
-      onCancel={() => onOpenChange(false)} 
+      onCancel={handleRequestClose} 
       onConfirm={form.handleSubmit(onSubmit)} 
       isLoading={isPending}
       confirmLabel="Guardar Cambios"
     />
   );
 
+  form.formState.isDirty; // Force tracking
   return (
-    <BaseModal 
+    <>
+      <BaseModal 
       isOpen={open} 
-      onClose={() => onOpenChange(false)}
+      onClose={handleRequestClose}
       title="Editar Sucursal"
       subtitle="Modifica la información y detalles de la sucursal."
       size="md"
@@ -159,5 +172,20 @@ export const EditSucursalModal = ({ sucursal, open, onOpenChange }: EditSucursal
         </form>
       </Form>
     </BaseModal>
+
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        onClose={() => setIsConfirmOpen(false)}
+        onConfirm={() => {
+          setIsConfirmOpen(false);
+          onOpenChange(false);
+        }}
+        title="¿Descartar cambios?"
+        description="¿Estás seguro de que deseas salir? Perderás todos los cambios no guardados."
+        confirmText="Descartar"
+        cancelText="Continuar editando"
+        variant="warning"
+      />
+    </>
   );
 };

@@ -3,7 +3,7 @@ import type { Proforma } from '../../domain/Proforma';
 import { DataTableColumnHeader } from '../../../../shared/components/ui/data-table/DataTableColumnHeader';
 import { DataTableCheckbox } from '../../../../shared/components/ui/data-table/DataTableCheckbox';
 import { DataTableRowActions, type DataTableRowActionItem } from '../../../../shared/components/ui/data-table/DataTableRowActions';
-import { Receipt, CheckCircle2, XCircle, Pencil, FileText } from 'lucide-react';
+import { Receipt, CheckCircle2, XCircle, Pencil, FileText, Mail, MessageCircle } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { DataTableStatusBadge } from '../../../../shared/components/ui/data-table/DataTableStatusBadge';
@@ -14,7 +14,9 @@ export interface ProformaTableMeta {
   onEdit: (id: string) => void;
   isCanceling: boolean;
   isPaying: boolean;
+  isSending: boolean;
   onViewPdf: (id: string) => void;
+  onSend: (id: string, channel: 'email' | 'whatsapp') => void;
 }
 
 export const columns: ColumnDef<Proforma>[] = [
@@ -167,6 +169,28 @@ export const columns: ColumnDef<Proforma>[] = [
             onClick: () => meta.onCancel(proforma.prfmaid),
             variant: 'danger',
             separatorAbove: true
+          }
+        );
+      }
+
+      if (proforma.prfmaestado !== 'cancelada') {
+        const receptor = proforma.receptor;
+        const hasEmail = Boolean(receptor.clntecorreo || receptor.cliente?.clntecorreo);
+        const hasPhone = Boolean(receptor.clntetelefono || receptor.cliente?.clntetelefono);
+
+        actions.push(
+          {
+            label: hasEmail ? 'Enviar por Email' : 'Sin correo registrado',
+            icon: <Mail className="h-4 w-4 text-slate-600" />,
+            onClick: () => meta.onSend(proforma.prfmaid, 'email'),
+            separatorAbove: true,
+            disabled: !hasEmail || meta.isSending
+          },
+          {
+            label: hasPhone ? 'Enviar por WhatsApp' : 'Sin teléfono registrado',
+            icon: <MessageCircle className="h-4 w-4 text-slate-600" />,
+            onClick: () => meta.onSend(proforma.prfmaid, 'whatsapp'),
+            disabled: !hasPhone || meta.isSending
           }
         );
       }
