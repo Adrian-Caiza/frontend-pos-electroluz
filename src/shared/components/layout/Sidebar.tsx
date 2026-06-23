@@ -91,10 +91,12 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
     items: group.items.filter(item => item.roles.includes(user?.usrol || ''))
   })).filter(group => group.items.length > 0);
 
-  const sidebarContent = (
+  const renderSidebarContent = (forceExpanded = false) => {
+    const expanded = isExpanded || forceExpanded;
+    return (
     <aside className={cn(
       "group relative z-20 flex flex-col bg-sidebar rounded-3xl transition-all duration-300 ease-in-out h-full",
-      isExpanded ? "w-56" : "w-[72px] hover:w-56"
+      expanded ? "w-56" : "w-[72px] hover:w-56"
     )}>
       {/* Header section (Company Logo) */}
       <div className="h-16 flex items-center px-4 overflow-hidden shrink-0 relative">
@@ -118,7 +120,7 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
         )}
         <div className={cn(
           "flex items-center justify-between w-[130px] shrink-0 ml-3 transition-opacity duration-300 delay-75",
-          isExpanded ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+          expanded ? "opacity-100" : "opacity-0 group-hover:opacity-100"
         )}>
           <span className="font-bold text-[15px] text-sidebar-foreground leading-tight whitespace-normal line-clamp-2 break-words">
             {companyName || 'My Workspace'}
@@ -151,13 +153,13 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
               {index > 0 && (
                 <div className={cn(
                   "absolute h-[2px] w-8 bg-sidebar-border rounded-full transition-all duration-300",
-                  isExpanded ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100 group-hover:opacity-0 group-hover:scale-x-0"
+                  expanded ? "opacity-0 scale-x-0" : "opacity-100 scale-x-100 group-hover:opacity-0 group-hover:scale-x-0"
                 )} />
               )}
               {/* Texto de cabecera visible cuando está expandido */}
               <div className={cn(
                 "w-full px-3 text-[10px] font-bold text-sidebar-primary tracking-wider uppercase transition-opacity duration-300 whitespace-nowrap",
-                isExpanded ? "opacity-100 delay-75" : "opacity-0 group-hover:opacity-100 group-hover:delay-75"
+                expanded ? "opacity-100 delay-75" : "opacity-0 group-hover:opacity-100 group-hover:delay-75"
               )}>
                 {group.group}
               </div>
@@ -171,7 +173,7 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
                   title={item.name}
                   className={cn(
                     'flex items-center py-2 rounded-xl transition-all duration-200 overflow-hidden whitespace-nowrap group/item',
-                    isExpanded ? 'px-3' : 'px-2 group-hover:px-3',
+                    expanded ? 'px-3' : 'px-2 group-hover:px-3',
                     isActive
                       ? 'bg-sidebar-primary text-sidebar-primary-foreground font-semibold shadow-sm border border-sidebar-border'
                       : 'text-sidebar-foreground/80 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
@@ -188,7 +190,7 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
                   </div>
                   <div className={cn(
                     "transition-all duration-300 overflow-hidden whitespace-nowrap flex items-center",
-                    isExpanded ? "w-auto opacity-100 ml-3" : "w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 group-hover:ml-3"
+                    expanded ? "w-auto opacity-100 ml-3" : "w-0 opacity-0 group-hover:w-auto group-hover:opacity-100 group-hover:ml-3"
                   )}>
                     <span className={cn(
                       "text-[13px]",
@@ -226,12 +228,13 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
         }
       `}</style>
     </aside>
-  );
+    );
+  };
 
   return (
     <>
       <div className="hidden md:block h-full">
-        {sidebarContent}
+        {renderSidebarContent(false)}
       </div>
 
       <Sheet open={isMobileOpen} onOpenChange={onMobileOpenChange}>
@@ -240,7 +243,7 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
           <div className="h-full py-4 pl-4 pr-1">
             {/* Forzamos a expandido en móvil */}
             <div className="h-full w-56 [&>aside]:w-full">
-              {sidebarContent}
+              {renderSidebarContent(true)}
             </div>
           </div>
         </SheetContent>
