@@ -61,7 +61,7 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
       items: [
         { name: 'Terminal POS', path: '/terminal', icon: MaterialSymbolsPointOfSale, roles: ['jefe', 'empleado', 'cajero'] },
         { name: 'Historial Ventas', path: '/proformas', icon: FaSolidFileInvoiceDollar, roles: ['jefe', 'empleado', 'cajero'] },
-        { name: 'Caja', path: '/caja', icon: FaSolidCashRegister, roles: ['jefe', 'cajero'] },
+        { name: 'Caja', path: '/caja', icon: FaSolidCashRegister, roles: ['jefe', 'empleado'] },
         { name: 'Clientes', path: '/clientes', icon: FluentPeopleTeam20Filled, roles: ['jefe', 'empleado'] },
       ]
     },
