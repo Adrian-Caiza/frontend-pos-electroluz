@@ -115,7 +115,7 @@ function App() {
             <Route
               path="caja"
               element={
-                <RoleGuard allowedRoles={['jefe', 'cajero']}>
+                <RoleGuard allowedRoles={['jefe', 'empleado']}>
                   <CajaPage />
                 </RoleGuard>
               }
