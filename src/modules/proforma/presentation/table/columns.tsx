@@ -3,7 +3,8 @@ import type { Proforma } from '../../domain/Proforma';
 import { DataTableColumnHeader } from '../../../../shared/components/ui/data-table/DataTableColumnHeader';
 import { DataTableCheckbox } from '../../../../shared/components/ui/data-table/DataTableCheckbox';
 import { DataTableRowActions, type DataTableRowActionItem } from '../../../../shared/components/ui/data-table/DataTableRowActions';
-import { Receipt, CheckCircle2, XCircle, Pencil, FileText, Mail, MessageCircle } from 'lucide-react';
+import { Receipt, CheckCircle2, XCircle, Pencil, FileText } from 'lucide-react';
+import { MdiGmail, LaWhatsapp } from '../../../../shared/components/icons/icons';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { DataTableStatusBadge } from '../../../../shared/components/ui/data-table/DataTableStatusBadge';
@@ -181,14 +182,14 @@ export const columns: ColumnDef<Proforma>[] = [
         actions.push(
           {
             label: hasEmail ? 'Enviar por Email' : 'Sin correo registrado',
-            icon: <Mail className="h-4 w-4 text-slate-600" />,
+            icon: <MdiGmail className="h-4 w-4 text-slate-600" />,
             onClick: () => meta.onSend(proforma.prfmaid, 'email'),
             separatorAbove: true,
             disabled: !hasEmail || meta.isSending
           },
           {
             label: hasPhone ? 'Enviar por WhatsApp' : 'Sin teléfono registrado',
-            icon: <MessageCircle className="h-4 w-4 text-slate-600" />,
+            icon: <LaWhatsapp className="h-4 w-4 text-slate-600" />,
             onClick: () => meta.onSend(proforma.prfmaid, 'whatsapp'),
             disabled: !hasPhone || meta.isSending
           }

@@ -15,7 +15,7 @@ export const AuthLayout = () => {
           style={{
             top: '-10%',
             left: '-5%',
-            background: 'radial-gradient(circle, rgba(99,102,241,0.5) 0%, rgba(59,130,246,0.2) 70%, transparent 100%)',
+            background: 'radial-gradient(circle, rgba(99,102,241,0.5) 0%, rgba(59,130,246,0.2) 70%, rgba(59,130,246,0) 100%)',
           }}
         />
         {/* Blob 2 — bottom-right, cool accent */}
@@ -24,7 +24,7 @@ export const AuthLayout = () => {
           style={{
             bottom: '-15%',
             right: '-10%',
-            background: 'radial-gradient(circle, rgba(37,99,235,0.45) 0%, rgba(30,58,138,0.2) 70%, transparent 100%)',
+            background: 'radial-gradient(circle, rgba(37,99,235,0.45) 0%, rgba(30,58,138,0.2) 70%, rgba(30,58,138,0) 100%)',
           }}
         />
         {/* Blob 3 — center, subtle */}
@@ -33,7 +33,7 @@ export const AuthLayout = () => {
           style={{
             top: '40%',
             left: '30%',
-            background: 'radial-gradient(circle, rgba(147,51,234,0.3) 0%, rgba(79,70,229,0.1) 70%, transparent 100%)',
+            background: 'radial-gradient(circle, rgba(147,51,234,0.3) 0%, rgba(79,70,229,0.1) 70%, rgba(79,70,229,0) 100%)',
           }}
         />
 
@@ -43,7 +43,7 @@ export const AuthLayout = () => {
           style={{
             top: '20%',
             right: '10%',
-            background: 'radial-gradient(circle, rgba(37,99,235,0.25) 0%, rgba(30,64,175,0.1) 70%, transparent 100%)',
+            background: 'radial-gradient(circle, rgba(37,99,235,0.25) 0%, rgba(30,64,175,0.1) 70%, rgba(30,64,175,0) 100%)',
           }}
         />
         <div
@@ -51,7 +51,7 @@ export const AuthLayout = () => {
           style={{
             bottom: '10%',
             left: '15%',
-            background: 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 100%)',
+            background: 'radial-gradient(circle, rgba(99,102,241,0.2) 0%, rgba(99,102,241,0) 100%)',
           }}
         />
       </div>
