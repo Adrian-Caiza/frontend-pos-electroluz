@@ -9,7 +9,7 @@ export interface PasswordInputProps
 }
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
-  ({ className, icon: Icon, ...props }, ref) => {
+  ({ className, icon: Icon, type, ...props }, ref) => {
     const [showPassword, setShowPassword] = React.useState(false)
 
     return (
