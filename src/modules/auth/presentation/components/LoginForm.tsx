@@ -1,4 +1,5 @@
-import { Building2, User, Lock, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
+import { SolarBuildings2Bold, ClarityEmployeeSolid, MynauiLockPasswordSolid } from '@/shared/components/icons/icons';
 import { useLoginForm } from '../hooks/useLoginForm';
 import { Button } from '@/shared/components/ui/button';
 import { Input } from '@/shared/components/ui/input';
@@ -45,7 +46,7 @@ export const LoginForm = () => {
                     <Input 
                       placeholder="RUC Empresa" 
                       {...field} 
-                      icon={Building2}
+                      icon={SolarBuildings2Bold}
                       className="h-12 bg-white dark:bg-gray-950" 
                       disabled={isPending}
                       inputMode="numeric"
@@ -73,7 +74,7 @@ export const LoginForm = () => {
                     <Input 
                       placeholder="Usuario" 
                       {...field} 
-                      icon={User}
+                      icon={ClarityEmployeeSolid}
                       className="h-12 bg-white dark:bg-gray-950"
                       disabled={isPending}
                       autoComplete="username"
@@ -100,7 +101,7 @@ export const LoginForm = () => {
                     <PasswordInput 
                       placeholder="Contraseña" 
                       {...field} 
-                      icon={Lock}
+                      icon={MynauiLockPasswordSolid}
                       className="h-12 bg-white dark:bg-gray-950"
                       disabled={isPending}
                       autoComplete="current-password"

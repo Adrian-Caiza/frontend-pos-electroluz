@@ -61,7 +61,7 @@ export const columns: ColumnDef<Usuario>[] = [
       return (
         <DataTableAvatarCell
           name={usuario.usnombre}
-          subtitle={`@${usuario.usapodo}`}
+          subtitle={usuario.usapodo}
           imageUrl={getImageUrl(usuario.usimagen)}
         />
       );

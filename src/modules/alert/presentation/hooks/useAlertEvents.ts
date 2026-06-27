@@ -112,6 +112,8 @@ export const useAlertEvents = () => {
                 showGenericNotification();
               }
               addBellAlert(alert);
+              queryClient.invalidateQueries({ queryKey: ['alert-summary'] });
+              queryClient.invalidateQueries({ queryKey: ['alerts'] });
               break;
             case 'alert-updated':
               console.log('[AlertEvents] SSE alert-updated:', alert.message);
@@ -131,8 +133,9 @@ export const useAlertEvents = () => {
                 // Alguien la marcó como leída en otro dispositivo
                 removeBellAlert(alert.id);
               }
-              // Forzamos a que React Query refresque el badge para mantener la exactitud
+              // Forzamos a que React Query refresque el badge y la tabla principal
               queryClient.invalidateQueries({ queryKey: ['alert-summary'] });
+              queryClient.invalidateQueries({ queryKey: ['alerts'] });
               break;
             case 'alert-resolved':
               console.log('[AlertEvents] SSE alert-resolved:', alert.message);
@@ -140,6 +143,8 @@ export const useAlertEvents = () => {
                 decrementUnseen();
               }
               removeBellAlert(alert.id);
+              queryClient.invalidateQueries({ queryKey: ['alert-summary'] });
+              queryClient.invalidateQueries({ queryKey: ['alerts'] });
               break;
             case 'connected':
               console.log('[AlertEvents] SSE handshake received');
