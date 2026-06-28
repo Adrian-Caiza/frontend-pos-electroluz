@@ -6,6 +6,7 @@ import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { useCreateSucursal } from '../hooks/useCreateSucursal';
 import { Button } from '../../../../shared/components/ui/button';
 import { Building2, Hash, MapPin, Mail, Store } from 'lucide-react';
+import { BiBuildingFillAdd } from '../../../../shared/components/icons/icons';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
   BaseModal,
@@ -97,7 +98,7 @@ export const CreateSucursalModal = () => {
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        <Store className="w-4 h-4 mr-2" /> Nueva Sucursal
+        <BiBuildingFillAdd className="w-5 h-5 mr-2" /> Nueva Sucursal
       </Button>
 
       <BaseModal 

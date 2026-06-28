@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState } from 'react';
 import { WalletCards, Type, Hash, Plus, Wallet } from 'lucide-react';
+import { MajesticonsCreditcardPlus } from '../../../../shared/components/icons/icons';
 import { useCreateMetodoPago } from '../hooks/useCreateMetodoPago';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
@@ -80,7 +81,7 @@ export const CreateMetodoPagoModal = () => {
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        <WalletCards className="w-4 h-4 mr-2" />
+        <MajesticonsCreditcardPlus className="w-5 h-5 mr-2" />
         Nuevo Método de Pago
       </Button>
 

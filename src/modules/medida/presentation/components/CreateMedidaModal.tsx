@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Input } from '../../../../shared/components/ui/input';
 import { Scale, Type } from 'lucide-react';
+import { BasilAddSolid } from '../../../../shared/components/icons/icons';
 import { Button } from '../../../../shared/components/ui/button';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
@@ -97,7 +98,7 @@ export const CreateMedidaModal = ({ open: controlledOpen, onOpenChange: setContr
     <>
       {!isControlled && (
         <Button onClick={() => setOpen(true)} className="w-full sm:w-auto font-medium">
-          <Scale className="w-4 h-4 mr-2" />
+          <BasilAddSolid className="w-5 h-5 mr-2" />
           Nueva Medida
         </Button>
       )}

@@ -36,10 +36,8 @@ export const ProductoTable = () => {
   const updateMutation = useUpdateProducto();
   const { user } = useAuthStore();
   const isAuthorized = user?.usrol === 'jefe' || user?.usrol === 'empleado';
-  const { openDetail, selectedProduct } = useProductoStore();
+  const { openDetail, selectedProduct, isEditOpen, selectedProductEdit, openEdit, closeEdit } = useProductoStore();
 
-  const [selectedProductoEdit, setSelectedProductoEdit] = useState<Producto | null>(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
@@ -77,8 +75,7 @@ export const ProductoTable = () => {
   const meta: ProductoTableMeta = {
     isJefe: isAuthorized,
     onEdit: (producto) => {
-      setSelectedProductoEdit(producto);
-      setIsEditOpen(true);
+      openEdit(producto);
     },
     onStatusChange: handleStatusChange
   };
@@ -169,9 +166,9 @@ export const ProductoTable = () => {
       />
 
       <EditProductoModal
-        producto={selectedProductoEdit}
+        producto={selectedProductEdit}
         open={isEditOpen}
-        onOpenChange={setIsEditOpen}
+        onOpenChange={(open) => !open && closeEdit()}
       />
     </>
   );

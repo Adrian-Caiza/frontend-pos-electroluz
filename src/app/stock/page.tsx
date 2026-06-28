@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MingcuteInventoryFill } from '../../shared/components/icons/icons';
+import { MingcuteInventoryFill, FluentBoxMultipleArrowRight20Filled } from '../../shared/components/icons/icons';
 import { PackagePlus, Building2 } from 'lucide-react';
 import { Button } from '../../shared/components/ui/button';
 import { StockTable } from '../../modules/stock/presentation/components/StockTable';
@@ -32,7 +32,7 @@ export const StockPage = () => {
         <Button
           onClick={() => setIsCreateModalOpen(true)}
         >
-          <PackagePlus className="w-4 h-4 mr-2" />
+          <FluentBoxMultipleArrowRight20Filled className="w-5 h-5 mr-2" />
           Ingresar Lote a Bodega
         </Button>
       </div>

@@ -7,6 +7,10 @@ interface ProductoStore {
   openDetail: (product: Producto) => void;
   closeDetail: () => void;
   setSelectedProduct: (product: Producto | null) => void;
+  isEditOpen: boolean;
+  selectedProductEdit: Producto | null;
+  openEdit: (product: Producto) => void;
+  closeEdit: () => void;
 }
 
 export const useProductoStore = create<ProductoStore>((set) => ({
@@ -15,4 +19,8 @@ export const useProductoStore = create<ProductoStore>((set) => ({
   openDetail: (product) => set({ selectedProduct: product, isDetailOpen: true }),
   closeDetail: () => set({ isDetailOpen: false, selectedProduct: null }),
   setSelectedProduct: (product) => set({ selectedProduct: product }),
+  isEditOpen: false,
+  selectedProductEdit: null,
+  openEdit: (product) => set({ isEditOpen: true, selectedProductEdit: product }),
+  closeEdit: () => set({ isEditOpen: false, selectedProductEdit: null }),
 }));

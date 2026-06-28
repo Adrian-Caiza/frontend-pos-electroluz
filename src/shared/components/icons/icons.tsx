@@ -174,4 +174,84 @@ export function MynauiLockPasswordSolid(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+// Iconos para botones de agregar
 
+// regitrar clientes
+export function FluentPeopleAdd16Filled(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16"><path fill="currentColor" d="M11.5 7a4.5 4.5 0 1 1 0 9a4.5 4.5 0 0 1 0-9m0 2a.5.5 0 0 0-.5.5V11H9.5a.5.5 0 0 0 0 1H11v1.5a.5.5 0 0 0 1 0V12h1.5a.5.5 0 0 0 0-1H12V9.5a.5.5 0 0 0-.5-.5M7.258 8A5.48 5.48 0 0 0 6 11.5c0 .485.062.955.18 1.402A7 7 0 0 1 5 13c-1.175 0-2.27-.272-3.089-.77C1.091 11.73.5 10.965.5 10a2 2 0 0 1 2-2zM5 1.5A2.75 2.75 0 1 1 5 7a2.75 2.75 0 0 1 0-5.5m6.502.997a2.25 2.25 0 0 1 2.252 2.251a2.24 2.24 0 0 1-.586 1.51A5.5 5.5 0 0 0 11.5 6a5.5 5.5 0 0 0-1.667.257a2.252 2.252 0 0 1 1.669-3.76"/></svg>
+  );
+}
+//agregar nuevo producto
+
+export function ProiconsBoxAdd(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="m11 12l8.073-4.625M11 12L6.963 9.688M11 12v2.281m8.073-6.906a3.17 3.17 0 0 0-1.165-1.156L15.25 4.696m3.823 2.679c.275.472.427 1.015.427 1.58v1.608M2.926 7.374a3.14 3.14 0 0 0-.426 1.58v6.09c0 1.13.607 2.172 1.592 2.736l5.316 3.046A3.2 3.2 0 0 0 11 21.25M2.926 7.375a3.17 3.17 0 0 1 1.166-1.156l5.316-3.046a3.2 3.2 0 0 1 3.184 0l2.658 1.523M2.926 7.375l4.037 2.313m0 0l8.287-4.992"/><path fill="currentColor" fillRule="evenodd" d="M17.5 23a5.5 5.5 0 1 0 0-11a5.5 5.5 0 0 0 0 11m0-8.993a.5.5 0 0 1 .5.5V17h2.493a.5.5 0 1 1 0 1H18v2.493a.5.5 0 1 1-1 0V18h-2.493a.5.5 0 1 1 0-1H17v-2.493a.5.5 0 0 1 .5-.5" clipRule="evenodd"/></g></svg>
+  );
+}
+
+// agregar nuevo metodo de pago
+
+export function MajesticonsCreditcardPlus(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none"><path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 15v3m0 3v-3m0 0h-3m3 0h3"/><path fill="currentColor" fillRule="evenodd" d="M5 4a3 3 0 0 0-3 3v1h20V7a3 3 0 0 0-3-3zM2 17v-7h20v3.528A6 6 0 0 0 12.341 20H5a3 3 0 0 1-3-3m4-4a1 1 0 0 1 1-1h5a1 1 0 1 1 0 2H7a1 1 0 0 1-1-1" clipRule="evenodd"/></g></svg>
+  );
+}
+
+// nueva marca
+
+export function FluentTagAdd16Filled(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16"><path fill="currentColor" d="M1.587 6.314a1.99 1.99 0 0 0 0 2.822l3.296 3.28a2 2 0 0 0 .64.428a5.5 5.5 0 0 1 7.458-7.254L13 3.01A2 2 0 0 0 10.987 1l-3.25.014a2 2 0 0 0-1.41.584zM10 5a1 1 0 1 1 0-2a1 1 0 0 1 0 2m5 5.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-4-2a.5.5 0 0 0-1 0V10H8.5a.5.5 0 0 0 0 1H10v1.5a.5.5 0 0 0 1 0V11h1.5a.5.5 0 0 0 0-1H11z"/></svg>
+  );
+}
+
+// nueva sucursal
+
+export function BiBuildingFillAdd(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="currentColor"><path d="M12.5 16a3.5 3.5 0 1 0 0-7a3.5 3.5 0 0 0 0 7m.5-5v1h1a.5.5 0 0 1 0 1h-1v1a.5.5 0 0 1-1 0v-1h-1a.5.5 0 0 1 0-1h1v-1a.5.5 0 0 1 1 0"/><path d="M2 1a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7.256A4.5 4.5 0 0 0 12.5 8a4.5 4.5 0 0 0-3.59 1.787A.5.5 0 0 0 9 9.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .39-.187A4.5 4.5 0 0 0 8.027 12H6.5a.5.5 0 0 0-.5.5V16H3a1 1 0 0 1-1-1zm2 1.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3 0v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5m3.5-.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zM4 5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M7.5 5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5zm2.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5M4.5 8a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5z"/></g></svg>
+  );
+}
+
+//ingresar lote a bodega
+
+export function FluentBoxMultipleArrowRight20Filled(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 20 20"><path fill="currentColor" d="M13.577 2.378a3 3 0 0 0-2.154 0L7.962 3.709A1.5 1.5 0 0 0 7 5.109v1.1a4 4 0 0 1 1.936.235l3.46 1.332c.617.236 1.099.7 1.367 1.272A5.48 5.48 0 0 1 18 10.256V5.109a1.5 1.5 0 0 0-.961-1.4zm1.868 2.154a.5.5 0 1 1 .359.934l-2.766 1.063a1.5 1.5 0 0 1-1.077 0L9.195 5.466a.5.5 0 0 1 .36-.934l2.765 1.064a.5.5 0 0 0 .36 0zM12.038 8.71a1.5 1.5 0 0 1 .713.574a5.5 5.5 0 0 0-1.699.93a.5.5 0 0 0-.607-.207L7.5 11.139l-2.946-1.133a.5.5 0 1 0-.359.933L7 12.018v2.49a.5.5 0 0 0 1 0v-2.49l2.088-.803A5.48 5.48 0 0 0 9 14.499c0 .977.255 1.894.7 2.689l-1.123.432a3 3 0 0 1-2.154 0l-3.461-1.33A1.5 1.5 0 0 1 2 14.89v-4.78a1.5 1.5 0 0 1 .962-1.4l3.46-1.331a3 3 0 0 1 2.155 0zM19 14.499a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-2.147.354l.003-.002a.5.5 0 0 0 .144-.349v-.006a.5.5 0 0 0-.146-.35l-2-2a.5.5 0 0 0-.708.707l1.147 1.146H12.5a.5.5 0 0 0 0 1h2.793l-1.147 1.146a.5.5 0 0 0 .708.708z"/></svg>
+  );
+}
+
+// nuevo proveedor
+
+export function MdiTruckPlus(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M18 18.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5m1.5-9H17V12h4.46zM6 18.5c.83 0 1.5-.67 1.5-1.5s-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5s.67 1.5 1.5 1.5M20 8l3 4v5h-2c0 1.66-1.34 3-3 3s-3-1.34-3-3H9c0 1.66-1.34 3-3 3s-3-1.34-3-3H1V6c0-1.11.89-2 2-2h14v4zM8 6v3H5v2h3v3h2v-3h3V9h-3V6z"/></svg>
+  );
+}
+
+// nueva caja
+
+export function PhCashRegisterFill(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="m239.76 158.06l-22.48-89.94A16 16 0 0 0 201.75 56H136V40a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v16h-9.75a16 16 0 0 0-15.53 12.12l-22.48 89.94A8 8 0 0 0 16 160v32a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16v-32a8 8 0 0 0-.24-1.94M168 88h16a8 8 0 0 1 0 16h-16a8 8 0 0 1 0-16m0 32h16a8 8 0 0 1 0 16h-16a8 8 0 0 1 0-16m-32-32a8 8 0 0 1 0 16h-16a8 8 0 0 1 0-16Zm8 40a8 8 0 0 1-8 8h-16a8 8 0 0 1 0-16h16a8 8 0 0 1 8 8M80 40h40v16H80Zm-8 48h16a8 8 0 0 1 0 16H72a8 8 0 0 1 0-16m0 32h16a8 8 0 0 1 0 16H72a8 8 0 0 1 0-16m152 72H32v-24h192Z"/></svg>
+  );
+}
+
+// registrar usuario
+
+export function WpfAddUser(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 26 26"><path fill="currentColor" d="M10.5.156c-3.017 0-5.438 2.072-5.438 6.032c0 2.586 1.03 5.22 2.594 6.843c.61 1.623-.49 2.227-.718 2.313C3.781 16.502.093 18.602.093 20.688v.78c0 2.843 5.414 3.5 10.437 3.5a46 46 0 0 0 3.281-.124a7.75 7.75 0 0 1-2.124-5.344c0-1.791.61-3.432 1.624-4.75c-.15-.352-.21-.907.063-1.75c1.555-1.625 2.563-4.236 2.563-6.813c0-3.959-2.424-6.03-5.438-6.03zm9 13.031a6.312 6.312 0 1 0 0 12.625a6.312 6.312 0 0 0 0-12.625M18.625 16h1.75v2.594h2.594v1.812h-2.594V23h-1.75v-2.594H16v-1.812h2.625z"/></svg>
+  );
+}
+
+// nueva categoria
+
+export function FluentFolderAdd16Filled(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 16 16"><path fill="currentColor" d="M1 4.5A2.5 2.5 0 0 1 3.5 2h2.086a1.5 1.5 0 0 1 1.06.44L8 3.792l-2.06 2.06A.5.5 0 0 1 5.585 6H1zM1 7v4.5A2.5 2.5 0 0 0 3.5 14h3.1A5.5 5.5 0 0 1 15 7.257V6.5A2.5 2.5 0 0 0 12.5 4H9.207l-2.56 2.56A1.5 1.5 0 0 1 5.585 7zm15 4.5a4.5 4.5 0 1 1-9 0a4.5 4.5 0 0 1 9 0m-4-2a.5.5 0 0 0-1 0V11H9.5a.5.5 0 0 0 0 1H11v1.5a.5.5 0 0 0 1 0V12h1.5a.5.5 0 0 0 0-1H12z"/></svg>
+  );
+}
+
+export default FluentFolderAdd16Filled;

@@ -8,12 +8,10 @@ import { cn } from '../../../../shared/lib/utils';
 import { formatCurrency } from '@/shared/utils/formatCurrency';
 import { useState } from 'react';
 import { useUpdateProducto } from '../hooks/useUpdateProducto';
-import { EditProductoModal } from './EditProductoModal';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 
 export const ProductDetailPanel = () => {
-  const { selectedProduct, isDetailOpen, closeDetail } = useProductoStore();
-  const [isEditOpen, setIsEditOpen] = useState(false);
+  const { selectedProduct, isDetailOpen, closeDetail, openEdit } = useProductoStore();
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const updateMutation = useUpdateProducto();
 
@@ -206,7 +204,12 @@ export const ProductDetailPanel = () => {
 
         {/* Footer Actions */}
         <div className="p-4 bg-card border-t border-border flex justify-end gap-3 shrink-0">
-          <Button variant="outline" className="gap-2 text-muted-foreground hover:text-foreground hover:bg-muted" onClick={() => setIsEditOpen(true)}>
+          <Button variant="outline" className="gap-2 text-muted-foreground hover:text-foreground hover:bg-muted" onClick={() => {
+            closeDetail();
+            setTimeout(() => {
+              openEdit(selectedProduct);
+            }, 50);
+          }}>
             <Pencil className="w-4 h-4" /> Editar
           </Button>
           <Button variant="outline" className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200" onClick={() => setIsConfirmOpen(true)}>
@@ -214,14 +217,6 @@ export const ProductDetailPanel = () => {
           </Button>
         </div>
       </div>
-
-      {selectedProduct && (
-        <EditProductoModal
-          producto={selectedProduct}
-          open={isEditOpen}
-          onOpenChange={setIsEditOpen}
-        />
-      )}
 
       <ConfirmDialog
         isOpen={isConfirmOpen}

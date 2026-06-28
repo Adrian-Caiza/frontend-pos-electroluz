@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { Input } from '../../../../shared/components/ui/input';
 import { Truck, Phone, Mail, FolderTree, Tag } from 'lucide-react';
+import { MdiTruckPlus } from '../../../../shared/components/icons/icons';
 import { Button } from '../../../../shared/components/ui/button';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
 import {
@@ -112,7 +113,7 @@ export const CreateProveedorModal = ({ open: controlledOpen, onOpenChange: setCo
     <>
       {!isControlled && (
         <Button onClick={() => setOpen(true)} className="w-full sm:w-auto font-medium">
-          <Truck className="w-4 h-4 mr-2" />
+          <MdiTruckPlus className="w-5 h-5 mr-2" />
           Nuevo Proveedor
         </Button>
       )}

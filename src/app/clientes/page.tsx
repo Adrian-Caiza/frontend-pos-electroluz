@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Users, UserPlus } from 'lucide-react';
-import { FluentPeopleTeam20Filled } from '../../shared/components/icons/icons';
+import { FluentPeopleTeam20Filled, FluentPeopleAdd16Filled } from '../../shared/components/icons/icons';
 import { Button } from '../../shared/components/ui/button';
 import { ClienteTable } from '../../modules/cliente/presentation/components/ClienteTable';
 import { CreateClienteModal } from '../../modules/cliente/presentation/components/CreateClienteModal';
@@ -27,7 +27,7 @@ export const ClientesPage = () => {
         <Button
           onClick={() => setIsCreateModalOpen(true)}
         >
-          <UserPlus className="w-4 h-4 mr-2" />
+          <FluentPeopleAdd16Filled className="w-5 h-5 mr-2" />
           Registrar Cliente
         </Button>
       </div>

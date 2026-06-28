@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
-import { ChevronsUpDown } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { Fa7SolidUserCog, IonMdLogOut } from '../icons/icons';
 import { ConfirmDialog } from '../ui/modal/ConfirmDialog';
 import { ProfileSettingsModal } from '../../../modules/usuario/presentation/components/ProfileSettingsModal';
@@ -54,9 +54,9 @@ export const UserProfileMenu = ({ onLogout, userImage }: UserProfileMenuProps) =
               </div>
             </div>
 
-            {/* Chevrons */}
+            {/* Chevron */}
             <div className="ml-2 text-muted-foreground/60 hidden sm:block">
-              <ChevronsUpDown className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4" />
             </div>
           </button>
         </DropdownMenuTrigger>

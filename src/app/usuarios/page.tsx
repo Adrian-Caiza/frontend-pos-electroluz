@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '../../shared/components/ui/button';
 import { Users, UserPlus } from 'lucide-react';
-import { ClarityEmployeeSolid } from '../../shared/components/icons/icons';
+import { ClarityEmployeeSolid, WpfAddUser } from '../../shared/components/icons/icons';
 import { UsuarioTable } from '../../modules/usuario/presentation/components/UsuarioTable';
 import { CreateUsuarioModal } from '../../modules/usuario/presentation/components/CreateUsuarioModal';
 
@@ -28,7 +28,7 @@ export default function UsuariosPage() {
           onClick={() => setIsCreateOpen(true)}
           className="bg-primary hover:bg-primary/90"
         >
-          <UserPlus className="w-4 h-4 mr-2" />
+          <WpfAddUser className="w-5 h-5 mr-2" />
           Registrar Usuario
         </Button>
       </div>

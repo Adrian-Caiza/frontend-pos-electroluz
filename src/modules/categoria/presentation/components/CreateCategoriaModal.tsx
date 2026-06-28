@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState, useEffect } from 'react';
 import { Tags, AlignLeft, Plus, FolderTree } from 'lucide-react';
+import { FluentFolderAdd16Filled } from '../../../../shared/components/icons/icons';
 import { useCreateCategoria } from '../hooks/useCreateCategoria';
 import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 import { ConfirmDialog } from '../../../../shared/components/ui/modal/ConfirmDialog';
@@ -90,7 +91,7 @@ export const CreateCategoriaModal = () => {
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        <Tags className="w-4 h-4 mr-2" />
+        <FluentFolderAdd16Filled className="w-5 h-5 mr-2" />
         Nueva Categoría
       </Button>
 

@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from '../../../../shared/components/ui/select';
 import { Store, Hash, MonitorSmartphone, Plus, Building2, Fingerprint } from 'lucide-react';
+import { PhCashRegisterFill } from '../../../../shared/components/icons/icons';
 
 const formSchema = z.object({
   cjidentificador: z.string().length(3, 'El identificador debe tener exactamente 3 dígitos').regex(/^\d+$/, 'Solo se permiten números'),
@@ -102,7 +103,7 @@ export const CreateCheckoutModal = () => {
   return (
     <>
       <Button onClick={() => setOpen(true)}>
-        <Store className="w-4 h-4 mr-2" /> Nueva Caja
+        <PhCashRegisterFill className="w-5 h-5 mr-2" /> Nueva Caja
       </Button>
 
       <BaseModal 
