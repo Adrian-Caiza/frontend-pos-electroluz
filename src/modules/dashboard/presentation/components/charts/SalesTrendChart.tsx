@@ -1,6 +1,5 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartCardWrapper } from '../../../../../shared/components/ui/charts/ChartCardWrapper';
-import { ChevronDown } from 'lucide-react';
 
 interface SalesTrendChartProps {
   data: Array<{ date: string; total: number; rawDate: string }>;
@@ -26,17 +25,9 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 export const SalesTrendChart = ({ data, isLoading }: SalesTrendChartProps) => {
-  const headerRight = (
-    <div className="flex items-center text-sm text-muted-foreground font-medium cursor-pointer hover:text-foreground transition-colors">
-      Mensual
-      <ChevronDown className="w-4 h-4 ml-1" />
-    </div>
-  );
-
   return (
     <ChartCardWrapper 
       title="Reporte de Ventas" 
-      headerRight={headerRight}
     >
       {isLoading ? (
         <div className="flex h-full items-center justify-center text-muted-foreground animate-pulse">Cargando datos...</div>

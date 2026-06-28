@@ -254,4 +254,3 @@ export function FluentFolderAdd16Filled(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-export default FluentFolderAdd16Filled;
