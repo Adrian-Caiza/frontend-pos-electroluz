@@ -95,8 +95,9 @@ export const columns: ColumnDef<Checkout>[] = [
       if (checkout.cjestado !== 'inactivo' && checkout.cjestado !== 'eliminado') {
         actions.push({
           label: 'Marcar Inactivo',
-          icon: <ShieldOff className="h-4 w-4 text-amber-600" />,
-          onClick: () => meta.onChangeStatus(checkout.cjid, 'inactivo')
+          icon: <ShieldOff className="h-4 w-4" />,
+          onClick: () => meta.onChangeStatus(checkout.cjid, 'inactivo'),
+          variant: 'warning',
         });
       }
       

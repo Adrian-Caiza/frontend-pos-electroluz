@@ -147,7 +147,7 @@ export const columns: ColumnDef<Proveedor>[] = [
   },
   {
     id: 'actions',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Acciones" className="justify-center" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Acciones" className="text-center w-full block" />,
     cell: ({ row, table }) => {
       const proveedor = row.original;
       const meta = table.options.meta as ProveedorTableMeta | undefined;
@@ -188,7 +188,7 @@ export const columns: ColumnDef<Proveedor>[] = [
 
       return (
         <div className="flex justify-center">
-          <DataTableRowActions actions={actions} />
+          <DataTableRowActions title="Acciones" actions={actions} />
         </div>
       );
     },

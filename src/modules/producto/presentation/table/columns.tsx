@@ -166,7 +166,8 @@ export const columns: ColumnDef<Producto>[] = [
         actions.push({
           label: "Marcar como inactivo",
           icon: <Ban className="h-4 w-4" />,
-          onClick: () => meta.onStatusChange(producto, 'inactivo')
+          onClick: () => meta.onStatusChange(producto, 'inactivo'),
+          variant: 'warning',
         });
       } else {
         actions.push({

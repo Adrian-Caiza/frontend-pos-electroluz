@@ -85,7 +85,7 @@ export const columns: ColumnDef<Marca>[] = [
   },
   {
     id: 'actions',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Acciones" className="justify-center" />,
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Acciones" className="text-center w-full block" />,
     cell: ({ row, table }) => {
       const marca = row.original;
       const meta = table.options.meta as MarcaTableMeta | undefined;
@@ -126,7 +126,7 @@ export const columns: ColumnDef<Marca>[] = [
 
       return (
         <div className="flex justify-center">
-          <DataTableRowActions actions={actions} />
+          <DataTableRowActions title="Acciones" actions={actions} />
         </div>
       );
     },

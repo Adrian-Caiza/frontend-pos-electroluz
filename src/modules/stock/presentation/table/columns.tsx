@@ -147,8 +147,9 @@ export const columns: ColumnDef<Stock>[] = [
       if (stock.stckestado === 'activo') {
         actions.push({
           label: 'Bloquear lote (inactivo)',
-          icon: <PackageX className="h-4 w-4 text-amber-600" />,
-          onClick: () => meta.onStatusChange(stock, 'inactivo')
+          icon: <PackageX className="h-4 w-4" />,
+          onClick: () => meta.onStatusChange(stock, 'inactivo'),
+          variant: 'warning',
         });
       } else {
         actions.push({

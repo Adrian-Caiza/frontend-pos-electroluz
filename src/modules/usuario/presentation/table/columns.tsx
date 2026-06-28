@@ -108,8 +108,9 @@ export const columns: ColumnDef<Usuario>[] = [
       if (usuario.usestado === 'activo') {
         actions.push({
           label: 'Marcar como Inactivo',
-          icon: <Ban className="h-4 w-4 text-amber-600" />,
-          onClick: () => meta.onStatusChange(usuario, 'inactivo')
+          icon: <Ban className="h-4 w-4" />,
+          onClick: () => meta.onStatusChange(usuario, 'inactivo'),
+          variant: 'warning',
         });
       } else {
         actions.push({

@@ -98,8 +98,9 @@ export const columns: ColumnDef<Sucursal>[] = [
       if (sucursal.suestado === 'activo') {
         actions.push({
           label: 'Marcar como Inactivo',
-          icon: <Ban className="h-4 w-4 text-amber-600" />,
-          onClick: () => meta.onStatusChange(sucursal, 'inactivo')
+          icon: <Ban className="h-4 w-4" />,
+          onClick: () => meta.onStatusChange(sucursal, 'inactivo'),
+          variant: 'warning',
         });
       } else {
         actions.push({

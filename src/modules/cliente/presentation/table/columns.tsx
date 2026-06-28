@@ -112,8 +112,9 @@ export const columns: ColumnDef<Cliente>[] = [
       if (cliente.clnteestado === 'activo') {
         actions.push({
           label: 'Marcar como inactivo',
-          icon: <UserMinus className="h-4 w-4 text-amber-600" />,
-          onClick: () => meta.onChangeStatus(cliente, 'inactivo')
+          icon: <UserMinus className="h-4 w-4" />,
+          onClick: () => meta.onChangeStatus(cliente, 'inactivo'),
+          variant: 'warning',
         });
       } else {
         actions.push({
