@@ -30,8 +30,8 @@ const HomeRedirect = () => {
   const { user } = useAuthStore();
   const role = user?.usrol?.toLowerCase();
   if (role === 'jefe') return <Navigate to="/dashboard" replace />;
-  if (role === 'cajero') return <Navigate to="/caja" replace />;
   if (role === 'empleado') return <Navigate to="/terminal" replace />;
+  if (role === 'administrador') return <Navigate to="/alertas" replace />;
   return <Navigate to="/unauthorized" replace />;
 };
 
@@ -101,21 +101,21 @@ function App() {
               }
             />
 
-            {/* Sucursales for 'jefe' */}
+            {/* Sucursales for 'jefe', 'empleado' and 'administrador' */}
             <Route
               path="sucursales"
               element={
-                <RoleGuard allowedRoles={['jefe']}>
+                <RoleGuard allowedRoles={['jefe', 'empleado', 'administrador']}>
                   <SucursalesPage />
                 </RoleGuard>
               }
             />
 
-            {/* Caja for 'jefe' and 'cajero' */}
+            {/* Caja for 'jefe', 'empleado' and 'administrador' */}
             <Route
               path="caja"
               element={
-                <RoleGuard allowedRoles={['jefe', 'empleado']}>
+                <RoleGuard allowedRoles={['jefe', 'empleado', 'administrador']}>
                   <CajaPage />
                 </RoleGuard>
               }

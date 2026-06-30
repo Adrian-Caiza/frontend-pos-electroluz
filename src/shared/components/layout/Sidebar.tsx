@@ -4,7 +4,8 @@ import { Sheet, SheetContent, SheetTitle } from '../ui/sheet';
 import { useAuthStore } from '../../stores/useAuthStore';
 import {
   PanelLeftClose,
-  PanelLeftOpen
+  PanelLeftOpen,
+  Bell
 } from 'lucide-react';
 import {
   StreamlineFlexDashboard3Solid,
@@ -59,9 +60,9 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
     {
       group: 'Ventas y Caja',
       items: [
-        { name: 'Terminal POS', path: '/terminal', icon: MaterialSymbolsPointOfSale, roles: ['jefe', 'empleado', 'cajero'] },
-        { name: 'Historial Ventas', path: '/proformas', icon: FaSolidFileInvoiceDollar, roles: ['jefe', 'empleado', 'cajero'] },
-        { name: 'Caja', path: '/caja', icon: FaSolidCashRegister, roles: ['jefe', 'empleado'] },
+        { name: 'Terminal POS', path: '/terminal', icon: MaterialSymbolsPointOfSale, roles: ['jefe', 'empleado'] },
+        { name: 'Historial Ventas', path: '/proformas', icon: FaSolidFileInvoiceDollar, roles: ['jefe', 'empleado'] },
+        { name: 'Caja', path: '/caja', icon: FaSolidCashRegister, roles: ['jefe', 'empleado', 'administrador'] },
         { name: 'Clientes', path: '/clientes', icon: FluentPeopleTeam20Filled, roles: ['jefe', 'empleado'] },
       ]
     },
@@ -80,8 +81,9 @@ export const Sidebar = ({ companyName, companyLogo, isMobileOpen, onMobileOpenCh
       group: 'Administración',
       items: [
         { name: 'Personal', path: '/usuarios', icon: ClarityEmployeeSolid, roles: ['jefe'] },
-        { name: 'Sucursales', path: '/sucursales', icon: SolarBuildings2Bold, roles: ['jefe'] },
+        { name: 'Sucursales', path: '/sucursales', icon: SolarBuildings2Bold, roles: ['jefe', 'empleado', 'administrador'] },
         { name: 'Métodos de Pago', path: '/metodos-pago', icon: TeenyiconsCreditCardSolid, roles: ['jefe', 'empleado'] },
+        { name: 'Alertas', path: '/alertas', icon: Bell, roles: ['jefe', 'empleado', 'administrador'] },
       ]
     }
   ];

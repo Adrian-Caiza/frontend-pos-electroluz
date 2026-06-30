@@ -13,8 +13,8 @@ export const GuestGuard = ({ children }: GuestGuardProps) => {
   if (token && user) {
     const role = user.usrol?.toLowerCase();
     if (role === 'jefe') return <Navigate to="/dashboard" replace />;
-    if (role === 'cajero') return <Navigate to="/caja" replace />;
     if (role === 'empleado') return <Navigate to="/terminal" replace />;
+    if (role === 'administrador') return <Navigate to="/alertas" replace />;
     return <Navigate to="/unauthorized" replace />;
   }
 

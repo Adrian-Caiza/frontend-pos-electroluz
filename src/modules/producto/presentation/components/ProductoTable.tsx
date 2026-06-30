@@ -103,13 +103,13 @@ export const ProductoTable = () => {
           globalFilter: search,
           onGlobalFilterChange: setSearch,
           searchPlaceholder: "Buscar por código o nombre...",
-          onAdvancedFilterClick: () => {}, // Adding this will render the "Filtros" button
+          onAdvancedFilterClick: () => { }, // Adding this will render the "Filtros" button
           children: (
             <div className="flex gap-2">
               {Object.keys(rowSelection).length > 0 ? (
                 <>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
                     onClick={() => handleBulkAction('activo')}
@@ -118,8 +118,8 @@ export const ProductoTable = () => {
                     <CheckCircle className="mr-2 h-4 w-4" />
                     Activar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-amber-600 hover:text-amber-700 hover:bg-amber-50"
                     onClick={() => handleBulkAction('inactivo')}
@@ -128,8 +128,8 @@ export const ProductoTable = () => {
                     <XCircle className="mr-2 h-4 w-4" />
                     Inactivar
                   </Button>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     className="h-9 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
                     onClick={() => handleBulkAction('eliminado')}
@@ -138,8 +138,8 @@ export const ProductoTable = () => {
                     <Trash2 className="mr-2 h-4 w-4" />
                     Eliminar
                   </Button>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     className="h-9 text-slate-500 hover:text-slate-700"
                     onClick={() => setRowSelection({})}

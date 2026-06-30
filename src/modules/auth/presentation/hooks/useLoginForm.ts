@@ -40,8 +40,11 @@ export const useLoginForm = () => {
       });
       
       // Role-based redirection
-      if (data.user.usrol === 'cajero') {
-        navigate('/caja');
+      const role = data.user.usrol?.toLowerCase();
+      if (role === 'administrador') {
+        navigate('/alertas');
+      } else if (role === 'empleado') {
+        navigate('/terminal');
       } else {
         navigate('/dashboard');
       }

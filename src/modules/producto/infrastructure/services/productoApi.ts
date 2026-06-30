@@ -5,7 +5,7 @@ import type { PaginatedResponse } from '../../../categoria/infrastructure/servic
 export const productoApi = {
   create: async (data: CreateProductoDto): Promise<Producto> => {
     const formData = new FormData();
-    
+
     // Append all string fields
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && key !== 'imagen') {
@@ -28,7 +28,7 @@ export const productoApi = {
 
   update: async (id: string, data: UpdateProductoDto): Promise<Producto> => {
     const formData = new FormData();
-    
+
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && key !== 'imagen') {
         formData.append(key, String(value));
