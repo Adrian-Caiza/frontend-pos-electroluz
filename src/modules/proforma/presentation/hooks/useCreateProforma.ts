@@ -12,7 +12,7 @@ export const useCreateProforma = () => {
   return useMutation({
     mutationFn: (data: CreateProformaDTO) => createProformaUseCase.execute(data),
     onSuccess: () => {
-      // Invalidate both proformas and stocks (since selling reduces stock)
+      
       queryClient.invalidateQueries({ queryKey: ['proformas'] });
       queryClient.invalidateQueries({ queryKey: ['stocks'] });
     },

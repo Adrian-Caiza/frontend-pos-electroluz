@@ -1,7 +1,4 @@
-/**
- * Repository interface for Authentication.
- * This contract isolates the business logic from infrastructure implementation details.
- */
+
 import type { AuthResponse } from '../entities/User';
 export interface LoginCredentials {
   emruc: string;

@@ -42,8 +42,7 @@ export const RecentTransactions = () => {
               </thead>
               <tbody className="divide-y divide-border">
                 {data?.items?.map((item) => {
-                  // In get-proformas-endpoint, the structure might be wrapped in `proforma` or directly spread.
-                  // According to the types and our standard useProformas response mapping:
+                  
                   const prof = (item as any).proforma || item;
                   return (
                     <tr key={prof.prfmaid} className="hover:bg-muted/50 transition-colors">

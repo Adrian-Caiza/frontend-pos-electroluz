@@ -18,13 +18,13 @@ import {
 export const AlertTable = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [globalFilter, setGlobalFilter] = useState(''); // Not used heavily by backend right now, but standard for UI
+  const [globalFilter, setGlobalFilter] = useState(''); 
   const [suidFilter, setSuidFilter] = useState('todas');
   
   const selectedSuid = suidFilter === 'todas' ? undefined : suidFilter;
   
   const { data, isLoading } = useAlerts(page, pageSize, { suid: selectedSuid });
-  const { data: sucursalesData } = useSucursales(1, 100); // fetch all for filter
+  const { data: sucursalesData } = useSucursales(1, 100); 
   
   const { mutate: markAsViewed } = useMarkAlertAsViewed();
   const { removeBellAlert } = useAlertStore();
@@ -32,7 +32,7 @@ export const AlertTable = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const handleMarkAsViewed = (id: string) => {
-    // Ya no hacemos actualizaciones optimistas locales
+    
     markAsViewed(id);
   };
 
@@ -59,7 +59,7 @@ export const AlertTable = () => {
       toolbar={{
         globalFilter,
         onGlobalFilterChange: setGlobalFilter,
-        searchPlaceholder: "Buscar alertas...", // Si el backend no soporta busqueda libre, esto solo filtrará localmente si el DataTable lo hace
+        searchPlaceholder: "Buscar alertas...", 
         onAdvancedFilterClick: () => {},
         children: (
           <div className="flex gap-2">

@@ -23,7 +23,7 @@ export const ClienteTable = () => {
   const { page, setPage, pageSize, setPageSize, search, setSearch, status, setStatus, debouncedSearch } = useListFilters(10);
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-    // idealmente la API debería soportar búsqueda global
+    
   const { data, isLoading } = useClientes(page, pageSize, debouncedSearch, status);
   const updateMutation = useUpdateCliente();
   const { mutate: updateCliente } = updateMutation;

@@ -101,7 +101,7 @@ export const EditCategoriaModal = ({ categoria, open, onOpenChange }: EditCatego
 
   if (!categoria) return null;
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <BaseModal 

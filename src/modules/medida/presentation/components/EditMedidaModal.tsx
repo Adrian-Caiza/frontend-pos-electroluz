@@ -87,7 +87,7 @@ export const EditMedidaModal = ({ medida, open, onOpenChange }: EditMedidaModalP
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <BaseModal 

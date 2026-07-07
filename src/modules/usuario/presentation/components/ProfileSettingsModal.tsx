@@ -112,7 +112,7 @@ export const ProfileSettingsModal = ({ open, onOpenChange }: ProfileSettingsModa
   const onSubmit = (values: FormValues) => {
     if (!currentUser) return;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    
     const payload: any = {};
 
     if (values.usnombre !== currentUser.usnombre) {
@@ -177,7 +177,7 @@ export const ProfileSettingsModal = ({ open, onOpenChange }: ProfileSettingsModa
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
     <BaseModal 

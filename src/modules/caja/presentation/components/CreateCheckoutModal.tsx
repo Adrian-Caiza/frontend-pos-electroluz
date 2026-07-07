@@ -46,7 +46,6 @@ export const CreateCheckoutModal = () => {
   const { company } = useAuthStore();
   const { mutate: createCheckout, isPending } = useCreateCheckout();
   
-  // Asumimos que traemos suficientes sucursales (ej. 100) para el dropdown
   const { data: sucursalesData, isLoading: loadingSucursales } = useSucursales(1, 100);
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -99,7 +98,7 @@ export const CreateCheckoutModal = () => {
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <Button onClick={() => setOpen(true)}>

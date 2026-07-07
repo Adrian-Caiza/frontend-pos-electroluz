@@ -60,7 +60,7 @@ export const EditMetodoPagoModal = ({ metodoPago, open, onOpenChange }: EditMeto
   const onSubmit = async (data: EditMetodoPagoFormData) => {
     if (!metodoPago) return;
     
-    // Only send modified fields
+    
     const payload: any = {};
     if (data.mpnombre !== metodoPago.mpnombre) payload.mpnombre = data.mpnombre;
     if (data.mpestado !== metodoPago.mpestado) payload.mpestado = data.mpestado;
@@ -91,7 +91,7 @@ export const EditMetodoPagoModal = ({ metodoPago, open, onOpenChange }: EditMeto
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <BaseModal 

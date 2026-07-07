@@ -58,7 +58,7 @@ export const CreateSucursalModal = () => {
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     if (!company) return;
     
-    // Clean up empty strings to undefined to match optional backend rules if needed
+    
     const payload = {
       suemid: company.emid,
       sunombre: values.sunombre,
@@ -94,7 +94,7 @@ export const CreateSucursalModal = () => {
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <Button onClick={() => setOpen(true)}>

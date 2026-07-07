@@ -16,7 +16,7 @@ import { es } from 'date-fns/locale';
 import { Badge } from '../../../../shared/components/ui/badge';
 
 export const AlertBell = () => {
-  useAlertEvents(); // Starts SSE
+  useAlertEvents(); 
   
   const { unseenCount, bellAlerts, setBellAlerts, removeBellAlert, clearBellAlerts, decrementUnseen } = useAlertStore();
   const { mutate: markAsViewed } = useMarkAlertAsViewed();
@@ -37,13 +37,12 @@ export const AlertBell = () => {
   }, [isOpen, setBellAlerts]);
 
   const handleMarkAsViewed = (id: string) => {
-    // Ya no hacemos actualizaciones optimistas locales
+    
     markAsViewed(id);
   };
 
   const handleMarkAllAsRead = () => {
-    // Ya no limpiamos la UI de forma optimista
-    // Iteramos y mandamos al servidor, la confirmación actualizará la UI
+    
     bellAlerts.forEach(alert => {
       markAsViewed(alert.id);
     });

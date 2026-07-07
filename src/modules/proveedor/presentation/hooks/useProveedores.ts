@@ -8,6 +8,6 @@ export const useProveedores = (page: number = 1, pageSize: number = 10, search?:
       const repository = new ProveedorRepository();
       return repository.getProveedores(page, pageSize, search, status);
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
 };

@@ -19,20 +19,18 @@ export const ProductDetailPanel = () => {
 
   const imageUrl = getImageUrl(selectedProduct.prdtoimagen) || '/placeholder-image.png';
   
-  // Calculate Profit Margin
+  
   const costPrice = Number(selectedProduct.prdtopreciocompra) || 0;
   const sellPrice = Number(selectedProduct.prdtoprecioventa) || 0;
   const marginRaw = costPrice > 0 ? ((sellPrice - costPrice) / costPrice) * 100 : 0;
   const margin = marginRaw.toFixed(2);
   const isGoodMargin = marginRaw >= 20;
 
-  // Stock representation (using stockMaximo as current stock, per user agreement)
+  
   const currentStock = Number(selectedProduct.prdtostockmaximo) || 0;
   const minStock = Number(selectedProduct.prdtostockminimo) || 0;
   
-  // We need a theoretical max capacity to draw a progress bar nicely.
-  // If currentStock is greater than minStock, let's say capacity is currentStock * 1.5
-  // If currentStock is 0, capacity is minStock * 2
+  
   const capacity = Math.max(currentStock * 1.2, minStock * 2, 10); 
   const stockPercentage = Math.min((currentStock / capacity) * 100, 100);
   const minStockPercentage = Math.min((minStock / capacity) * 100, 100);

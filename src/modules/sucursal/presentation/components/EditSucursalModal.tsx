@@ -57,7 +57,7 @@ export const EditSucursalModal = ({ sucursal, open, onOpenChange }: EditSucursal
     },
   });
 
-  // Actualizar valores del formulario si la sucursal seleccionada cambia
+  
   useEffect(() => {
     form.reset({
       sunombre: sucursal.sunombre,
@@ -94,7 +94,7 @@ export const EditSucursalModal = ({ sucursal, open, onOpenChange }: EditSucursal
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <BaseModal 

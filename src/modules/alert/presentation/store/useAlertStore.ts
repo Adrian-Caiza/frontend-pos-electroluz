@@ -1,19 +1,19 @@
 import { create } from 'zustand';
 import type { Alert } from '../../domain/entities/Alert';
 
-/** Stable key for a product-branch combination (survives backend alert re-creation) */
+
 function alertKey(alert: Alert): string {
   return `${alert.product?.id || ''}_${alert.branch?.id || ''}`;
 }
 
 interface AlertStore {
-  // Badge count (from GET /alerts/summary)
+  
   unseenCount: number;
   setUnseenCount: (count: number) => void;
   incrementUnseen: () => void;
   decrementUnseen: () => void;
 
-  // Bell dropdown alerts (loaded on demand)
+  
   bellAlerts: Alert[];
   setBellAlerts: (alerts: Alert[]) => void;
   addBellAlert: (alert: Alert) => void;
@@ -33,12 +33,12 @@ export const useAlertStore = create<AlertStore>((set) => ({
   setBellAlerts: (alerts) => set({ bellAlerts: alerts }),
 
   addBellAlert: (newAlert) => set((state) => {
-    // If we already have it in the bell, update it instead of duplicate
+    
     const exists = state.bellAlerts.some(a => a.id === newAlert.id);
     if (exists) {
       return { bellAlerts: state.bellAlerts.map(a => a.id === newAlert.id ? newAlert : a) };
     }
-    // Add to the top
+    
     return { bellAlerts: [newAlert, ...state.bellAlerts] };
   }),
 

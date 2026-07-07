@@ -14,7 +14,7 @@ export interface Checkout {
   cjidentificador: string;
   cjfchregistro: string;
   cjestado: CheckoutStatus;
-  sucursal?: CheckoutBranch; // Only present in GET endpoints, not in POST response usually, but we make it optional
+  sucursal?: CheckoutBranch; 
 }
 
 export interface PaginatedCheckouts {

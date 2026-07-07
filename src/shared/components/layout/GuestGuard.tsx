@@ -9,7 +9,7 @@ export const GuestGuard = ({ children }: GuestGuardProps) => {
   const token = useAuthStore((state) => state.token);
   const user = useAuthStore((state) => state.user);
 
-  // If there's a token, redirect to their respective dashboard
+  
   if (token && user) {
     const role = user.usrol?.toLowerCase();
     if (role === 'jefe') return <Navigate to="/dashboard" replace />;

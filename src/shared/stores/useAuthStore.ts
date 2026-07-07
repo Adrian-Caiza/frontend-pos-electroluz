@@ -24,8 +24,7 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ user: null, company: null, token: null, refreshToken: null }),
     }),
     {
-      name: 'auth-storage', // only user data and token in localStorage, though it's recommended to use httpOnly cookies
-      // We persist in localStorage for now as a fallback since httpOnly is backend-dependent.
+      name: 'auth-storage', 
     }
   )
 );

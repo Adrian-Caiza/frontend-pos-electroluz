@@ -9,7 +9,7 @@ export const apiClient = axios.create({
   },
 });
 
-// Request Interceptor: Attach access token
+
 apiClient.interceptors.request.use(
   (config) => {
     const token = useAuthStore.getState().token;
@@ -21,13 +21,13 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response Interceptor: Handle 401 and refresh token
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // Avoid infinite loops if refresh itself fails
+    
     if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/refresh') && !originalRequest.url?.includes('/auth/login')) {
       originalRequest._retry = true;
 
@@ -39,7 +39,7 @@ apiClient.interceptors.response.use(
           refreshToken,
         });
 
-        // Store new tokens
+       
         const currentUser = useAuthStore.getState().user;
         const currentCompany = useAuthStore.getState().company;
         
@@ -52,13 +52,13 @@ apiClient.interceptors.response.use(
           );
         }
 
-        // Update auth header for the failed request and retry
+        
         originalRequest.headers['Authorization'] = `Bearer ${data.accessToken}`;
         return apiClient(originalRequest);
       } catch (refreshError) {
-        // If refresh fails, log out the user
+        
         useAuthStore.getState().logout();
-        window.location.href = '/auth/login'; // Redirect hard to login to clear memory
+        window.location.href = '/auth/login'; 
         return Promise.reject(refreshError);
       }
     }

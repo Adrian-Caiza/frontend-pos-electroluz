@@ -14,6 +14,6 @@ export const useAlertSummary = () => {
       return useCase.execute();
     },
     enabled: !!token,
-    refetchInterval: 60000, // Fallback polling every minute
+    refetchInterval: 60000, 
   });
 };

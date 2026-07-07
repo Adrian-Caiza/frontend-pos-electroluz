@@ -104,7 +104,7 @@ export const EditClienteModal = ({ cliente, open, onOpenChange }: EditClienteMod
 
     const payload: any = {};
 
-    // Smart update: Only send fields that actually changed
+    
     if (values.clntetipoidentificacion !== cliente.clntetipoidentificacion) payload.clntetipoidentificacion = values.clntetipoidentificacion;
     if (values.clnteidentificacion !== cliente.clnteidentificacion) payload.clnteidentificacion = values.clnteidentificacion;
     if (values.clntenombre !== cliente.clntenombre) payload.clntenombre = values.clntenombre;
@@ -113,7 +113,7 @@ export const EditClienteModal = ({ cliente, open, onOpenChange }: EditClienteMod
     if (values.clntetelefono !== cliente.clntetelefono) payload.clntetelefono = values.clntetelefono;
 
     if (Object.keys(payload).length === 0) {
-      onOpenChange(false); // No changes made
+      onOpenChange(false); 
       return;
     }
 
@@ -137,7 +137,7 @@ export const EditClienteModal = ({ cliente, open, onOpenChange }: EditClienteMod
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <BaseModal 

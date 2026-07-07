@@ -12,7 +12,6 @@ import { useAuthStore } from '../../../../shared/stores/useAuthStore';
 
 import { useState } from 'react';
 
-// In a real app with DI container, we'd inject this. For now we instantiate.
 const authRepository = new AuthRepository();
 const loginUseCase = new LoginUseCase(authRepository);
 
@@ -39,7 +38,7 @@ export const useLoginForm = () => {
         description: 'Inicio de sesión exitoso'
       });
       
-      // Role-based redirection
+      
       const role = data.user.usrol?.toLowerCase();
       if (role === 'administrador') {
         navigate('/alertas');
@@ -50,7 +49,7 @@ export const useLoginForm = () => {
       }
     },
     onError: (error: any) => {
-      // Manejar error 401, 422, 500, etc.
+      
       let message = error.response?.data?.message;
       if (message === 'Unauthorized' || error.response?.status === 401) {
         message = 'Credenciales incorrectas.';

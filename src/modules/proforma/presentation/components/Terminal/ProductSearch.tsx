@@ -32,7 +32,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
   const [isClienteModalOpen, setClienteModalOpen] = useState(false);
   const [isEditClienteModalOpen, setEditClienteModalOpen] = useState(false);
 
-  // Fetch lists for selectors
+  
   const { data: sucursalesData } = useSucursales(1, 50);
   const { data: clientesData } = useClientes(1, 100, debouncedClienteSearch);
   const { data: metodosData } = useMetodosPago(1, 50);
@@ -43,7 +43,7 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
   const metodos = metodosData?.items.filter(m => m.mpestado === 'activo') || [];
   const cajas = cajasData?.items.filter(c => c.cjestado === 'activo' && (!config.sucursalId || c.cjsuid === config.sucursalId)) || [];
 
-  // Build SearchableSelect options
+  
   const sucursalOptions = useMemo(() =>
     sucursales.map(s => ({ id: s.suid, label: s.sunombre })),
     [sucursales]
@@ -68,13 +68,13 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
     [metodos]
   );
 
-  // Selected client data for info card
+  
   const selectedCliente = useMemo(() =>
     clientes.find(c => c.clnteid === config.clienteId) || null,
     [clientes, config.clienteId]
   );
 
-  // Debounce search input
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(searchTerm);
@@ -101,15 +101,14 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
 
   const filteredItems = data?.items.filter(stock => {
     const productoData = productosData?.items.find(p => p.prdtoid === stock.producto.prdtoid);
-    // Si la data de productos ya cargó, verificamos que el producto esté activo
-    // Si no ha cargado, permitimos que se muestre temporalmente para no retrasar el renderizado (o lo bloqueamos)
+   
     const isProductActive = productosData ? (productoData?.prdtoestado === 'activo') : true;
 
     return stock.stckestado === 'activo' && isProductActive;
   }) || [];
 
   const handleAddProduct = (stock: any, productoData: any, availableStock: number) => {
-    // Only add if there is stock available
+    
     if (availableStock <= 0) {
       toast.error('Ocurrió un error', {
         description: 'No hay existencias disponibles para este producto en la sucursal seleccionada.'
@@ -118,11 +117,11 @@ export const ProductSearch = ({ config, onChangeConfig }: ProductSearchProps) =>
     }
 
     addItem({
-      id: stock.producto.prdtoid, // Use Product ID as unique local ID for inventariable items
+      id: stock.producto.prdtoid, 
       esInventariable: true,
       codigo: stock.producto.prdtocodigo,
       descripcion: stock.producto.prdtonombre,
-      cantidad: 1, // Default add 1
+      cantidad: 1, 
       precioUnitario: productoData ? Number(productoData.prdtoprecioventa) : 0,
       stockMaximo: Number(stock.stckcantidad)
     });

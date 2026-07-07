@@ -11,7 +11,7 @@ export const useCancelProforma = () => {
   return useMutation({
     mutationFn: (id: string) => cancelProformaUseCase.execute(id),
     onSuccess: () => {
-      // Invalidate both proformas and stocks (since canceling restores stock)
+      
       queryClient.invalidateQueries({ queryKey: ['proformas'] });
       queryClient.invalidateQueries({ queryKey: ['stocks'] });
     },

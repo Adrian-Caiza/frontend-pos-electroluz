@@ -8,6 +8,6 @@ export const useProductos = (page: number = 1, pageSize: number = 10, search?: s
       const repository = new ProductoRepository();
       return repository.getProductos(page, pageSize, search, status);
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
 };

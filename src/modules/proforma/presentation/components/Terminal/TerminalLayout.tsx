@@ -49,7 +49,7 @@ export const TerminalLayout = () => {
       setConfig(prev => {
         const next = { ...prev, [key]: value };
         if (key === 'sucursalId' && prev.sucursalId !== value) {
-          next.cajaId = null; // Reset caja si cambia de sucursal
+          next.cajaId = null; 
         }
         return next;
       });
@@ -58,12 +58,11 @@ export const TerminalLayout = () => {
 
   const handleSaleSuccess = () => {
     if (editId) {
-      // Si estaba editando, limpiamos la url
+      
       setSearchParams(new URLSearchParams());
       clearCart();
     }
-    // We could redirect or just stay on the terminal for the next sale.
-    // Resetting only the non-sticky config if desired. For now, keep config to make next sale faster.
+    
   };
 
   if (isLoading && editId) {

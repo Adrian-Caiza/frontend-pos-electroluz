@@ -10,9 +10,9 @@ export const useUpdateProforma = () => {
   return useMutation<Proforma, Error, { id: string; data: UpdateProformaDTO }>({
     mutationFn: ({ id, data }) => proformaRepository.updateProforma(id, data),
     onSuccess: (updatedProforma) => {
-      // Invalidar o actualizar la cache de proformas
+      
       queryClient.invalidateQueries({ queryKey: ['proformas'] });
-      // También podríamos actualizar la caché individual si se usara
+      
       queryClient.setQueryData(['proforma', updatedProforma.prfmaid], updatedProforma);
     },
   });

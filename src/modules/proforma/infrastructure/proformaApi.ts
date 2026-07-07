@@ -8,7 +8,7 @@ export const fetchProformas = async (page: number, pageSize: number, search?: st
   if (status) params.status = status;
   const { data } = await apiClient.get<PaginatedResult<Proforma>>('/proformas', { params });
 
-  // Flatten 'proforma' wrapper from response
+  
   return {
     items: data.items.map((item: any) => item.proforma),
     page: data.page,

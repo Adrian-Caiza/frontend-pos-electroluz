@@ -13,6 +13,6 @@ export const useProformas = (page: number, pageSize: number, search?: string, st
     queryKey: ['proformas', user?.usemid, page, pageSize, search, status],
     queryFn: () => getProformasUseCase.execute(page, pageSize, search, status),
     enabled: !!user?.usemid,
-    staleTime: 1000 * 30, // 30 seconds (keep it relatively fresh since sales happen often)
+    staleTime: 1000 * 30, 
   });
 };

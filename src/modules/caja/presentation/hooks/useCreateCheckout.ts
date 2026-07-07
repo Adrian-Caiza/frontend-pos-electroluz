@@ -16,7 +16,7 @@ export const useCreateCheckout = () => {
       toast.success('Operación exitosa', {
         description: 'Caja registrada exitosamente'
       });
-      // Invalidate queries to refetch the list
+      
       queryClient.invalidateQueries({ queryKey: ['cajas'] });
     },
     onError: (error: any) => {

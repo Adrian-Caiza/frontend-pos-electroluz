@@ -13,7 +13,7 @@ export function useListFilters(initialPageSize: number = 20) {
     return () => clearTimeout(timer);
   }, [search]);
 
-  // Reiniciar página al cambiar filtros
+  
   useEffect(() => { 
     setPage(1); 
   }, [debouncedSearch, status]);

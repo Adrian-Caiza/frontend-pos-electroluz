@@ -1,6 +1,3 @@
-/**
- * Domain entities for the Authentication module.
- */
 
 export interface User {
   usid: string;

@@ -35,8 +35,7 @@ export const columns: ColumnDef<Alert>[] = [
       
       const displayMessage = alert.message;
       if (alert.type === 'stock_bajo') {
-        // If the message is long, we can keep it as is, or extract parts if needed.
-        // The endpoint provides 'almensaje' which is already descriptive.
+        
       }
 
       return (

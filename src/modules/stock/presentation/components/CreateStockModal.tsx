@@ -38,14 +38,14 @@ type FormOutput = z.infer<typeof formSchema>;
 interface CreateStockModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  defaultSucursalId?: string; // Para preseleccionar si el usuario ya está viendo una sucursal
+  defaultSucursalId?: string; 
 }
 
 export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: CreateStockModalProps) => {
   const { company } = useAuthStore();
   const { mutate: createStock, isPending } = useCreateStock();
   
-  // Cargamos sucursales y productos para los selects (traemos bastantes para el dropdown)
+  
   const { data: sucursalesData } = useSucursales(1, 100);
   const { data: productosData } = useProductos(1, 100);
 
@@ -110,7 +110,7 @@ export const CreateStockModal = ({ open, onOpenChange, defaultSucursalId }: Crea
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <BaseModal 

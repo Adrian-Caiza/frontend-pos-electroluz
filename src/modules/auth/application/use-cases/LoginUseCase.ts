@@ -1,7 +1,4 @@
-/**
- * Use case for logging in a user.
- * Pure business logic, no framework dependencies.
- */
+
 import type { IAuthRepository, LoginCredentials } from '../../domain/repositories/IAuthRepository';
 import type { AuthResponse } from '../../domain/entities/User';
 

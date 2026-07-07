@@ -56,9 +56,9 @@ export const ManualItemModal = () => {
 
   const onSubmit = (data: ManualItemFormData) => {
     addItem({
-      id: crypto.randomUUID(), // Local unique ID
+      id: crypto.randomUUID(), 
       esInventariable: false,
-      codigo: undefined, // Manual items don't have a code usually
+      codigo: undefined, 
       descripcion: data.descripcion,
       cantidad: data.cantidad,
       precioUnitario: data.precioUnitario,
@@ -76,7 +76,7 @@ export const ManualItemModal = () => {
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <Button onClick={() => setOpen(true)} variant="secondary" className="h-12 px-6 shadow-sm border border-slate-200">

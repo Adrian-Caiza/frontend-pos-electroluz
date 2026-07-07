@@ -8,6 +8,6 @@ export const useMedidas = (page: number = 1, pageSize: number = 10, search?: str
       const repository = new MedidaRepository();
       return repository.getMedidas(page, pageSize, search, status);
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
 };

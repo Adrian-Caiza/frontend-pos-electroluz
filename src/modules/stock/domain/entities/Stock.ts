@@ -11,7 +11,7 @@ export interface Stock {
     prdtocodigo: string;
     prdtonombre: string;
   };
-  stckcantidad: number | string; // The API might return stringified numbers "800.00"
+  stckcantidad: number | string; 
   stckfchregistro: string;
   stckfchactualizacion: string;
   stckestado: 'activo' | 'inactivo' | 'eliminado';
@@ -33,7 +33,7 @@ export interface CreateStockDto {
 }
 
 export interface UpdateStockDto {
-  stcksuid: string; // Obligatorio según la API
+  stcksuid: string; 
   stckcantidad?: number;
   stckestado?: 'activo' | 'inactivo' | 'eliminado';
 }

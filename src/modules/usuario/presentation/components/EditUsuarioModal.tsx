@@ -92,7 +92,7 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
       form.reset({
         usnombre: usuario.usnombre,
         uscorreo: usuario.uscorreo,
-        usrol: usuario.usrol === 'administrador' ? 'jefe' : usuario.usrol, // Fallback safely
+        usrol: usuario.usrol === 'administrador' ? 'jefe' : usuario.usrol, 
         uspassword: '',
         uspasswordConfirm: '',
       });
@@ -144,7 +144,7 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
     const hasInfoChanges = Object.keys(payload).length > 0;
 
     if (!hasInfoChanges && !hasPasswordChange) {
-      onOpenChange(false); // No changes made
+      onOpenChange(false); 
       return;
     }
 
@@ -170,7 +170,7 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
     } else if (hasPasswordChange) {
       updateUsuarioPassword({ id: usuario.usid, uspassword: values.uspassword! })
         .then(() => finalize())
-        .catch(() => {}); // Error already handled in hook
+        .catch(() => {}); 
     }
   };
 
@@ -183,7 +183,7 @@ export const EditUsuarioModal = ({ usuario, open, onOpenChange }: EditUsuarioMod
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <BaseModal 

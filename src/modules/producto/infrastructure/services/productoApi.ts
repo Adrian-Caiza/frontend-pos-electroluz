@@ -6,14 +6,14 @@ export const productoApi = {
   create: async (data: CreateProductoDto): Promise<Producto> => {
     const formData = new FormData();
 
-    // Append all string fields
+    
     Object.entries(data).forEach(([key, value]) => {
       if (value !== undefined && key !== 'imagen') {
         formData.append(key, String(value));
       }
     });
 
-    // Append file if exists
+    
     if (data.imagen instanceof File) {
       formData.append('imagen', data.imagen);
     }

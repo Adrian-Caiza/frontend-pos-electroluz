@@ -20,7 +20,7 @@ export const useUpdateUsuario = () => {
       });
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
 
-      // If the updated user is the current user, update the global store
+      
       if (currentUser?.usid === variables.id) {
         updateUser({
           usnombre: updatedUsuario.usnombre,

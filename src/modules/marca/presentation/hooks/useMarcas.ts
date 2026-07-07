@@ -8,6 +8,6 @@ export const useMarcas = (page: number = 1, pageSize: number = 10, search?: stri
       const repository = new MarcaRepository();
       return repository.getMarcas(page, pageSize, search, status);
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
 };

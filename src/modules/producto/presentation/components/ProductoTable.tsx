@@ -31,7 +31,7 @@ export const ProductoTable = () => {
     debouncedSearch
   } = useListFilters(10);
 
-  // Server-side filtering
+  
   const { data, isLoading } = useProductos(page, pageSize, debouncedSearch, status);
   const updateMutation = useUpdateProducto();
   const { user } = useAuthStore();
@@ -41,7 +41,7 @@ export const ProductoTable = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [isProcessingBulk, setIsProcessingBulk] = useState(false);
 
-  // Use server response data
+  
   const tableData = data?.items || [];
   const totalItems = data?.totalItems || 0;
   const pageCount = data?.totalPages || 0;
@@ -59,14 +59,14 @@ export const ProductoTable = () => {
 
     setIsProcessingBulk(true);
     try {
-      // Run updates in parallel
+      
       await Promise.all(
         selectedIds.map(id => updateMutation.mutateAsync({ id, data: { prdtoestado: newStatus } }))
       );
       setRowSelection({});
     } catch (error) {
       console.error("Bulk update failed", error);
-      // Let the mutation's onError handle the toast
+     
     } finally {
       setIsProcessingBulk(false);
     }
@@ -103,7 +103,7 @@ export const ProductoTable = () => {
           globalFilter: search,
           onGlobalFilterChange: setSearch,
           searchPlaceholder: "Buscar por código o nombre...",
-          onAdvancedFilterClick: () => { }, // Adding this will render the "Filtros" button
+          onAdvancedFilterClick: () => { }, 
           children: (
             <div className="flex gap-2">
               {Object.keys(rowSelection).length > 0 ? (

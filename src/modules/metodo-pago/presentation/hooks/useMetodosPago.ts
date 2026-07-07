@@ -13,6 +13,6 @@ export const useMetodosPago = (page: number, pageSize: number, search?: string, 
     queryKey: ['metodosPago', user?.usemid, page, pageSize, search, status],
     queryFn: () => getMetodosPagoUseCase.execute(page, pageSize, search, status),
     enabled: !!user?.usemid,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
 };

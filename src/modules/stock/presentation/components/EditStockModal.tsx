@@ -71,9 +71,9 @@ export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProp
   }, [open, form.reset, stock]);
 
   const onSubmit = (values: FormOutput) => {
-    const payload: any = { stcksuid: stock.sucursal.suid }; // Obligatorio para API
+    const payload: any = { stcksuid: stock.sucursal.suid }; 
 
-    // Solo enviamos lo que cambió para evitar conflictos
+    
     if (values.stckcantidad !== Number(stock.stckcantidad)) {
       payload.stckcantidad = values.stckcantidad;
     }
@@ -81,8 +81,8 @@ export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProp
       payload.stckestado = values.stckestado;
     }
 
-    // Si no hay cambios, cerramos
-    if (Object.keys(payload).length === 1) { // Solo tiene stcksuid
+    
+    if (Object.keys(payload).length === 1) { 
       onOpenChange(false);
       return;
     }
@@ -106,7 +106,7 @@ export const EditStockModal = ({ stock, open, onOpenChange }: EditStockModalProp
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <BaseModal 

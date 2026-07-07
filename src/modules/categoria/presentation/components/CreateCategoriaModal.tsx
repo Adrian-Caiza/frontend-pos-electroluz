@@ -87,7 +87,7 @@ export const CreateCategoriaModal = () => {
     />
   );
 
-  form.formState.isDirty; // Force tracking
+  form.formState.isDirty; 
   return (
     <>
       <Button onClick={() => setOpen(true)}>

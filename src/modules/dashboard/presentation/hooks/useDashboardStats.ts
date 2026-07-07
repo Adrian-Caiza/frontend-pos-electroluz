@@ -5,20 +5,19 @@ import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 
 export const useDashboardStats = () => {
-  // Fetch historical data to compute stats
+  
   const { data: proformasData, isLoading: isLoadingProformas } = useProformas(1, 1000);
   const { data: productosData, isLoading: isLoadingProductos } = useProductos(1, 10000);
 
   const isLoading = isLoadingProformas || isLoadingProductos;
 
-  // 1. Sales Trend Data (Line Chart)
+  
   const salesTrendData = useMemo(() => {
     if (!proformasData?.items) return [];
     
-    // Agrupar por fecha (día)
+    
     const grouped = proformasData.items.reduce((acc: any, proforma: any) => {
-      // Ignoramos anuladas/canceladas para ingresos si queremos, o las contamos aparte.
-      // Para este caso solo sumaremos emitidas y pagadas como ventas.
+     
       if (proforma.prfmaestado === 'anulada' || proforma.prfmaestado === 'cancelada') return acc;
 
       const dateStr = proforma.prfmafchregistro.split('T')[0];
@@ -27,7 +26,7 @@ export const useDashboardStats = () => {
       return acc;
     }, {});
 
-    // Convertir a array y ordenar por fecha ascendente
+    
     return Object.entries(grouped)
       .map(([date, total]) => ({
         date: format(parseISO(date), 'dd MMM', { locale: es }),
@@ -37,14 +36,14 @@ export const useDashboardStats = () => {
       .sort((a, b) => new Date(a.rawDate).getTime() - new Date(b.rawDate).getTime());
   }, [proformasData]);
 
-  // 2. Top Products Data (Bar Chart)
+  
   const topProductsData = useMemo(() => {
     if (!proformasData?.items) return [];
 
     const productCounts: Record<string, { name: string; count: number }> = {};
 
     proformasData.items.forEach((proforma: any) => {
-      // Solo contar proformas validas
+     
       if (proforma.prfmaestado === 'anulada' || proforma.prfmaestado === 'cancelada') return;
 
       proforma.detalle?.forEach((item: any) => {
@@ -63,10 +62,10 @@ export const useDashboardStats = () => {
 
     return Object.values(productCounts)
       .sort((a, b) => b.count - a.count)
-      .slice(0, 5); // Tomar solo los 5 principales
+      .slice(0, 5); 
   }, [proformasData]);
 
-  // 3. Proforma Status Data (Pie/Stacked)
+ 
   const proformaStatusData = useMemo(() => {
     if (!proformasData?.items) return [];
 
@@ -79,7 +78,7 @@ export const useDashboardStats = () => {
       }
     });
 
-    // Combinar anulada y cancelada por simplicidad visual
+    
     return [
       { name: 'Pagadas', value: counts.pagada, fill: 'var(--color-emerald-500)' },
       { name: 'Emitidas (Pendientes)', value: counts.emitida, fill: 'var(--color-blue-500)' },
@@ -87,11 +86,11 @@ export const useDashboardStats = () => {
     ].filter(item => item.value > 0);
   }, [proformasData]);
 
-  // 4. Sales Composition by Category (Pie Chart)
+  
   const categoryCompositionData = useMemo(() => {
     if (!proformasData?.items || !productosData?.items) return [];
 
-    // Mapear código de producto a categoría
+    
     const productCategoryMap = new Map<string, string>();
     productosData.items.forEach((p: any) => {
       if (p.prdtocodigo && p.categoria?.ctgnombre) {
@@ -106,7 +105,7 @@ export const useDashboardStats = () => {
 
       proforma.detalle?.forEach((item: any) => {
         const codigo = item.producto.dprfmacodigo;
-        // Si no tiene código o no está en el mapa, es "Otros / Servicios"
+        
         const categoryName = codigo ? productCategoryMap.get(codigo) || 'Otros / Servicios' : 'Otros / Servicios';
         
         if (!categoryTotals[categoryName]) {

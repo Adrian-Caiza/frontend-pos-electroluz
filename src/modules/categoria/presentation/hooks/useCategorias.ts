@@ -8,6 +8,6 @@ export const useCategorias = (page: number = 1, pageSize: number = 100, search?:
       const repository = new CategoriaRepository();
       return repository.getCategorias(page, pageSize, search, status);
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 5, 
   });
 };

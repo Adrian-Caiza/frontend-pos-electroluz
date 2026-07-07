@@ -40,11 +40,11 @@ function App() {
 
   useEffect(() => {
     if (company?.emlogo) {
-      // Remove all existing favicons
+      
       const links = document.querySelectorAll("link[rel~='icon']");
       links.forEach(l => l.remove());
 
-      // Create a fresh one by fetching it as a Blob to bypass CORP same-origin policy
+     
       fetch(`${company.emlogo}?v=${new Date().getTime()}`)
         .then(res => res.blob())
         .then(blob => {
@@ -57,7 +57,7 @@ function App() {
         })
         .catch(err => console.error('Error loading favicon:', err));
     } else {
-      // Revert to POS SVG if logged out
+      
       const links = document.querySelectorAll("link[rel~='icon']");
       links.forEach(l => l.remove());
       const link = document.createElement('link');

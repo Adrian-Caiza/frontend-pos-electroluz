@@ -21,7 +21,7 @@ export const useAlertEvents = () => {
     setUnseenCount
   } = useAlertStore();
 
-  // Load summary initially to set the badge count
+  
   const { data: summaryData } = useAlertSummary();
 
   useEffect(() => {
@@ -75,7 +75,7 @@ export const useAlertEvents = () => {
           try {
             const audio = new Audio('/sounds/dragon-studio-notification-sound-effect-372475.mp3');
             audio.play().catch(e => {
-              // Puede fallar si el usuario no ha interactuado con el DOM aún
+              
               console.warn('[AlertEvents] Audio play blocked:', e.message);
             });
           } catch (e) {
@@ -84,8 +84,7 @@ export const useAlertEvents = () => {
         };
 
         const showGenericNotification = () => {
-          // Usamos toast.warning (o toast.info) en lugar del genérico 'toast()' 
-          // para que tome los estilos, iconos y bordes del diseño de tu sistema.
+          
           toast.warning('Nuevas notificaciones', {
             id: 'generic-alert-toast',
             description: 'Revisa la campana para ver los detalles de inventario o sistema.',
@@ -103,7 +102,7 @@ export const useAlertEvents = () => {
             case 'new-alert':
               console.log('[AlertEvents] SSE event:', event.event, alert.message);
 
-              // Protegemos contra spam en caso de que el backend envíe 'new-alert' repetidamente
+              
               const state = useAlertStore.getState();
               const alreadyExists = state.bellAlerts.some(a => a.id === alert.id);
 
@@ -121,19 +120,18 @@ export const useAlertEvents = () => {
                 const state = useAlertStore.getState();
                 const wasInBell = state.bellAlerts.some(a => a.id === alert.id);
 
-                // Si la alerta NO estaba en la campana (porque ya la habíamos visto) 
-                // y el backend la vuelve a poner como "no vista" (re-trigger de 5 mins):
+                
                 if (!wasInBell) {
                   showGenericNotification();
                 }
 
-                // La agregamos/actualizamos en la campana
+                
                 addBellAlert(alert);
               } else {
-                // Alguien la marcó como leída en otro dispositivo
+                
                 removeBellAlert(alert.id);
               }
-              // Forzamos a que React Query refresque el badge y la tabla principal
+              
               queryClient.invalidateQueries({ queryKey: ['alert-summary'] });
               queryClient.invalidateQueries({ queryKey: ['alerts'] });
               break;
@@ -159,7 +157,7 @@ export const useAlertEvents = () => {
         if (err.message === 'TOKEN_EXPIRED') {
           console.log('[AlertEvents] Token expired, executing refresh mechanism...');
 
-          // Abortamos la ejecución de fetchEventSource actual síncronamente para evitar bucles
+          
           if (abortRef.current) {
             abortRef.current.abort();
           }
@@ -193,13 +191,13 @@ export const useAlertEvents = () => {
             }
           };
 
-          // Disparamos la función asíncrona sin bloquear el hilo principal
+          
           executeRefresh();
 
           return;
         }
 
-        // Lanzamos otros errores para que fetchEventSource haga su retry automático con backoff
+        
         throw err;
       },
 

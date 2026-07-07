@@ -1,15 +1,15 @@
 import { create } from 'zustand';
 
 export interface CartItem {
-  id: string; // unique local ID (could be product ID or a random UUID for manual items)
-  dprfmaid?: string; // Optional backend ID for updating existing items
+  id: string; 
+  dprfmaid?: string; 
   esInventariable: boolean;
   codigo?: string;
   descripcion: string;
   cantidad: number;
   precioUnitario: number;
   precioTotal: number;
-  stockMaximo?: number; // Added to restrict quantity based on stock
+  stockMaximo?: number; 
 }
 
 interface TerminalCartState {
@@ -18,7 +18,7 @@ interface TerminalCartState {
   descuento: number;
   total: number;
   
-  // Actions
+  
   addItem: (item: Omit<CartItem, 'precioTotal'>) => void;
   removeItem: (id: string) => void;
   updateQuantity: (id: string, cantidad: number) => void;
@@ -35,7 +35,7 @@ export const useTerminalCart = create<TerminalCartState>((set, get) => ({
 
   addItem: (newItem) => {
     set((state) => {
-      // Check if inventariable item already exists, just increase quantity
+      
       if (newItem.esInventariable) {
         const existingItemIndex = state.items.findIndex(i => i.id === newItem.id && i.esInventariable);
         if (existingItemIndex >= 0) {
@@ -62,7 +62,7 @@ export const useTerminalCart = create<TerminalCartState>((set, get) => ({
         }
       }
 
-      // Add new item
+      
       let initialQuantity = newItem.cantidad;
       if (newItem.stockMaximo !== undefined && initialQuantity > newItem.stockMaximo) {
         initialQuantity = newItem.stockMaximo;

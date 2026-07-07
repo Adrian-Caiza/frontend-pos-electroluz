@@ -221,7 +221,7 @@ export const StockTable = ({ sucursalId }: StockTableProps) => {
         title={confirmDialog.title}
         description={confirmDialog.description}
         variant={confirmDialog.variant}
-        isLoading={false} // useUpdateStock doesn't easily expose isPending for the non-async version in this component structure unless we use mutateAsync or extract it, but it's quick.
+        isLoading={false} 
       />
     </>
   );

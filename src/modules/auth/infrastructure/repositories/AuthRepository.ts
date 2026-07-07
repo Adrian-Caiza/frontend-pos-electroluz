@@ -1,6 +1,4 @@
-/**
- * Concrete implementation of IAuthRepository.
- */
+
 import type { IAuthRepository, LoginCredentials } from '../../domain/repositories/IAuthRepository';
 import type { AuthResponse } from '../../domain/entities/User';
 import { authApi } from '../services/authApi';

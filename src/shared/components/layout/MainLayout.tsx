@@ -16,19 +16,19 @@ export const MainLayout = () => {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
-    // 1. Instanciar dependencias (Idealmente esto vendría de un contenedor DI o un hook)
+   
     const { AuthRepository } = await import('../../../modules/auth/infrastructure/repositories/AuthRepository');
     const { LogoutUseCase } = await import('../../../modules/auth/application/use-cases/LogoutUseCase');
     
     const repository = new AuthRepository();
     const useCase = new LogoutUseCase(repository);
 
-    // 2. Ejecutar caso de uso (API call)
+    
     if (refreshToken) {
       await useCase.execute(refreshToken);
     }
 
-    // 3. Limpiar estado local y redirigir
+    
     logout();
     navigate('/auth/login');
   };
